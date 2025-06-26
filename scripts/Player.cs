@@ -122,9 +122,10 @@ namespace Planets
                     MotionMode = MotionModeEnum.Grounded;
                     Velocity = Vector3.Zero;
                     _up = -(cParent.GlobalPosition - GlobalPosition).Normalized();
-                    _planet = cParent;
+                    _planet = cParent.GetNode<MeshInstance3D>($"{cParent.Planet.Name}");
                     _camera.Basis = Basis.Identity;
                     GD.Print("Motion mode set to grounded.");
+                    GD.Print($"{_planet.Name}");
                     ApplyFloorSnap();
                 }
             }

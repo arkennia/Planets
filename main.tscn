@@ -53,3 +53,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.730058, 0)
 shape = SubResource("CapsuleShape3D_1bvp3")
 
 [node name="_Node3D_4" parent="." instance=ExtResource("4_1bvp3")]
+visible = false
