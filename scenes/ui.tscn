@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://gqyfs0rbresq"]
+
+[ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
+[ext_resource type="Script" uid="uid://ij5bmivpajda" path="res://scripts/ui/GameMenu.cs" id="2_x4jx1"]
+[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUI.cs" id="2_yev5y"]
+
+[node name="UI" type="Control"]
+layout_direction = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_nt7q6")
+script = ExtResource("2_yev5y")
+
+[node name="GameMenu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = 11.0
+offset_right = 123.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_x4jx1")
+
+[node name="ExitButton" type="Button" parent="GameMenu"]
+layout_mode = 2
+text = "Exit"
+
+[connection signal="pressed" from="GameMenu/ExitButton" to="GameMenu" method="OnExitButtonPressed"]
