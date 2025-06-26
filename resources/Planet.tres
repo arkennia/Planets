@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Planet" load_steps=2 format=3 uid="uid://cvpb0gfhaqo0u"]
+
+[ext_resource type="Script" uid="uid://soam6v83eu56" path="res://scripts/SystemGenerator/Planet.cs" id="1_42yyb"]
+
+[resource]
+script = ExtResource("1_42yyb")
