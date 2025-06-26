@@ -1,47 +1,55 @@
-[gd_scene load_steps=6 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=7 format=3 uid="uid://db3hwgud2i8fs"]
 
+[ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_h2yge"]
 [ext_resource type="ArrayMesh" uid="uid://dfemc8usto8sj" path="res://CubeSphere.tres" id="3_1bvp3"]
+[ext_resource type="PackedScene" path="res://TestPlanet.tscn" id="4_1bvp3"]
 [ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="5_lquwl"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1bvp3"]
 radius = 0.508161
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1bvp3"]
-
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1bvp3"]
 radius = 0.432522
 height = 1.4615
 
-[node name="Node3D" type="Node3D"]
+[node name="Main" type="Node"]
+script = ExtResource("1_h2yge")
 
-[node name="Earth" type="MeshInstance3D" parent="."]
+[node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true
-transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, 0, -1302.39)
+
+[node name="Earth" type="MeshInstance3D" parent="World"]
+unique_name_in_owner = true
+transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, 0, 1997.55)
+visible = false
 mesh = ExtResource("3_1bvp3")
+skeleton = NodePath("../..")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Earth"]
+[node name="StaticBody3D" type="StaticBody3D" parent="World/Earth"]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Earth/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Earth/StaticBody3D"]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 shape = SubResource("SphereShape3D_1bvp3")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-visible = false
-mesh = SubResource("ArrayMesh_1bvp3")
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
 
-[node name="Player" type="CharacterBody3D" parent="."]
+[node name="PlayerNode" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Player" type="CharacterBody3D" parent="PlayerNode"]
 motion_mode = 1
 script = ExtResource("5_lquwl")
 Speed = 100
 
-[node name="Pivot" type="Node3D" parent="Player"]
+[node name="Pivot" type="Node3D" parent="PlayerNode/Player"]
 
-[node name="MainCamera" type="Camera3D" parent="Player/Pivot"]
+[node name="MainCamera" type="Camera3D" parent="PlayerNode/Player/Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.752561, 0.401916)
+current = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerNode/Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.730058, 0)
 shape = SubResource("CapsuleShape3D_1bvp3")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
+[node name="_Node3D_4" parent="." instance=ExtResource("4_1bvp3")]
