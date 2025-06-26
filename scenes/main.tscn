@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://db3hwgud2i8fs"]
 
-[ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_h2yge"]
-[ext_resource type="ArrayMesh" uid="uid://dfemc8usto8sj" path="res://CubeSphere.tres" id="3_1bvp3"]
-[ext_resource type="PackedScene" path="res://TestPlanet.tscn" id="4_1bvp3"]
-[ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="5_lquwl"]
+[ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
+[ext_resource type="ArrayMesh" uid="uid://dfemc8usto8sj" path="res://resources/CubeSphere.tres" id="2_tbgi4"]
+[ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="3_tefeu"]
+[ext_resource type="PackedScene" path="res://scenes/TestPlanet.tscn" id="4_o6xl0"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1bvp3"]
 radius = 0.508161
@@ -13,7 +13,7 @@ radius = 0.432522
 height = 1.4615
 
 [node name="Main" type="Node"]
-script = ExtResource("1_h2yge")
+script = ExtResource("1_jyhfs")
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true
@@ -22,7 +22,7 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, 0, 1997.55)
 visible = false
-mesh = ExtResource("3_1bvp3")
+mesh = ExtResource("2_tbgi4")
 skeleton = NodePath("../..")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="World/Earth"]
@@ -39,7 +39,7 @@ unique_name_in_owner = true
 
 [node name="Player" type="CharacterBody3D" parent="PlayerNode"]
 motion_mode = 1
-script = ExtResource("5_lquwl")
+script = ExtResource("3_tefeu")
 Speed = 100
 
 [node name="Pivot" type="Node3D" parent="PlayerNode/Player"]
@@ -52,5 +52,5 @@ current = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.730058, 0)
 shape = SubResource("CapsuleShape3D_1bvp3")
 
-[node name="_Node3D_4" parent="." instance=ExtResource("4_1bvp3")]
+[node name="_Node3D_4" parent="." instance=ExtResource("4_o6xl0")]
 visible = false
