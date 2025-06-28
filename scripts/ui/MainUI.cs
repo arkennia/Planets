@@ -3,11 +3,15 @@ using System;
 
 public partial class MainUI : Control
 {
-
+    [Export]
+    public PackedScene GameMenu { get; set; }
     private bool _gameMenuOpen = false;
+
+    private Control _gameMenu = null;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        // GameMenu = ResourceLoader.Load<PackedScene>("res://scene.tscn");
     }
 
     public override void _Input(InputEvent @event)
@@ -27,16 +31,17 @@ public partial class MainUI : Control
 
     private void HandleGameMenu()
     {
-        Control gameMenu = GetNode<Control>("GameMenu");
         if (!_gameMenuOpen)
         {
+            _gameMenu = (Control)GameMenu.Instantiate();
+            AddChild(_gameMenu);
             _gameMenuOpen = true;
-            gameMenu.Show();
+            _gameMenu.Show();
         }
         else
         {
             _gameMenuOpen = false;
-            gameMenu.Hide();
+            _gameMenu.QueueFree();
         }
     }
 }
