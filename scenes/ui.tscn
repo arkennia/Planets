@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://gqyfs0rbresq"]
+[gd_scene load_steps=5 format=3 uid="uid://gqyfs0rbresq"]
 
 [ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
 [ext_resource type="Script" uid="uid://ij5bmivpajda" path="res://scripts/ui/GameMenu.cs" id="2_x4jx1"]
 [ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUI.cs" id="2_yev5y"]
+[ext_resource type="StyleBox" uid="uid://dgon6tha8ldjw" path="res://resources/ui/game_menu_stylebox.tres" id="3_gdt2y"]
 
 [node name="UI" type="Control"]
 layout_direction = 1
@@ -15,23 +16,51 @@ grow_vertical = 2
 theme = ExtResource("1_nt7q6")
 script = ExtResource("2_yev5y")
 
-[node name="GameMenu" type="VBoxContainer" parent="."]
+[node name="GameMenu" type="Panel" parent="." node_paths=PackedStringArray("ExitButton")]
+custom_minimum_size = Vector2(150, 200)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 10.0
-offset_top = 11.0
-offset_right = 123.0
-offset_bottom = 42.0
+offset_left = -75.0
+offset_top = -100.0
+offset_right = 75.0
+offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_gdt2y")
 script = ExtResource("2_x4jx1")
+ExitButton = NodePath("MarginContainer/GameMenuVbox/ExitButton")
 
-[node name="ExitButton" type="Button" parent="GameMenu"]
+[node name="MarginContainer" type="MarginContainer" parent="GameMenu"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -60.0
+offset_right = 60.0
+offset_bottom = 59.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="GameMenuVbox" type="VBoxContainer" parent="GameMenu/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="GameMenu/MarginContainer/GameMenuVbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Menu"
+horizontal_alignment = 1
+
+[node name="ExitButton" type="Button" parent="GameMenu/MarginContainer/GameMenuVbox"]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Exit"
 
-[connection signal="pressed" from="GameMenu/ExitButton" to="GameMenu" method="OnExitButtonPressed"]
+[connection signal="pressed" from="GameMenu/MarginContainer/GameMenuVbox/ExitButton" to="GameMenu/MarginContainer/GameMenuVbox" method="OnExitButtonPressed"]
