@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://db3hwgud2i8fs"]
+
+[ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_tbgi4"]
+[ext_resource type="PackedScene" path="res://scenes/test_planet.tscn" id="4_o6xl0"]
+[ext_resource type="PackedScene" uid="uid://gqyfs0rbresq" path="res://scenes/ui.tscn" id="5_tbgi4"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_jyhfs")
+
+[node name="World" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="TestPlanet" parent="World" instance=ExtResource("4_o6xl0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -962.087)
+visible = false
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
+
+[node name="PlayerNode" parent="." instance=ExtResource("3_tbgi4")]
+unique_name_in_owner = true
+
+[node name="UI" parent="." instance=ExtResource("5_tbgi4")]

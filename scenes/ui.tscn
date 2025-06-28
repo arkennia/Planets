@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://gqyfs0rbresq"]
+
+[ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
+[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUI.cs" id="2_yev5y"]
+[ext_resource type="PackedScene" uid="uid://gf6gneyha1om" path="res://scenes/game_menu.tscn" id="3_yev5y"]
+
+[node name="UI" type="Control"]
+layout_direction = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_nt7q6")
+script = ExtResource("2_yev5y")
+GameMenu = ExtResource("3_yev5y")
