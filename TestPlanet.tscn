@@ -24,7 +24,7 @@ Mesh = SubResource("ArrayMesh_m0pr0")
 [sub_resource type="SphereShape3D" id="SphereShape3D_y4s0e"]
 radius = 1010.0
 
-[node name="@Node3D@4" type="Node3D"]
+[node name="@Node3D@5" type="Node3D"]
 script = ExtResource("1_j554i")
 Planet = SubResource("Resource_mctu5")
 
@@ -32,7 +32,7 @@ Planet = SubResource("Resource_mctu5")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1300)
 mesh = SubResource("ArrayMesh_m0pr0")
 
-[node name="@StaticBody3D@2" type="StaticBody3D" parent="TestPlanet"]
+[node name="@StaticBody3D@3" type="StaticBody3D" parent="TestPlanet"]
 
-[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="TestPlanet/@StaticBody3D@2"]
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="TestPlanet/@StaticBody3D@3"]
 shape = SubResource("SphereShape3D_y4s0e")

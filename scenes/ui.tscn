@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://gqyfs0rbresq"]
 
 [ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
-[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUI.cs" id="2_yev5y"]
+[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUi.cs" id="2_yev5y"]
 [ext_resource type="PackedScene" uid="uid://gf6gneyha1om" path="res://scenes/game_menu.tscn" id="3_yev5y"]
 [ext_resource type="Texture2D" uid="uid://ca4a670yhh6dd" path="res://textures/circle_crosshair.png" id="4_gdt2y"]
 
