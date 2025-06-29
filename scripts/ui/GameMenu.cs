@@ -18,6 +18,7 @@ namespace Planets.UI
             _exitDialog = null;
             Hide();
             ExitButton.Pressed += OnExitButtonPressed;
+            SettingsButton.Pressed += OnSettingsButtonPressed;
         }
 
         // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -25,6 +26,10 @@ namespace Planets.UI
         {
         }
 
+        private void OnSettingsButtonPressed()
+        {
+            GD.Print("Settings button pressed");
+        }
         private void OnExitButtonPressed()
         {
             GD.Print("Exit button pressed");
