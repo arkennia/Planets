@@ -1,18 +1,30 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://d4be054boylrp"]
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://d4be054boylrp"]
 
-[ext_resource type="StyleBox" uid="uid://dgon6tha8ldjw" path="res://resources/ui/game_menu_stylebox.tres" id="1_6o17r"]
+[ext_resource type="StyleBox" uid="uid://gwxsqhjxssg4" path="res://resources/ui/tab_panel_stylxbox.tres" id="1_ghnui"]
+[ext_resource type="StyleBox" uid="uid://c3ptatqlq75rr" path="res://resources/ui/tabbar_stylebox.tres" id="1_kx1jw"]
 [ext_resource type="StyleBox" uid="uid://du0m2cbiywd5t" path="res://resources/ui/button_hover.tres" id="2_qtln4"]
 [ext_resource type="StyleBox" uid="uid://blqauurfovn6d" path="res://resources/ui/button_normal.tres" id="3_7smq8"]
+[ext_resource type="StyleBox" uid="uid://c2y85t2n44ta7" path="res://resources/ui/tab_stylebox_unselected.tres" id="4_7smq8"]
+[ext_resource type="StyleBox" uid="uid://kw2waf2oug7m" path="res://tab_stylebox_selected.tres" id="4_ghnui"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_qtln4"]
 color = Color(0.396889, 0.396889, 0.396889, 1)
 thickness = 3
 
 [resource]
-AcceptDialog/styles/panel = ExtResource("1_6o17r")
+AcceptDialog/styles/panel = ExtResource("1_ghnui")
 Button/font_sizes/font_size = 14
 Button/styles/hover = ExtResource("2_qtln4")
 Button/styles/normal = ExtResource("3_7smq8")
 HSeparator/styles/separator = SubResource("StyleBoxLine_qtln4")
 MenuButton/styles/hover = ExtResource("2_qtln4")
 MenuButton/styles/normal = ExtResource("3_7smq8")
+Panel/styles/panel = ExtResource("1_ghnui")
+TabContainer/constants/side_margin = 5
+TabContainer/font_sizes/font_size = 12
+TabContainer/styles/panel = ExtResource("1_ghnui")
+TabContainer/styles/tab_focus = ExtResource("1_ghnui")
+TabContainer/styles/tab_hovered = null
+TabContainer/styles/tab_selected = ExtResource("4_ghnui")
+TabContainer/styles/tab_unselected = ExtResource("4_7smq8")
+TabContainer/styles/tabbar_background = ExtResource("1_kx1jw")

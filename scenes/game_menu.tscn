@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://gf6gneyha1om"]
 
-[ext_resource type="StyleBox" uid="uid://dgon6tha8ldjw" path="res://resources/ui/game_menu_stylebox.tres" id="1_vrsc2"]
 [ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_ysvk1"]
+[ext_resource type="StyleBox" uid="uid://gwxsqhjxssg4" path="res://resources/ui/tab_panel_stylxbox.tres" id="2_mw6r2"]
 [ext_resource type="Script" uid="uid://ij5bmivpajda" path="res://scripts/ui/GameMenu.cs" id="2_ysvk1"]
 
 [node name="GameMenu" type="Panel" node_paths=PackedStringArray("ExitButton", "SettingsButton")]
@@ -19,7 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
 theme = ExtResource("1_ysvk1")
-theme_override_styles/panel = ExtResource("1_vrsc2")
+theme_override_styles/panel = ExtResource("2_mw6r2")
 script = ExtResource("2_ysvk1")
 ExitButton = NodePath("MarginContainer/GameMenuVbox/ExitButton")
 SettingsButton = NodePath("MarginContainer/GameMenuVbox/SettingsButton")
