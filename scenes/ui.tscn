@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://gqyfs0rbresq"]
+[gd_scene load_steps=5 format=3 uid="uid://gqyfs0rbresq"]
 
 [ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
-[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUI.cs" id="2_yev5y"]
+[ext_resource type="Script" uid="uid://c64amitihym7" path="res://scripts/ui/MainUi.cs" id="2_yev5y"]
 [ext_resource type="PackedScene" uid="uid://gf6gneyha1om" path="res://scenes/game_menu.tscn" id="3_yev5y"]
+[ext_resource type="Texture2D" uid="uid://ca4a670yhh6dd" path="res://textures/circle_crosshair.png" id="4_gdt2y"]
 
 [node name="UI" type="Control"]
 layout_direction = 1
@@ -15,3 +16,24 @@ grow_vertical = 2
 theme = ExtResource("1_nt7q6")
 script = ExtResource("2_yev5y")
 GameMenu = ExtResource("3_yev5y")
+
+[node name="Crosshair" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Crosshair"]
+texture_filter = 5
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("4_gdt2y")
+expand_mode = 1

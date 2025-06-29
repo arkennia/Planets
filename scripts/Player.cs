@@ -1,5 +1,7 @@
 using Godot;
+using Planets.UI;
 using System;
+using System.Threading.Tasks;
 
 namespace Planets
 {
@@ -7,12 +9,9 @@ namespace Planets
     {
         [Export]
         public int Speed { get; set; } = 50;
-        // The downward acceleration when in the air, in meters per second squared.
-        [Export]
-        public int FallAcceleration { get; set; } = 75;
-
         [Export]
         public float MouseSensitivty { get; set; } = 0.01f;
+
         private Vector3 _targetVelocity = Vector3.Zero;
 
         private Vector2 _rotation = new();
@@ -27,14 +26,23 @@ namespace Planets
 
         private Node3D _planet;
 
-
         public override void _Ready()
         {
             Input.MouseMode = Input.MouseModeEnum.Captured;
             _camera = GetNode<Camera3D>("./Pivot/MainCamera");
             _pivot = GetNode<Node3D>("Pivot");
             MotionMode = MotionModeEnum.Floating;
+            _ = InitUiSignals();
         }
+
+        private async Task InitUiSignals()
+        {
+            await ToSignal(GetNode<Node>("/root/Main"), Node.SignalName.Ready);
+            UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
+            UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
+            GD.Print("Signals connected to UI.");
+        }
+
 
         public override void _Input(InputEvent @event)
         {
@@ -67,7 +75,6 @@ namespace Planets
                 }
             }
         }
-
 
         public override void _PhysicsProcess(double delta)
         {
@@ -131,6 +138,17 @@ namespace Planets
             }
         }
 
+        public void DisableMovement()
+        {
+            _movementDisabled = true;
+            Input.MouseMode = Input.MouseModeEnum.Visible;
+        }
+
+        public void EnableMovement()
+        {
+            _movementDisabled = false;
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+        }
         private void RotatePlayer(float delta)
         {
             Transform3D target = new();
@@ -175,6 +193,5 @@ namespace Planets
             }
             return direction.Normalized();
         }
-
     }
 }

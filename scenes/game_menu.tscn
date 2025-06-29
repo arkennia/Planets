@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://gf6gneyha1om"]
+[gd_scene load_steps=4 format=3 uid="uid://gf6gneyha1om"]
 
 [ext_resource type="StyleBox" uid="uid://dgon6tha8ldjw" path="res://resources/ui/game_menu_stylebox.tres" id="1_vrsc2"]
+[ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_ysvk1"]
 [ext_resource type="Script" uid="uid://ij5bmivpajda" path="res://scripts/ui/GameMenu.cs" id="2_ysvk1"]
 
-[node name="GameMenu" type="Panel" node_paths=PackedStringArray("ExitButton")]
+[node name="GameMenu" type="Panel" node_paths=PackedStringArray("ExitButton", "SettingsButton")]
 custom_minimum_size = Vector2(150, 200)
 anchors_preset = 8
 anchor_left = 0.5
@@ -16,9 +17,12 @@ offset_right = 75.0
 offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_vertical = 3
+theme = ExtResource("1_ysvk1")
 theme_override_styles/panel = ExtResource("1_vrsc2")
 script = ExtResource("2_ysvk1")
 ExitButton = NodePath("MarginContainer/GameMenuVbox/ExitButton")
+SettingsButton = NodePath("MarginContainer/GameMenuVbox/SettingsButton")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -40,9 +44,16 @@ theme_override_constants/separation = 5
 
 [node name="Label" type="Label" parent="MarginContainer/GameMenuVbox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
 text = "Menu"
 horizontal_alignment = 1
+
+[node name="VSeparator" type="HSeparator" parent="MarginContainer/GameMenuVbox"]
+layout_mode = 2
+
+[node name="SettingsButton" type="Button" parent="MarginContainer/GameMenuVbox"]
+layout_mode = 2
+theme = ExtResource("1_ysvk1")
+text = "Settings"
 
 [node name="ExitButton" type="Button" parent="MarginContainer/GameMenuVbox"]
 custom_minimum_size = Vector2(120, 0)

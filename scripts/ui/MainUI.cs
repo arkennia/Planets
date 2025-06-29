@@ -1,47 +1,58 @@
 using Godot;
 using System;
 
-public partial class MainUI : Control
+namespace Planets.UI
 {
-    [Export]
-    public PackedScene GameMenu { get; set; }
-    private bool _gameMenuOpen = false;
-
-    private Control _gameMenu = null;
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
+    public partial class MainUi : Control
     {
-        // GameMenu = ResourceLoader.Load<PackedScene>("res://scene.tscn");
-    }
+        [Export]
+        public PackedScene GameMenu { get; set; }
 
-    public override void _Input(InputEvent @event)
-    {
+        [Signal]
+        public delegate void GameMenuOpenedEventHandler();
 
-        if (@event.IsActionReleased("ui_cancel"))
+        [Signal]
+        public delegate void GameMenuClosedEventHandler();
+
+        private bool _gameMenuOpen = false;
+
+        private Control _gameMenu = null;
+        // Called when the node enters the scene tree for the first time.
+        public override void _Ready()
         {
-            HandleGameMenu();
+            // GameMenu = ResourceLoader.Load<PackedScene>("res://scene.tscn");
         }
-    }
 
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-    {
-    }
-
-    private void HandleGameMenu()
-    {
-        if (!_gameMenuOpen)
+        public override void _Input(InputEvent @event)
         {
-            _gameMenu = (Control)GameMenu.Instantiate();
-            AddChild(_gameMenu);
-            _gameMenuOpen = true;
-            _gameMenu.Show();
+            if (@event.IsActionReleased("ui_cancel"))
+            {
+                HandleGameMenu();
+            }
         }
-        else
+
+
+        // Called every frame. 'delta' is the elapsed time since the previous frame.
+        public override void _Process(double delta)
         {
-            _gameMenuOpen = false;
-            _gameMenu.QueueFree();
+        }
+
+        private void HandleGameMenu()
+        {
+            if (!_gameMenuOpen)
+            {
+                _gameMenu = (Control)GameMenu.Instantiate();
+                AddChild(_gameMenu);
+                EmitSignal(SignalName.GameMenuOpened);
+                _gameMenuOpen = true;
+                _gameMenu.Show();
+            }
+            else
+            {
+                EmitSignal(SignalName.GameMenuClosed);
+                _gameMenuOpen = false;
+                _gameMenu.QueueFree();
+            }
         }
     }
 }

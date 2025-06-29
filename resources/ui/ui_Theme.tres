@@ -1,35 +1,18 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://d4be054boylrp"]
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://d4be054boylrp"]
 
 [ext_resource type="StyleBox" uid="uid://dgon6tha8ldjw" path="res://resources/ui/game_menu_stylebox.tres" id="1_6o17r"]
+[ext_resource type="StyleBox" uid="uid://du0m2cbiywd5t" path="res://resources/ui/button_hover.tres" id="2_qtln4"]
+[ext_resource type="StyleBox" uid="uid://blqauurfovn6d" path="res://resources/ui/button_normal.tres" id="3_7smq8"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_62jak"]
-bg_color = Color(0.733005, 0.733005, 0.733005, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0, 0, 0, 1)
-border_blend = true
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6o17r"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.385492, 0.385493, 0.385492, 1)
-border_blend = true
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_qtln4"]
+color = Color(0.396889, 0.396889, 0.396889, 1)
+thickness = 3
 
 [resource]
 AcceptDialog/styles/panel = ExtResource("1_6o17r")
 Button/font_sizes/font_size = 14
-Button/styles/hover = SubResource("StyleBoxFlat_62jak")
-Button/styles/normal = SubResource("StyleBoxFlat_6o17r")
+Button/styles/hover = ExtResource("2_qtln4")
+Button/styles/normal = ExtResource("3_7smq8")
+HSeparator/styles/separator = SubResource("StyleBoxLine_qtln4")
+MenuButton/styles/hover = ExtResource("2_qtln4")
+MenuButton/styles/normal = ExtResource("3_7smq8")
