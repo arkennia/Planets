@@ -6,10 +6,10 @@ namespace Planets.SystemGenerator
 {
     public partial class PlanetGenerator : GodotObject
     {
-        public static Node3D GeneratePlanet()
+        public static PlanetNode GeneratePlanet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128)
         {
-            var planet = new Planet("TestPlanet");
-            var mI = planet.Generate();
+            Planet planet = new Planet(name, mesh, scale, resolution);
+            PlanetNode mI = planet.Generate();
             return mI;
         }
     }

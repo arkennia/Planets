@@ -4,25 +4,20 @@ using System;
 namespace Planets.SystemGenerator
 {
     [GlobalClass]
-    public partial class Planet : Resource
+    public partial class Planet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128) : Resource
     {
-        [Export]
-        public string Name { get; set; }
-        [Export]
-        public Mesh Mesh { get; set; }
 
-        public Planet() { }
+        public string Name { get; private set; } = name;
 
-        public Planet(string name = "Earth", Mesh mesh = null)
-        {
-            Name = name;
-            Mesh = mesh;
-        }
+        public Mesh Mesh { get; private set; } = mesh;
+
+        public int Scale { get; private set; } = scale;
+        public int Resolution { get; private set; } = resolution;
 
         public PlanetNode Generate()
         {
-            var cs = new CubeSphere();
-            var arrayMesh = cs.Generate(true);
+            var cs = new CubeSphere { MeshName = Name, Scale = 20000, Resolution = 128 };
+            var arrayMesh = cs.Generate(false);
             PlanetNode rootNode = new();
             Mesh = arrayMesh;
             MeshInstance3D mI = new()
@@ -34,7 +29,7 @@ namespace Planets.SystemGenerator
             var collider = new CollisionShape3D();
             var colliderShape = new SphereShape3D();
 
-            colliderShape.Radius = cs.Scale + 10;
+            colliderShape.Radius = cs.Scale + 25;
             collider.Shape = colliderShape;
             rootNode.Planet = this;
             rootNode.AddChild(mI);

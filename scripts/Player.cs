@@ -118,12 +118,11 @@ namespace Planets
 
             }
             MoveAndSlide();
-            for (int i = 0; i < GetSlideCollisionCount() - 1; i++)
+            for (int i = 0; i < GetSlideCollisionCount(); i++)
             {
                 var collision = GetSlideCollision(i);
                 var collider = (Node)collision.GetCollider();
                 var cParent = collider.GetOwner<PlanetNode>();
-                // GD.Print($"Collided with: {cParent}");
                 if (cParent is PlanetNode && MotionMode == MotionModeEnum.Floating)
                 {
                     MotionMode = MotionModeEnum.Grounded;

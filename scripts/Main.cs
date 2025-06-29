@@ -22,11 +22,19 @@ namespace Planets
             if (!Generated)
             {
                 var p = SystemGenerator.PlanetGenerator.GeneratePlanet();
+                p.Position = new Vector3(0, 0, -10000f);
                 GetNode<Node3D>("%World").AddChild(p);
-                p.GetChild<MeshInstance3D>(0).Position = new Vector3(0, 0, -1300f);
-                PackedScene scene = new();
-                scene.Pack(p);
-                ResourceSaver.Save(scene, "res://TestPlanet.tscn", ResourceSaver.SaverFlags.Compress);
+                //p.GetChild<MeshInstance3D>(0).Position = new Vector3(0, 0, -6000f);
+                // PackedScene scene = new();
+                // scene.Pack(p);
+                // ResourceSaver.Save(scene, "res://TestPlanet.tscn", ResourceSaver.SaverFlags.Compress);
+                p.Save();
+            }
+            else
+            {
+                var scene = ResourceLoader.Load<PackedScene>("res://TestPlanet.tscn").Instantiate();
+                GetNode("%World").AddChild(scene);
+                GD.Print("Planet loaded");
             }
         }
 

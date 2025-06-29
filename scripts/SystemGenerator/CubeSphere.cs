@@ -7,14 +7,14 @@ namespace Planets.SystemGenerator
 {
     public partial class CubeSphere : Mesh
     {
-        [Export]
-        public int Scale { get; set; } = 1000;
-        [Export]
-        public int Resolution { get; set; } = 32;
-        [Export]
-        public int Sides { get; set; } = 6;
-        [Export]
-        public string MeshName = "CubeSphere";
+
+        public int Scale { get; set; }
+
+        public int Resolution { get; set; }
+
+        public int Sides { get; set; }
+
+        public string MeshName { get; set; } = "CubeSphere";
 
         struct Side
         {
@@ -37,8 +37,9 @@ namespace Planets.SystemGenerator
 
         private ArrayMesh _m;
 
-        public CubeSphere(int resolution = 32, string meshName = "CubeSphere", int sides = 6)
+        public CubeSphere(int scale = 1000, int resolution = 32, string meshName = "CubeSphere", int sides = 6)
         {
+            Scale = scale;
             Resolution = resolution;
             MeshName = meshName;
             Sides = sides;

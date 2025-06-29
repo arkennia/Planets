@@ -2,9 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="1_72p8a"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1bvp3"]
-radius = 0.432522
-height = 1.4615
+[sub_resource type="SphereShape3D" id="SphereShape3D_4m5hh"]
+radius = 0.979159
 
 [node name="PlayerNode" type="Node3D"]
 
@@ -18,7 +17,8 @@ Speed = 100
 [node name="MainCamera" type="Camera3D" parent="Player/Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.752561, 0.401916)
 current = true
+fov = 34.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.730058, 0)
-shape = SubResource("CapsuleShape3D_1bvp3")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.333709, 0)
+shape = SubResource("SphereShape3D_4m5hh")
