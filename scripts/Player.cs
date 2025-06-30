@@ -32,6 +32,8 @@ namespace Planets
 
         private bool _isInAir = false;
 
+        private bool _jumped = false;
+
         public override void _Ready()
         {
             Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -93,13 +95,17 @@ namespace Planets
                 //UpDirection = _up;
                 if (direction != Vector3.Zero)
                 {
-                    // GD.Print("Direction before Adjustment: ", direction);
+                    //GD.Print("Direction before Adjustment: ", direction);
                     var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                     var newX = newZ.Cross(_up).Normalized();
                     direction = (newX * direction.X + -newZ * direction.Z).Normalized();
-                    // GD.Print("Direction after Adjustment: ", direction);
+                    //GD.Print("Direction after Adjustment: ", direction);
                     _targetVelocity = direction * Speed;
-                    //_targetVelocity += _up * Speed;
+                    if (_jumped)
+                    {
+                        _targetVelocity += _up * Speed * 2f;
+                        _jumped = false;
+                    }
                     Velocity = _targetVelocity;
 
                 }
@@ -110,8 +116,8 @@ namespace Planets
                 RotatePlayer((float)delta);
                 if (_isInAir)
                 {
-                    Velocity += _up * -_gravity * (float)delta;
-                    GD.Print($"Is in air: {_isInAir}");
+                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 2f * (float)delta;
+                    //GD.Print($"Is in air: {_isInAir}");
                     //GD.Print(Velocity);
                 }
             }
@@ -149,7 +155,7 @@ namespace Planets
                 {
                     _isInAir = false;
                     //ApplyFloorSnap();
-                    Velocity = Vector3.Zero;
+                    //Velocity = Vector3.Zero;
                     GD.Print($"Is in air: {_isInAir}");
                 }
             }
@@ -207,6 +213,7 @@ namespace Planets
                     _isInAir = true;
                     GD.Print($"Is in air: {_isInAir}");
                     direction.Y += 1.0f;
+                    _jumped = true;
                 }
                 else if (MotionMode == MotionModeEnum.Floating)
                 {

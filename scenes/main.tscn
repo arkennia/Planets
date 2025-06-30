@@ -16,6 +16,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
 
 [node name="Player" parent="." instance=ExtResource("3_tbgi4")]
-unique_name_in_owner = true
-
-[editable path="Player"]
