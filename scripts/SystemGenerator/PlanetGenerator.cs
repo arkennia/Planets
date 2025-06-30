@@ -8,7 +8,7 @@ namespace Planets.SystemGenerator
     {
         public static PlanetNode GeneratePlanet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128)
         {
-            Planet planet = new Planet(name, mesh, scale, resolution);
+            Planet planet = new(name, mesh, scale, resolution);
             PlanetNode mI = planet.Generate();
             return mI;
         }

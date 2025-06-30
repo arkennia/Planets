@@ -5,6 +5,7 @@
 
 [node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
+Generated = true
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true
@@ -12,10 +13,9 @@ unique_name_in_owner = true
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
 
-[node name="PlayerNode" parent="." instance=ExtResource("3_tbgi4")]
-unique_name_in_owner = true
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, -514.467)
-
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
 
-[editable path="PlayerNode"]
+[node name="Player" parent="." instance=ExtResource("3_tbgi4")]
+unique_name_in_owner = true
+
+[editable path="Player"]

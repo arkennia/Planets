@@ -8,7 +8,7 @@ namespace Planets
     public partial class Player : CharacterBody3D
     {
         [Export]
-        public int Speed { get; set; } = 50;
+        public int Speed { get; set; } = 20;
         [Export]
         public float MouseSensitivty { get; set; } = 0.01f;
 
@@ -25,6 +25,12 @@ namespace Planets
         private Vector3 _up = Vector3.Up;
 
         private Node3D _planet;
+
+        private float _gravity;
+
+        private Vector3 _gravityDir = new Vector3(0, -1, 0);
+
+        private bool _isInAir = false;
 
         public override void _Ready()
         {
@@ -78,61 +84,73 @@ namespace Planets
 
         public override void _PhysicsProcess(double delta)
         {
-            if (!_movementDisabled)
+
+            Vector3 direction = GetDirection();
+
+            if (MotionMode == MotionModeEnum.Grounded)
             {
-                Vector3 direction = GetDirection();
-
-                if (MotionMode == MotionModeEnum.Grounded)
+                _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
+                //UpDirection = _up;
+                if (direction != Vector3.Zero)
                 {
-                    _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
+                    // GD.Print("Direction before Adjustment: ", direction);
+                    var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+                    var newX = newZ.Cross(_up).Normalized();
+                    direction = (newX * direction.X + -newZ * direction.Z).Normalized();
+                    // GD.Print("Direction after Adjustment: ", direction);
+                    _targetVelocity = direction * Speed;
+                    //_targetVelocity += _up * Speed;
+                    Velocity = _targetVelocity;
 
-                    if (direction != Vector3.Zero)
-                    {
-                        // GD.Print("Direction before Adjustment: ", direction);
-                        var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
-                        var newX = newZ.Cross(_up).Normalized();
-                        direction = (newX * direction.X + -newZ * direction.Z).Normalized();
-                        // GD.Print("Direction after Adjustment: ", direction);
-                        _targetVelocity = direction * Speed;
-                        Velocity = _targetVelocity;
-                        RotatePlayer((float)delta);
-                    }
-                    else
-                    {
-                        Velocity = Vector3.Zero;
-                    }
-                    if (!IsOnWall())
-                        Velocity += _up * GetGravity().Y * (float)delta;
                 }
                 else
                 {
-                    if (direction != Vector3.Zero)
-                    {
-                        direction = direction.Normalized();
-                        // _pivot.Basis = Basis.LookingAt(direction);
-                        _targetVelocity = _camera.GlobalBasis * direction * Speed;
-                        Velocity = _targetVelocity;
-                        RotatePlayer((float)delta);
-                    }
+                    Velocity = Vector3.Zero;
                 }
-
+                RotatePlayer((float)delta);
+                if (_isInAir)
+                {
+                    Velocity += _up * -_gravity * (float)delta;
+                    GD.Print($"Is in air: {_isInAir}");
+                    //GD.Print(Velocity);
+                }
+            }
+            else
+            {
+                if (direction != Vector3.Zero)
+                {
+                    direction = direction.Normalized();
+                    // _pivot.Basis = Basis.LookingAt(direction);
+                    _targetVelocity = _camera.GlobalBasis * direction * Speed;
+                    Velocity = _targetVelocity;
+                    RotatePlayer((float)delta);
+                }
             }
             MoveAndSlide();
             for (int i = 0; i < GetSlideCollisionCount(); i++)
             {
                 var collision = GetSlideCollision(i);
                 var collider = (Node)collision.GetCollider();
-                var cParent = collider.GetOwner<PlanetNode>();
-                if (cParent is PlanetNode && MotionMode == MotionModeEnum.Floating)
+                var cParent = collider.GetOwnerOrNull<PlanetNode>();
+                if (cParent is not null && MotionMode == MotionModeEnum.Floating)
                 {
                     MotionMode = MotionModeEnum.Grounded;
                     Velocity = Vector3.Zero;
                     _up = -(cParent.GlobalPosition - GlobalPosition).Normalized();
-                    _planet = cParent.GetNode<MeshInstance3D>($"{cParent.Planet.Name}");
+                    _planet = cParent;
                     _camera.Basis = Basis.Identity;
                     GD.Print("Motion mode set to grounded.");
                     GD.Print($"{_planet.Name}");
-                    ApplyFloorSnap();
+                    _gravity = cParent.PlanetArea.Gravity;
+                    GD.Print($"Current gravity: {cParent.PlanetArea.Gravity} {cParent.PlanetArea.GravityDirection}");
+                    //ApplyFloorSnap();
+                }
+                else if (MotionMode == MotionModeEnum.Grounded && cParent is PlanetNode && _isInAir)
+                {
+                    _isInAir = false;
+                    //ApplyFloorSnap();
+                    Velocity = Vector3.Zero;
+                    GD.Print($"Is in air: {_isInAir}");
                 }
             }
         }
@@ -182,9 +200,22 @@ namespace Planets
             {
                 direction.Z += 1.0f;
             }
-            if (Input.IsActionPressed("MoveUp") && MotionMode != MotionModeEnum.Grounded)
+            if (Input.IsActionPressed("MoveUp"))
             {
-                direction.Y += 1.0f;
+                if (MotionMode == MotionModeEnum.Grounded && !_isInAir)
+                {
+                    _isInAir = true;
+                    GD.Print($"Is in air: {_isInAir}");
+                    direction.Y += 1.0f;
+                }
+                else if (MotionMode == MotionModeEnum.Floating)
+                {
+                    direction.Y += 1.0f;
+                }
+                else
+                {
+                    direction.Y += 0.0f;
+                }
             }
             if (Input.IsActionPressed("MoveDown") && !IsOnWall())
             {
