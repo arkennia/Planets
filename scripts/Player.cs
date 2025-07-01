@@ -10,6 +10,8 @@ namespace Planets
         [Export]
         public int Speed { get; set; } = 20;
         [Export]
+        public int JumpSpeed { get; set; } = 3;
+        [Export]
         public float MouseSensitivty { get; set; } = 0.01f;
 
         private Vector3 _targetVelocity = Vector3.Zero;
@@ -27,8 +29,6 @@ namespace Planets
         private Node3D _planet;
 
         private float _gravity;
-
-        private Vector3 _gravityDir = new Vector3(0, -1, 0);
 
         private bool _isInAir = false;
 
@@ -95,15 +95,13 @@ namespace Planets
                 //UpDirection = _up;
                 if (direction != Vector3.Zero)
                 {
-                    //GD.Print("Direction before Adjustment: ", direction);
                     var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                     var newX = newZ.Cross(_up).Normalized();
-                    direction = (newX * direction.X + -newZ * direction.Z).Normalized();
-                    //GD.Print("Direction after Adjustment: ", direction);
+                    direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
                     _targetVelocity = direction * Speed;
                     if (_jumped)
                     {
-                        _targetVelocity += _up * Speed * 2f;
+                        _targetVelocity += _up * JumpSpeed;
                         _jumped = false;
                     }
                     Velocity = _targetVelocity;
@@ -116,9 +114,7 @@ namespace Planets
                 RotatePlayer((float)delta);
                 if (_isInAir)
                 {
-                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 2f * (float)delta;
-                    //GD.Print($"Is in air: {_isInAir}");
-                    //GD.Print(Velocity);
+                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 3f * (float)delta;
                 }
             }
             else
@@ -154,8 +150,6 @@ namespace Planets
                 else if (MotionMode == MotionModeEnum.Grounded && cParent is PlanetNode && _isInAir)
                 {
                     _isInAir = false;
-                    //ApplyFloorSnap();
-                    //Velocity = Vector3.Zero;
                     GD.Print($"Is in air: {_isInAir}");
                 }
             }
@@ -212,8 +206,8 @@ namespace Planets
                 {
                     _isInAir = true;
                     GD.Print($"Is in air: {_isInAir}");
-                    direction.Y += 1.0f;
                     _jumped = true;
+                    direction.Y += 1.0f;
                 }
                 else if (MotionMode == MotionModeEnum.Floating)
                 {
