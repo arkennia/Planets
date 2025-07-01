@@ -1,6 +1,5 @@
 using Godot;
-using Planets.SystemGenerator;
-using System;
+
 
 namespace Planets.SystemGenerator
 {
@@ -11,6 +10,11 @@ namespace Planets.SystemGenerator
             Planet planet = new(name, mesh, scale, resolution);
             PlanetNode mI = planet.Generate();
             return mI;
+        }
+
+        public static PlanetNode GeneratePlanet(Planet p)
+        {
+            return p.Generate();
         }
     }
 }

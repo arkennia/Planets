@@ -7,17 +7,21 @@ namespace Planets.SystemGenerator
     public partial class Planet : Resource
     {
         [Export]
-        public string Name { get; private set; }
+        public string Name { get; set; } = "Earth";
         [Export]
-        public Mesh Mesh { get; private set; }
+        public string Area3DName { get; private set; }
         [Export]
-        public int Scale { get; private set; }
+        public int Area3DExtraSpace { get; set; } = 3000;
         [Export]
-        public int Resolution { get; private set; }
+        public Mesh Mesh { get; set; }
+        [Export]
+        public int Scale { get; set; }
+        [Export]
+        public int Resolution { get; set; }
         [Export]
         public bool Generated { get; private set; }
         [Export]
-        public string Area3DName { get; private set; }
+        public float Gravity { get; set; } = 9.8f;
 
         public Planet()
         {
@@ -34,45 +38,66 @@ namespace Planets.SystemGenerator
 
         public PlanetNode Generate()
         {
-            var cs = new CubeSphere { MeshName = Name, Scale = Scale, Resolution = Resolution };
-            var arrayMesh = cs.Generate(false);
+            if (Mesh == null)
+            {
+                CubeSphere cs = new() { MeshName = Name, Scale = Scale, Resolution = Resolution };
+                ArrayMesh arrayMesh = cs.Generate();
+                Mesh = arrayMesh;
+            }
             PlanetNode rootNode = new();
-            Mesh = arrayMesh;
             MeshInstance3D mI = new()
             {
                 Mesh = Mesh,
                 Name = Name
             };
-            var sB = new RigidBody3D();
-            var collider = new CollisionShape3D();
-            var colliderShape = new SphereShape3D();
+            RigidBody3D rB = new();
 
-            var area = new Area3D();
-            area.GravitySpaceOverride = Area3D.SpaceOverride.Replace;
-            area.GravityPoint = true;
-            area.GravityPointUnitDistance = Scale;
 
-            var areaCollider = new CollisionShape3D();
-            var areaColliderShape = new SphereShape3D();
-            areaColliderShape.Radius = Scale + 3000;
-            areaCollider.Shape = areaColliderShape;
-            area.Gravity = 10f;
-            area.GravityDirection = new Vector3(0, -1, 0);
 
-            colliderShape.Radius = cs.Scale + 5;
-            collider.Shape = colliderShape;
+            Area3D area = new()
+            {
+                GravitySpaceOverride = Area3D.SpaceOverride.Replace,
+                GravityPoint = true,
+                GravityPointUnitDistance = Scale,
+                Gravity = Gravity,
+                GravityDirection = new Vector3(0, -1, 0)
+            };
+
+            SphereShape3D areaColliderShape = new()
+            {
+                Radius = Scale + 3000
+            };
+            CollisionShape3D areaCollider = new()
+            {
+                Shape = areaColliderShape
+            };
+
+
+            SphereShape3D colliderShape = new()
+            {
+                Radius = Scale + 5
+            };
+            CollisionShape3D collider = new()
+            {
+                Shape = colliderShape
+            };
+
             rootNode.Planet = this;
             rootNode.AddChild(mI);
             rootNode.AddChild(area);
             area.Owner = rootNode;
             area.AddChild(areaCollider);
             areaCollider.Owner = rootNode;
+
             mI.Owner = rootNode;
-            mI.AddChild(sB);
-            sB.Owner = rootNode;
-            sB.AddChild(collider);
+            mI.AddChild(rB);
+
+            rB.Owner = rootNode;
+            rB.AddChild(collider);
+
             collider.Owner = rootNode;
             Generated = true;
+
             Area3DName = area.Name;
             return rootNode;
         }

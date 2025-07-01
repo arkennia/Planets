@@ -1,7 +1,4 @@
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Planets.SystemGenerator
 {
@@ -45,12 +42,11 @@ namespace Planets.SystemGenerator
             Sides = sides;
         }
 
-        public ArrayMesh Generate(bool saveToFile = false)
+        public ArrayMesh Generate()
         {
             SurfaceTool surfaceTool = new();
-            List<Vector3> verts = [.. new Vector3[VertexCount]];
 
-            surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+            surfaceTool.Begin(PrimitiveType.Triangles);
 
             surfaceTool = GenerateMesh(surfaceTool);
 
@@ -60,8 +56,6 @@ namespace Planets.SystemGenerator
 
             _m = surfaceTool.Commit();
 
-            if (saveToFile)
-                ResourceSaver.Save(_m, $"res://{MeshName}.res", ResourceSaver.SaverFlags.Compress);
             return _m;
         }
 

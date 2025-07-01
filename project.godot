@@ -34,6 +34,14 @@ movie_writer/movie_file="D:/GodotProjects/planets/movie_writer/movie.avi"
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
 
+[file_customization]
+
+folder_colors={
+"res://scripts/": "yellow",
+"res://scripts/SystemGenerator/": "green",
+"res://scripts/ui/": "orange"
+}
+
 [input]
 
 MoveLeft={
