@@ -4,7 +4,7 @@ using System;
 namespace Planets.SystemGenerator
 {
     [GlobalClass]
-    public partial class Planet : Resource
+    public partial class Planet : Resource, ICelestialBody
     {
         [Export]
         public string Name { get; set; } = "Earth";
@@ -22,10 +22,22 @@ namespace Planets.SystemGenerator
         public bool Generated { get; private set; }
         [Export]
         public float Gravity { get; set; } = 9.8f;
+        [Export]
+        public Vector2 Sector { get; private set; } = Vector2.Zero;
+        [Export]
+        public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
+
+        public Guid Guid { get; private set; } = Guid.Empty;
+
+
+
 
         public Planet()
         {
-
+            if (Guid == Guid.Empty)
+            {
+                Guid = Guid.NewGuid();
+            }
         }
 
         public Planet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128)
@@ -34,6 +46,7 @@ namespace Planets.SystemGenerator
             Mesh = mesh;
             Scale = scale;
             Resolution = resolution;
+            Guid = new Guid();
         }
 
         public PlanetNode Generate()
@@ -51,8 +64,6 @@ namespace Planets.SystemGenerator
                 Name = Name
             };
             RigidBody3D rB = new();
-
-
 
             Area3D area = new()
             {
@@ -104,7 +115,7 @@ namespace Planets.SystemGenerator
 
         public void Save(string path = "res://resources")
         {
-            ResourceSaver.Save(this, $"{path}/{Name}.res", ResourceSaver.SaverFlags.Compress);
+            ResourceSaver.Save(this, $"{path}/{Guid}.res", ResourceSaver.SaverFlags.Compress);
         }
     }
 }

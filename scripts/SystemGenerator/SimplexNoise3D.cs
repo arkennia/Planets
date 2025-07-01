@@ -2,7 +2,8 @@ using Godot;
 
 namespace Planets.SystemGenerator
 {
-    public partial class Noise3D : RefCounted
+    public partial class SimplexNoise3D : RefCounted
     {
+        
     }
 }

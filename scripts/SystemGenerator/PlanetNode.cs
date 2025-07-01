@@ -2,12 +2,17 @@ using Godot;
 
 namespace Planets.SystemGenerator
 {
-    public partial class PlanetNode : Node3D
+    public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
     {
         [Export]
         public Planet Planet { get; set; }
         [Export]
         public Area3D PlanetArea { get; set; }
+
+        public ICelestialBody CelestialBody => Planet;
+
+
+
 
         public override void _Ready()
         {
@@ -18,7 +23,7 @@ namespace Planets.SystemGenerator
         {
             PackedScene ps = new();
             ps.Pack(this);
-            ResourceSaver.Save(ps, $"{path}/{Planet.Name}.tscn", ResourceSaver.SaverFlags.Compress);
+            ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.tscn", ResourceSaver.SaverFlags.Compress);
         }
     }
 }
