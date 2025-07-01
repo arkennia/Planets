@@ -34,7 +34,7 @@ namespace Planets.SystemGenerator
 
         public PlanetNode Generate()
         {
-            var cs = new CubeSphere { MeshName = Name, Scale = 1000, Resolution = 128 };
+            var cs = new CubeSphere { MeshName = Name, Scale = Scale, Resolution = Resolution };
             var arrayMesh = cs.Generate(false);
             PlanetNode rootNode = new();
             Mesh = arrayMesh;
@@ -59,7 +59,7 @@ namespace Planets.SystemGenerator
             area.Gravity = 10f;
             area.GravityDirection = new Vector3(0, -1, 0);
 
-            colliderShape.Radius = cs.Scale + 25;
+            colliderShape.Radius = cs.Scale + 5;
             collider.Shape = colliderShape;
             rootNode.Planet = this;
             rootNode.AddChild(mI);
