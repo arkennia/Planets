@@ -2,23 +2,24 @@
 
 [ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="1_72p8a"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1bvp3"]
-radius = 0.432522
-height = 1.4615
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4m5hh"]
+radius = 0.41064453
+height = 1.9667969
 
-[node name="PlayerNode" type="Node3D"]
-
-[node name="Player" type="CharacterBody3D" parent="."]
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 motion_mode = 1
 script = ExtResource("1_72p8a")
-Speed = 100
 
-[node name="Pivot" type="Node3D" parent="Player"]
+[node name="Pivot" type="Node3D" parent="."]
 
-[node name="MainCamera" type="Camera3D" parent="Player/Pivot"]
+[node name="MainCamera" type="Camera3D" parent="Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.752561, 0.401916)
 current = true
+fov = 34.5
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.730058, 0)
-shape = SubResource("CapsuleShape3D_1bvp3")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.90819395, 0)
+shape = SubResource("CapsuleShape3D_4m5hh")
+
+[node name="PlayerNode" type="Node3D" parent="."]
