@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 namespace Planets.SystemGenerator
 {
@@ -56,6 +57,8 @@ namespace Planets.SystemGenerator
                 CubeSphere cs = new() { MeshName = Name, Scale = Scale, Resolution = Resolution };
                 ArrayMesh arrayMesh = cs.Generate();
                 Mesh = arrayMesh;
+                Cubemap cb = NoiseGenerator.GenerateCubemapTexture();
+                ResourceSaver.Save(cb, $"res://textures/{Guid}.tres");
             }
             PlanetNode rootNode = new();
             MeshInstance3D mI = new()
@@ -86,7 +89,7 @@ namespace Planets.SystemGenerator
 
             SphereShape3D colliderShape = new()
             {
-                Radius = Scale + 5
+                Radius = Scale + 8
             };
             CollisionShape3D collider = new()
             {

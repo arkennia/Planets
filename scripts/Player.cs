@@ -2,6 +2,7 @@ using Godot;
 using Planets.UI;
 using System;
 using System.Threading.Tasks;
+using Planets.SystemGenerator;
 
 namespace Planets
 {
