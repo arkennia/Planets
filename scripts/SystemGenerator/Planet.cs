@@ -56,6 +56,7 @@ namespace Planets.SystemGenerator
             {
                 CubeSphere cs = new() { MeshName = Name, Scale = Scale, Resolution = Resolution };
                 ArrayMesh arrayMesh = cs.Generate();
+                // arrayMesh = GenerateNoise(arrayMesh);
                 Mesh = arrayMesh;
                 Cubemap cb = NoiseGenerator.GenerateCubemapTexture();
                 ResourceSaver.Save(cb, $"res://textures/{Guid}.tres");
@@ -120,5 +121,7 @@ namespace Planets.SystemGenerator
         {
             ResourceSaver.Save(this, $"{path}/{Guid}.res", ResourceSaver.SaverFlags.Compress);
         }
+
+
     }
 }

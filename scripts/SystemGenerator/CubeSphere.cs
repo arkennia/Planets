@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 
 namespace Planets.SystemGenerator
@@ -50,11 +51,19 @@ namespace Planets.SystemGenerator
 
             surfaceTool = GenerateMesh(surfaceTool);
 
+            // _m = surfaceTool.Commit();
+
+            // _m = GenerateNoise(_m);
+
+            // surfaceTool.Clear();
+            // surfaceTool.CreateFrom(_m, 0);
+
             surfaceTool.GenerateNormals();
             surfaceTool.GenerateTangents();
             surfaceTool.Index();
 
             _m = surfaceTool.Commit();
+            _m = GenerateNoise(_m);
 
             return _m;
         }
@@ -66,6 +75,7 @@ namespace Planets.SystemGenerator
 
         private SurfaceTool GenerateMesh(SurfaceTool surfaceTool)
         {
+            FastNoiseLite noise = new();
             for (int i = 0; i < JobLength; i++)
             {
                 int u = i / Sides;
@@ -121,6 +131,56 @@ namespace Planets.SystemGenerator
             }
             return surfaceTool;
         }
+        private ArrayMesh GenerateNoise(ArrayMesh arrayMesh)
+        {
+            Vector3 vert;
+            float n;
+            Vector3 vert_n;
+            FastNoiseLite noise = new();
+            RandomNumberGenerator rng = new();
+            // var x = noise.GetNoise2D(5, 5);
+            // var x_norm = x - (-1) / (1 - (-1));
+            MeshDataTool mdt = new();
+            mdt.CreateFromSurface(arrayMesh, 0);
+
+            for (int i = 0; i < mdt.GetVertexCount(); i++)
+            {
+                vert = mdt.GetVertex(i);
+                n = noise.GetNoise3Dv(vert);
+                vert_n = mdt.GetVertexNormal(i);
+                vert += vert_n * (n * 0.5f + 0.75f) * 20f;
+                mdt.SetVertex(i, vert);
+                mdt.SetVertexNormal(i, Vector3.Zero);
+            }
+
+            for (int i = 0; i < mdt.GetVertexCount() - 1; i++)
+            {
+                var v = mdt.GetVertex(i);
+                var faces = mdt.GetVertexFaces(i);
+                Vector3[] normals = new Vector3[faces.Length];
+                for (int j = 0; j < faces.Length; j++)
+                {
+                    var a = mdt.GetFaceVertex(faces[j], 0);
+                    var b = mdt.GetFaceVertex(faces[j], 1);
+                    var c = mdt.GetFaceVertex(faces[j], 2);
+
+                    var ap = mdt.GetVertex(a);
+                    var bp = mdt.GetVertex(b);
+                    var cp = mdt.GetVertex(c);
+
+                    normals[j] = (bp - cp).Cross(ap - bp).Normalized();
+                }
+                vert_n = Enumerable.Aggregate(normals, Vector3.Zero, (sum, x) => sum + x) / normals.Length;
+                mdt.SetVertexNormal(i, vert_n.Normalized());
+                mdt.SetVertexColor(i, new Color(v.X, v.Y, v.Z));
+            }
+            arrayMesh.ClearSurfaces();
+
+            mdt.CommitToSurface(arrayMesh);
+
+            return arrayMesh;
+        }
+
 
         static Side GetSide(int id) => id switch
         {

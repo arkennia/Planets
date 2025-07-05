@@ -22,7 +22,7 @@ namespace Planets
             // AddChild(Ui);
             if (!Generated)
             {
-                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet();
+                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(resolution: 256);
                 p.Position = new Vector3(0, 0, -1300);
                 GetNode<Node3D>("%World").AddChild(p);
                 //p.GetChild<MeshInstance3D>(0).Position = new Vector3(0, 0, -6000f);
@@ -33,7 +33,7 @@ namespace Planets
             }
             else
             {
-                var scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/Earth.tscn").Instantiate();
+                var scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.tscn").Instantiate();
                 GetNode("%World").AddChild(scene);
                 GD.Print("Planet loaded");
             }
