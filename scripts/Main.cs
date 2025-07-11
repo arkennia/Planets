@@ -22,7 +22,7 @@ namespace Planets
             // AddChild(Ui);
             if (!Generated)
             {
-                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(resolution: 256);
+                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(scale: 1000, resolution: 256);
                 p.Position = new Vector3(0, 0, -1300);
                 GetNode<Node3D>("%World").AddChild(p);
                 //p.GetChild<MeshInstance3D>(0).Position = new Vector3(0, 0, -6000f);

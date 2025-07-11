@@ -1,23 +1,60 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
 namespace Planets.SystemGenerator
 {
-    public partial class CubeSphere : Mesh
+    public partial class CubeSphere(int scale = 1000, int resolution = 32, int sides = 6) : Mesh
     {
 
-        public int Scale { get; set; }
+        public int Scale { get; set; } = scale;
 
-        public int Resolution { get; set; }
+        public int Resolution { get; set; } = resolution;
 
-        public int Sides { get; set; }
+        public int Sides { get; set; } = sides;
+        public const string FOLDER_PATH = "res://meshes/planets";
 
-        public string MeshName { get; set; } = "CubeSphere";
+        //public string MeshName { get; set; } = meshName;
+
+        static List<GeneratedCubeSphere> _generatedCubeSpheres = null;
+
+
 
         struct Side
         {
             public int id;
             public Vector3 uvOrigin, uVector, vVector;
+        }
+
+        struct GeneratedCubeSphere
+        {
+            public int scale;
+            public int resolution;
+            public string path;
+
+            public static bool operator ==(GeneratedCubeSphere left, GeneratedCubeSphere right)
+            {
+                return left.Equals(right);
+            }
+            public static bool operator !=(GeneratedCubeSphere left, GeneratedCubeSphere right)
+            {
+                return !left.Equals(right);
+            }
+
+            public override readonly bool Equals(object obj)
+            {
+                if (obj == null || GetType() != obj.GetType())
+                    return false;
+
+                var comp = (GeneratedCubeSphere)obj;
+                return scale == comp.scale && resolution == comp.resolution;
+            }
+
+            public override readonly int GetHashCode()
+            {
+                return HashCode.Combine(scale, resolution);
+            }
         }
 
         public int VertexCount => Sides * 4 * Resolution * Resolution;
@@ -35,47 +72,40 @@ namespace Planets.SystemGenerator
 
         private ArrayMesh _m;
 
-        public CubeSphere(int scale = 1000, int resolution = 32, string meshName = "CubeSphere", int sides = 6)
-        {
-            Scale = scale;
-            Resolution = resolution;
-            MeshName = meshName;
-            Sides = sides;
-        }
-
         public ArrayMesh Generate()
         {
+            if (_generatedCubeSpheres == null)
+            {
+                _generatedCubeSpheres = [];
+                LoadGeneratedCubeSpheres();
+            }
+
+            var csg = Exists(Scale, Resolution);
+            if ( csg != null)
+            {
+                
+            }
             SurfaceTool surfaceTool = new();
 
             surfaceTool.Begin(PrimitiveType.Triangles);
-
             surfaceTool = GenerateMesh(surfaceTool);
-
-            // _m = surfaceTool.Commit();
-
-            // _m = GenerateNoise(_m);
-
-            // surfaceTool.Clear();
-            // surfaceTool.CreateFrom(_m, 0);
-
             surfaceTool.GenerateNormals();
             surfaceTool.GenerateTangents();
             surfaceTool.Index();
 
             _m = surfaceTool.Commit();
-            _m = GenerateNoise(_m);
+            //_m = GenerateNoise(_m);
 
             return _m;
         }
 
         public void Save()
         {
-            ResourceSaver.Save(_m, $"res://{MeshName}.res", ResourceSaver.SaverFlags.Compress);
+            ResourceSaver.Save(_m, $"res://{Resolution}_{Scale}_CubeSphere.res", ResourceSaver.SaverFlags.Compress);
         }
 
         private SurfaceTool GenerateMesh(SurfaceTool surfaceTool)
         {
-            FastNoiseLite noise = new();
             for (int i = 0; i < JobLength; i++)
             {
                 int u = i / Sides;
@@ -95,14 +125,6 @@ namespace Planets.SystemGenerator
                     Vector3 pC = (uA + side.vVector * v / Resolution).Normalized();
                     Vector3 pD = (uB + side.vVector * v / Resolution).Normalized();
 
-                    // verts[vi + 1] = pA;
-                    // uvs.Add(Vector2.Zero);
-                    // verts[vi] = pB;
-                    // uvs.Add(new Vector2(1f, 0f));
-                    // verts[vi + 2] = pC;
-                    // uvs.Add(Vector2.One);
-                    // verts[vi + 3] = pD;
-                    // uvs.Add(new Vector2(0f, 1f));
                     surfaceTool.SetUV(Vector2.Zero);
                     surfaceTool.AddVertex(pB * Scale);
                     surfaceTool.SetUV(new Vector2(1f, 0f));
@@ -120,67 +142,40 @@ namespace Planets.SystemGenerator
 
                     pA = pC;
                     pB = pD;
-
-                    // List<int> t1 = [vi + 3, vi + 2, vi];
-                    // List<int> t2 = [vi + 2, vi + 1, vi];
-
-
-                    // indices.InsertRange(ti, t1.Concat(t2));
                 }
-                // surfaceTool.AddTriangleFan([.. verts], [.. uvs]);
+
             }
             return surfaceTool;
         }
-        private ArrayMesh GenerateNoise(ArrayMesh arrayMesh)
+
+        private static GeneratedCubeSphere? Exists(int scale, int resolution)
         {
-            Vector3 vert;
-            float n;
-            Vector3 vert_n;
-            FastNoiseLite noise = new();
-            RandomNumberGenerator rng = new();
-            // var x = noise.GetNoise2D(5, 5);
-            // var x_norm = x - (-1) / (1 - (-1));
-            MeshDataTool mdt = new();
-            mdt.CreateFromSurface(arrayMesh, 0);
-
-            for (int i = 0; i < mdt.GetVertexCount(); i++)
+            var tmp = new GeneratedCubeSphere() { scale = scale, resolution = resolution };
+            var csg = _generatedCubeSpheres.FindIndex(x => x.Equals(tmp));
+            if (csg != -1)
             {
-                vert = mdt.GetVertex(i);
-                n = noise.GetNoise3Dv(vert);
-                vert_n = mdt.GetVertexNormal(i);
-                vert += vert_n * (n * 0.5f + 0.75f) * 20f;
-                mdt.SetVertex(i, vert);
-                mdt.SetVertexNormal(i, Vector3.Zero);
+                return _generatedCubeSpheres[csg];
             }
-
-            for (int i = 0; i < mdt.GetVertexCount() - 1; i++)
-            {
-                var v = mdt.GetVertex(i);
-                var faces = mdt.GetVertexFaces(i);
-                Vector3[] normals = new Vector3[faces.Length];
-                for (int j = 0; j < faces.Length; j++)
-                {
-                    var a = mdt.GetFaceVertex(faces[j], 0);
-                    var b = mdt.GetFaceVertex(faces[j], 1);
-                    var c = mdt.GetFaceVertex(faces[j], 2);
-
-                    var ap = mdt.GetVertex(a);
-                    var bp = mdt.GetVertex(b);
-                    var cp = mdt.GetVertex(c);
-
-                    normals[j] = (bp - cp).Cross(ap - bp).Normalized();
-                }
-                vert_n = Enumerable.Aggregate(normals, Vector3.Zero, (sum, x) => sum + x) / normals.Length;
-                mdt.SetVertexNormal(i, vert_n.Normalized());
-                mdt.SetVertexColor(i, new Color(v.X, v.Y, v.Z));
-            }
-            arrayMesh.ClearSurfaces();
-
-            mdt.CommitToSurface(arrayMesh);
-
-            return arrayMesh;
+            else return null;
         }
 
+        private static void LoadGeneratedCubeSpheres()
+        {
+            var dir = DirAccess.Open(FOLDER_PATH);
+            foreach (var cs in dir.GetFiles())
+            {
+                var split = cs.Split("_");
+                int res = split[0].ToInt();
+                int scale = split[1].ToInt();
+                _generatedCubeSpheres.Add(new GeneratedCubeSphere
+                {
+                    scale = scale,
+                    resolution = res,
+                    path = $"{dir.GetCurrentDir()}/{cs}"
+                });
+            }
+            GD.Print($"Generated cubespheres: \n {_generatedCubeSpheres}");
+        }
 
         static Side GetSide(int id) => id switch
         {

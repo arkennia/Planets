@@ -27,6 +27,12 @@ namespace Planets.SystemGenerator
         public Vector2 Sector { get; private set; } = Vector2.Zero;
         [Export]
         public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
+        [Export]
+        public NoiseTexture3D NoiseTexture { get; set; }
+        [Export]
+        public ShaderMaterial ShaderMaterial { get; set; } = ResourceLoader.Load<ShaderMaterial>("res://materials/shader_materials/planet_material.tres");
+
+        public const int NOISE_SIZE = 128;
 
         public Guid Guid { get; private set; } = Guid.Empty;
 
@@ -54,19 +60,24 @@ namespace Planets.SystemGenerator
         {
             if (Mesh == null)
             {
-                CubeSphere cs = new() { MeshName = Name, Scale = Scale, Resolution = Resolution };
+                CubeSphere cs = new()
+                {
+                    Resolution = Resolution,
+                    Scale = Scale
+                };
                 ArrayMesh arrayMesh = cs.Generate();
-                // arrayMesh = GenerateNoise(arrayMesh);
-                Mesh = arrayMesh;
-                Cubemap cb = NoiseGenerator.GenerateCubemapTexture();
-                ResourceSaver.Save(cb, $"res://textures/{Guid}.tres");
+                Mesh = GenerateNoise(arrayMesh);
+                Mesh.SurfaceSetMaterial(0, ShaderMaterial);
             }
             PlanetNode rootNode = new();
+
             MeshInstance3D mI = new()
             {
                 Mesh = Mesh,
                 Name = Name
             };
+            // mI.SetInstanceShaderParameter("noise", NoiseTexture);
+
             RigidBody3D rB = new();
 
             Area3D area = new()
@@ -80,7 +91,7 @@ namespace Planets.SystemGenerator
 
             SphereShape3D areaColliderShape = new()
             {
-                Radius = Scale + 3000
+                Radius = Scale + Area3DExtraSpace
             };
             CollisionShape3D areaCollider = new()
             {
@@ -88,13 +99,13 @@ namespace Planets.SystemGenerator
             };
 
 
-            SphereShape3D colliderShape = new()
-            {
-                Radius = Scale + 8
-            };
+            // SphereShape3D colliderShape = new()
+            // {
+            //     Radius = Scale + 8
+            // };
             CollisionShape3D collider = new()
             {
-                Shape = colliderShape
+                Shape = Mesh.CreateConvexShape(),
             };
 
             rootNode.Planet = this;
@@ -122,6 +133,66 @@ namespace Planets.SystemGenerator
             ResourceSaver.Save(this, $"{path}/{Guid}.res", ResourceSaver.SaverFlags.Compress);
         }
 
+        private ArrayMesh GenerateNoise(ArrayMesh arrayMesh)
+        {
+            Vector3 vert;
+            float n;
+            Vector3 vert_n;
+            FastNoiseLite noise = new();
+            NoiseTexture = new NoiseTexture3D() { Noise = noise };
+            RandomNumberGenerator rng = new();
+            // var x = noise.GetNoise2D(5, 5);
+            // var x_norm = x - (-1) / (1 - (-1));
+            MeshDataTool mdt = new();
+            mdt.CreateFromSurface(arrayMesh, 0);
+
+            for (int i = 0; i < mdt.GetVertexCount(); i++)
+            {
+                vert = mdt.GetVertex(i);
+                n = 1.0f * SampleNoise(noise, 1 * vert) + 0.5f * SampleNoise(noise, 2 * vert) + 0.25f * SampleNoise(noise, 4 * vert);
+                n /= (1.0f + 0.5f + 0.25f);
+                vert_n = mdt.GetVertexNormal(i);
+                vert += vert_n * Mathf.Pow(n * 1.2f, 5.0f) * 20f;
+                mdt.SetVertex(i, vert);
+                mdt.SetVertexNormal(i, Vector3.Zero);
+                if (n <= 0.4)
+                {
+                    mdt.SetVertexColor(i, new Color(0.1f, 0.3f, 0.5f));
+                }
+                else
+                {
+                    mdt.SetVertexColor(i, new Color("GREEN"));
+                }
+            }
+
+            for (int i = 0; i < mdt.GetVertexCount() - 1; i++)
+            {
+                var v = mdt.GetVertex(i);
+                var faces = mdt.GetVertexFaces(i);
+                Vector3[] normals = new Vector3[faces.Length];
+                for (int j = 0; j < faces.Length; j++)
+                {
+                    var a = mdt.GetFaceVertex(faces[j], 0);
+                    var b = mdt.GetFaceVertex(faces[j], 1);
+                    var c = mdt.GetFaceVertex(faces[j], 2);
+
+                    var ap = mdt.GetVertex(a);
+                    var bp = mdt.GetVertex(b);
+                    var cp = mdt.GetVertex(c);
+
+                    normals[j] = (bp - cp).Cross(ap - bp).Normalized();
+                }
+                vert_n = Enumerable.Aggregate(normals, Vector3.Zero, (sum, x) => sum + x) / normals.Length;
+                mdt.SetVertexNormal(i, vert_n.Normalized());
+            }
+            arrayMesh.ClearSurfaces();
+
+            mdt.CommitToSurface(arrayMesh);
+
+            return arrayMesh;
+        }
+
+        private static float SampleNoise(FastNoiseLite noise, Vector3 v) => (noise.GetNoise3Dv(v) + 1) / 2;
 
     }
 }
