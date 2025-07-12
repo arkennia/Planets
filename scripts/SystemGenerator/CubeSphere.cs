@@ -81,27 +81,32 @@ namespace Planets.SystemGenerator
             }
 
             var csg = Exists(Scale, Resolution);
-            if ( csg != null)
+            if (csg != default)
             {
-                
+                _m = (ArrayMesh)ResourceLoader.Load(csg.path);
+                GD.Print($"Cubesphere mesh found with {Scale} scale and {Resolution} resolution.");
             }
-            SurfaceTool surfaceTool = new();
+            else
+            {
+                SurfaceTool surfaceTool = new();
 
-            surfaceTool.Begin(PrimitiveType.Triangles);
-            surfaceTool = GenerateMesh(surfaceTool);
-            surfaceTool.GenerateNormals();
-            surfaceTool.GenerateTangents();
-            surfaceTool.Index();
+                surfaceTool.Begin(PrimitiveType.Triangles);
+                surfaceTool = GenerateMesh(surfaceTool);
+                surfaceTool.GenerateNormals();
+                surfaceTool.GenerateTangents();
+                surfaceTool.Index();
 
-            _m = surfaceTool.Commit();
-            //_m = GenerateNoise(_m);
-
+                _m = surfaceTool.Commit();
+                //_m = GenerateNoise(_m);
+                GD.Print($"Cubesphere mesh generated with {Scale} scale and {Resolution} resolution.");
+            }
+            Save();
             return _m;
         }
 
         public void Save()
         {
-            ResourceSaver.Save(_m, $"res://{Resolution}_{Scale}_CubeSphere.res", ResourceSaver.SaverFlags.Compress);
+            ResourceSaver.Save(_m, $"{FOLDER_PATH}/{Resolution}_{Scale}_CubeSphere.res", ResourceSaver.SaverFlags.Compress);
         }
 
         private SurfaceTool GenerateMesh(SurfaceTool surfaceTool)
@@ -148,7 +153,7 @@ namespace Planets.SystemGenerator
             return surfaceTool;
         }
 
-        private static GeneratedCubeSphere? Exists(int scale, int resolution)
+        private static GeneratedCubeSphere Exists(int scale, int resolution)
         {
             var tmp = new GeneratedCubeSphere() { scale = scale, resolution = resolution };
             var csg = _generatedCubeSpheres.FindIndex(x => x.Equals(tmp));
@@ -156,7 +161,7 @@ namespace Planets.SystemGenerator
             {
                 return _generatedCubeSpheres[csg];
             }
-            else return null;
+            else return default;
         }
 
         private static void LoadGeneratedCubeSpheres()
@@ -164,17 +169,20 @@ namespace Planets.SystemGenerator
             var dir = DirAccess.Open(FOLDER_PATH);
             foreach (var cs in dir.GetFiles())
             {
-                var split = cs.Split("_");
-                int res = split[0].ToInt();
-                int scale = split[1].ToInt();
-                _generatedCubeSpheres.Add(new GeneratedCubeSphere
+                if (cs.EndsWith("res"))
                 {
-                    scale = scale,
-                    resolution = res,
-                    path = $"{dir.GetCurrentDir()}/{cs}"
-                });
+                    var split = cs.Split("_");
+                    int res = split[0].ToInt();
+                    int scale = split[1].ToInt();
+                    _generatedCubeSpheres.Add(new GeneratedCubeSphere
+                    {
+                        scale = scale,
+                        resolution = res,
+                        path = $"{dir.GetCurrentDir()}/{cs}"
+                    });
+                }
             }
-            GD.Print($"Generated cubespheres: \n {_generatedCubeSpheres}");
+            // GD.Print($"Generated cubespheres: \n {_generatedCubeSpheres}");
         }
 
         static Side GetSide(int id) => id switch

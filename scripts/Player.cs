@@ -113,10 +113,9 @@ namespace Planets
                     Velocity = Vector3.Zero;
                 }
                 RotatePlayer((float)delta);
-                if (_isInAir)
-                {
-                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 3f * (float)delta;
-                }
+
+                Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f * (float)delta;
+
             }
             else
             {

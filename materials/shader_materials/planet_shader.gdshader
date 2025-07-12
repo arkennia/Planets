@@ -1,9 +1,11 @@
 shader_type spatial;
 
+uniform sampler3D noiseTexture;
 varying vec3 tex_pos;
 
 void vertex() {
 	// Called for every vertex the material is visible on.
+	tex_pos = VERTEX.xyz;
 }
 
 void fragment() {
