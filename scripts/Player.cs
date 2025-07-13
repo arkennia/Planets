@@ -106,7 +106,6 @@ namespace Planets
                         _jumped = false;
                     }
                     Velocity = _targetVelocity;
-
                 }
                 else
                 {
@@ -147,10 +146,31 @@ namespace Planets
                     GD.Print($"Current gravity: {cParent.PlanetArea.Gravity} {cParent.PlanetArea.GravityDirection}");
                     //ApplyFloorSnap();
                 }
-                else if (MotionMode == MotionModeEnum.Grounded && cParent is PlanetNode && _isInAir)
+                else if (MotionMode == MotionModeEnum.Grounded && cParent is not null && _isInAir)
                 {
                     _isInAir = false;
                     GD.Print($"Is in air: {_isInAir}");
+                }
+            }
+
+            if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
+            {
+                // var ground_normal = GetLastSlideCollision().GetNormal();
+                // UpDirection = ground_normal;
+                // ApplyFloorSnap();
+                // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
+                Vector3 dest = -_up * 20f;
+                var spaceState = GetWorld3D().DirectSpaceState;
+                var query = PhysicsRayQueryParameters3D.Create(Position, -_up * 100f);
+                query.Exclude = [GetRid()];
+                query.HitFromInside = true;
+                var result = spaceState.IntersectRay(query);
+                Control debugUI = GetNode<Control>("%DebugUI");
+                if (debugUI != null)
+                {
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text = Position.ToString();
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString();
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
                 }
             }
         }

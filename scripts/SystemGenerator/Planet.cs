@@ -73,6 +73,7 @@ namespace Planets.SystemGenerator
                 _mesh.SurfaceSetMaterial(0, ShaderMaterial);
                 GD.Print("Noise generated");
             }
+
             PlanetNode rootNode = new();
 
             MeshInstance3D mI = new()
@@ -137,6 +138,15 @@ namespace Planets.SystemGenerator
             return rootNode;
         }
 
+        public static Vector3 GetRandomSurfacePosition(int scale)
+        {
+            RandomNumberGenerator rng = new();
+            //var vert = rng.RandiRange(0, _mesh)
+            Vector3 v = new(rng.Randfn(), rng.Randfn(), rng.Randfn());
+            v = v.Normalized();
+            return v * scale;
+        }
+
         public void Save(string path = "res://resources")
         {
             ResourceSaver.Save(this, $"{path}/{Guid}.res", ResourceSaver.SaverFlags.Compress);
@@ -147,21 +157,25 @@ namespace Planets.SystemGenerator
             Vector3 vert;
             float n;
             Vector3 vert_n;
-            FastNoiseLite noise = new();
+            FastNoiseLite noise = new()
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
+                FractalGain = 0.4f,
+                FractalOctaves = 3,
+                DomainWarpEnabled = true,
+            };
             NoiseTexture = new NoiseTexture3D() { Noise = noise };
             RandomNumberGenerator rng = new();
-            // var x = noise.GetNoise2D(5, 5);
-            // var x_norm = x - (-1) / (1 - (-1));
             MeshDataTool mdt = new();
             mdt.CreateFromSurface(arrayMesh, 0);
 
             for (int i = 0; i < mdt.GetVertexCount(); i++)
             {
                 vert = mdt.GetVertex(i);
-                n = 1.0f * SampleNoise(noise, 1 * vert) + 0.5f * SampleNoise(noise, 2 * vert) + 0.25f * SampleNoise(noise, 4 * vert);
-                n /= (1.0f + 0.5f + 0.25f);
+                n = SampleNoise(noise, vert);
+                //n /= (1.0f + 0.5f + 0.25f);
                 vert_n = mdt.GetVertexNormal(i);
-                vert += vert_n * Mathf.Pow(n * 1.2f, 5.0f) * 20f;
+                vert += vert_n * Mathf.Pow(n * 1.1f, 9.0f) * 10f;
                 mdt.SetVertex(i, vert);
                 // mdt.SetVertexNormal(i, Vector3.Zero);
                 if (n <= 0.4)

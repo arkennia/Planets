@@ -9,6 +9,12 @@ namespace Planets
     {
         [Export]
         public bool Generated { get; set; } = false;
+        [Export]
+        public int Scale { get; set; } = 1000;
+        [Export]
+        public int Resolution { get; set; } = 512;
+        [Export]
+        public CharacterBody3D player { get; set; }
         // [Export]
         // public PackedScene UI { get; set; }
 
@@ -22,13 +28,12 @@ namespace Planets
             // AddChild(Ui);
             if (!Generated)
             {
-                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(scale: 1000, resolution: 256);
+                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
                 p.Position = new Vector3(0, 0, -1300);
                 GetNode<Node3D>("%World").AddChild(p);
-                //p.GetChild<MeshInstance3D>(0).Position = new Vector3(0, 0, -6000f);
-                // PackedScene scene = new();
-                // scene.Pack(p);
-                // ResourceSaver.Save(scene, "res://TestPlanet.tscn", ResourceSaver.SaverFlags.Compress);
+                var spawn = Planet.GetRandomSurfacePosition(Scale);
+                spawn += p.Planet.MeshInstance.GlobalPosition;
+                player.GlobalPosition = spawn;
                 p.Save();
             }
             else
