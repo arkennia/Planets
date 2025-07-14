@@ -29,17 +29,18 @@ namespace Planets
             if (!Generated)
             {
                 PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
-                p.Position = new Vector3(0, 0, -1300);
+                p.Position = new Vector3(0, 0, -1000);
                 GetNode<Node3D>("%World").AddChild(p);
-                var spawn = Planet.GetRandomSurfacePosition(Scale);
+                var spawn = Planet.GetRandomSurfacePosition(Scale + 5);
                 spawn += p.Planet.MeshInstance.GlobalPosition;
                 player.GlobalPosition = spawn;
                 p.Save();
             }
             else
             {
-                var scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.tscn").Instantiate();
-                GetNode("%World").AddChild(scene);
+                var sceneLoader = ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn", useSubThreads: true);
+                var scene = ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as PackedScene;
+                GetNode("%World").AddChild(scene.Instantiate());
                 GD.Print("Planet loaded");
             }
         }

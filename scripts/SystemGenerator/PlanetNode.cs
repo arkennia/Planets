@@ -23,7 +23,7 @@ namespace Planets.SystemGenerator
         {
             PackedScene ps = new();
             ps.Pack(this);
-            ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.tscn", ResourceSaver.SaverFlags.Compress);
+            ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.scn");
         }
     }
 }

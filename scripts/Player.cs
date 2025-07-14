@@ -42,6 +42,7 @@ namespace Planets
             _pivot = GetNode<Node3D>("Pivot");
             MotionMode = MotionModeEnum.Floating;
             _ = InitUiSignals();
+            FloorSnapLength = 0.5f;
         }
 
         private async Task InitUiSignals()
@@ -80,7 +81,7 @@ namespace Planets
                     // t.Basis = Basis.Identity;
                     // _pivot.Transform = t;
                     _pivot.Rotate(Vector3.Up, _rotation.X);
-                    _camera.RotateX((float)Mathf.Clamp(_rotation.Y, -Math.PI / 2, Math.PI / 2));
+                    _camera.Rotate(Vector3.Right, (float)Mathf.Clamp(_rotation.Y, -Math.PI / 2, Math.PI / 2));
                 }
             }
         }
@@ -106,15 +107,17 @@ namespace Planets
                         _jumped = false;
                     }
                     Velocity = _targetVelocity;
+
+
+
                 }
                 else
                 {
                     Velocity = Vector3.Zero;
                 }
                 RotatePlayer((float)delta);
-
-                Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f * (float)delta;
-
+                if (!IsOnFloor())
+                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f * (float)delta;
             }
             else
             {
@@ -122,11 +125,13 @@ namespace Planets
                 {
                     direction = direction.Normalized();
                     // _pivot.Basis = Basis.LookingAt(direction);
-                    _targetVelocity = _camera.GlobalBasis * direction * Speed;
+                    _targetVelocity = _camera.GlobalBasis * direction * Speed * 2f;
                     Velocity = _targetVelocity;
                     RotatePlayer((float)delta);
                 }
             }
+
+
             MoveAndSlide();
             for (int i = 0; i < GetSlideCollisionCount(); i++)
             {
@@ -161,19 +166,25 @@ namespace Planets
                 // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
                 Vector3 dest = -_up * 20f;
                 var spaceState = GetWorld3D().DirectSpaceState;
-                var query = PhysicsRayQueryParameters3D.Create(Position, -_up * 100f);
-                query.Exclude = [GetRid()];
+                var query = PhysicsRayQueryParameters3D.Create(Position, dest);
+                // query.Exclude = [GetRid()];
+                query.CollisionMask = CollisionMask;
                 query.HitFromInside = true;
                 var result = spaceState.IntersectRay(query);
                 Control debugUI = GetNode<Control>("%DebugUI");
                 if (debugUI != null)
                 {
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text = Position.ToString();
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString();
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text = Position.ToString("F");
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
                     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
                 }
+                UpDirection = (Vector3)result["normal"];
+                ApplyFloorSnap();
+
             }
         }
+
 
         public void DisableMovement()
         {

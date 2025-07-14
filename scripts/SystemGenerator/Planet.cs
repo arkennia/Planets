@@ -14,7 +14,7 @@ namespace Planets.SystemGenerator
         public string Area3DName { get; private set; }
         [Export]
         public int Area3DExtraSpace { get; set; } = 3000;
-        public MeshInstance3D MeshInstance { get; set; }
+        public MeshInstance3D MeshInstance { get; set; } = null;
         [Export]
         public int Scale { get; set; }
         [Export]
@@ -36,7 +36,7 @@ namespace Planets.SystemGenerator
 
         public Guid Guid { get; private set; } = Guid.Empty;
 
-        private Mesh _mesh;
+        // private Mesh _mesh;
 
 
 
@@ -52,7 +52,14 @@ namespace Planets.SystemGenerator
         public Planet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128)
         {
             Name = name;
-            _mesh = mesh;
+            if (mesh is not null)
+            {
+                MeshInstance = new()
+                {
+                    Mesh = mesh,
+                    Name = name
+                };
+            }
             Scale = scale;
             Resolution = resolution;
             Guid = new Guid();
@@ -60,6 +67,7 @@ namespace Planets.SystemGenerator
 
         public PlanetNode Generate()
         {
+            Mesh m;
             if (MeshInstance == null)
             {
                 CubeSphere cs = new()
@@ -69,23 +77,31 @@ namespace Planets.SystemGenerator
                 };
                 ArrayMesh arrayMesh = cs.Generate();
                 GD.Print("Mesh loaded.");
-                _mesh = GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
-                _mesh.SurfaceSetMaterial(0, ShaderMaterial);
+                m = GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
+                m.SurfaceSetMaterial(0, ShaderMaterial);
                 GD.Print("Noise generated");
+                MeshInstance = new()
+                {
+                    Name = Name,
+                    Mesh = m
+                };
             }
 
             PlanetNode rootNode = new();
 
-            MeshInstance3D mI = new()
-            {
-                Mesh = _mesh,
-                Name = Name,
-            };
-            MeshInstance = mI;
-            mI.SetSurfaceOverrideMaterial(0, ShaderMaterial);
-            mI.SetInstanceShaderParameter("noiseTexture", NoiseTexture);
+            // MeshInstance3D mI = new()
+            // {
+            //     Mesh = _mesh,
+            //     Name = Name,
+            // };
+            //MeshInstance = mI;
+            MeshInstance.SetSurfaceOverrideMaterial(0, ShaderMaterial);
+            MeshInstance.SetInstanceShaderParameter("noiseTexture", NoiseTexture);
 
-            StaticBody3D sB = new();
+            StaticBody3D sB = new()
+            {
+                CollisionLayer = 0b10,
+            };
 
             Area3D area = new()
             {
@@ -111,21 +127,21 @@ namespace Planets.SystemGenerator
             //     Radius = Scale + 8
             // };
             ConcavePolygonShape3D colliderShape = new();
-            colliderShape.SetFaces(_mesh.GetFaces());
+            colliderShape.SetFaces(MeshInstance.Mesh.GetFaces());
             CollisionShape3D collider = new()
             {
                 Shape = colliderShape,
             };
 
             rootNode.Planet = this;
-            rootNode.AddChild(mI);
+            rootNode.AddChild(MeshInstance);
             rootNode.AddChild(area);
             area.Owner = rootNode;
             area.AddChild(areaCollider);
             areaCollider.Owner = rootNode;
 
-            mI.Owner = rootNode;
-            mI.AddChild(sB);
+            MeshInstance.Owner = rootNode;
+            MeshInstance.AddChild(sB);
 
             sB.Owner = rootNode;
             sB.AddChild(collider);
@@ -135,6 +151,7 @@ namespace Planets.SystemGenerator
 
             Area3DName = area.Name;
             GD.Print("Planet generation complete.");
+            //_mesh = null;
             return rootNode;
         }
 
