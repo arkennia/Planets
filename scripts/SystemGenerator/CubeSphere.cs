@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 namespace Planets.SystemGenerator
@@ -17,21 +16,21 @@ namespace Planets.SystemGenerator
 
         //public string MeshName { get; set; } = meshName;
 
-        static List<GeneratedCubeSphere> _generatedCubeSpheres = null;
+        static List<GeneratedCubeSphere> _generatedCubeSpheres;
 
 
 
         struct Side
         {
-            public int id;
-            public Vector3 uvOrigin, uVector, vVector;
+            public int Id;
+            public Vector3 UvOrigin, UVector, VVector;
         }
 
-        struct GeneratedCubeSphere
+        struct GeneratedCubeSphere : IEquatable<GeneratedCubeSphere>
         {
-            public int scale;
-            public int resolution;
-            public string path;
+            public int Scale;
+            public int Resolution;
+            public string Path;
 
             public static bool operator ==(GeneratedCubeSphere left, GeneratedCubeSphere right)
             {
@@ -42,19 +41,28 @@ namespace Planets.SystemGenerator
                 return !left.Equals(right);
             }
 
-            public override readonly bool Equals(object obj)
+            public bool Equals(GeneratedCubeSphere comp)
             {
-                if (obj == null || GetType() != obj.GetType())
+                if (GetType() != comp.GetType())
+                    return false;
+                
+                return Scale == comp.Scale && Resolution == comp.Resolution;
+            }
+
+            public override bool Equals(object o)
+            {
+                if (o == null || GetType() != o.GetType())
                     return false;
 
-                var comp = (GeneratedCubeSphere)obj;
-                return scale == comp.scale && resolution == comp.resolution;
+                var comp = (GeneratedCubeSphere)o;
+                return Scale == comp.Scale && Resolution == comp.Resolution;
             }
 
-            public override readonly int GetHashCode()
+            public readonly override int GetHashCode()
             {
-                return HashCode.Combine(scale, resolution);
+                return HashCode.Combine(Scale, Resolution);
             }
+            
         }
 
         public int VertexCount => Sides * 4 * Resolution * Resolution;
@@ -83,7 +91,7 @@ namespace Planets.SystemGenerator
             var csg = Exists(Scale, Resolution);
             if (csg != default)
             {
-                _m = (ArrayMesh)ResourceLoader.Load(csg.path);
+                _m = (ArrayMesh)ResourceLoader.Load(csg.Path);
                 GD.Print($"Cubesphere mesh found with {Scale} scale and {Resolution} resolution.");
             }
             else
@@ -116,27 +124,31 @@ namespace Planets.SystemGenerator
                 int u = i / Sides;
                 Side side = GetSide(i - Sides * u);
 
-                Vector3 uA = side.uvOrigin + side.uVector * (u) / Resolution;
-                Vector3 uB = side.uvOrigin + side.uVector * (u + 1) / Resolution;
+                Vector3 uA = side.UvOrigin + side.UVector * (u) / Resolution;
+                Vector3 uB = side.UvOrigin + side.UVector * (u + 1) / Resolution;
                 Vector3 pA = uA.Normalized();
                 Vector3 pB = uB.Normalized();
 
-                int vi = 4 * Resolution * (Resolution * side.id + u);
-                int ti = 2 * Resolution * (Resolution * side.id + u);
+                int vi = 4 * Resolution * (Resolution * side.Id + u);
+                int ti = 2 * Resolution * (Resolution * side.Id + u);
 
 
                 for (int v = 1; v <= Resolution; v++, vi += 4, ti += 2)
                 {
-                    Vector3 pC = (uA + side.vVector * v / Resolution).Normalized();
-                    Vector3 pD = (uB + side.vVector * v / Resolution).Normalized();
+                    Vector3 pC = (uA + side.VVector * v / Resolution).Normalized();
+                    Vector3 pD = (uB + side.VVector * v / Resolution).Normalized();
 
                     surfaceTool.SetUV(Vector2.Zero);
+                    surfaceTool.SetSmoothGroup(1);
                     surfaceTool.AddVertex(pB * Scale);
                     surfaceTool.SetUV(new Vector2(1f, 0f));
+                    surfaceTool.SetSmoothGroup(1);
                     surfaceTool.AddVertex(pA * Scale);
                     surfaceTool.SetUV(Vector2.One);
+                    surfaceTool.SetSmoothGroup(1);
                     surfaceTool.AddVertex(pC * Scale);
                     surfaceTool.SetUV(new Vector2(0f, 1f));
+                    surfaceTool.SetSmoothGroup(1);
                     surfaceTool.AddVertex(pD * Scale);
                     surfaceTool.AddIndex(vi + 3);
                     surfaceTool.AddIndex(vi + 2);
@@ -155,7 +167,7 @@ namespace Planets.SystemGenerator
 
         private static GeneratedCubeSphere Exists(int scale, int resolution)
         {
-            var tmp = new GeneratedCubeSphere() { scale = scale, resolution = resolution };
+            var tmp = new GeneratedCubeSphere() { Scale = scale, Resolution = resolution };
             var csg = _generatedCubeSpheres.FindIndex(x => x.Equals(tmp));
             if (csg != -1)
             {
@@ -176,9 +188,9 @@ namespace Planets.SystemGenerator
                     int scale = split[1].ToInt();
                     _generatedCubeSpheres.Add(new GeneratedCubeSphere
                     {
-                        scale = scale,
-                        resolution = res,
-                        path = $"{dir.GetCurrentDir()}/{cs}"
+                        Scale = scale,
+                        Resolution = res,
+                        Path = $"{dir.GetCurrentDir()}/{cs}"
                     });
                 }
             }
@@ -189,49 +201,49 @@ namespace Planets.SystemGenerator
         {
             0 => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(-1f, -1f, -1f),
-                uVector = Vector3.Right * 2f,
-                vVector = Vector3.Up * 2f
+                Id = id,
+                UvOrigin = new Vector3(-1f, -1f, -1f),
+                UVector = Vector3.Right * 2f,
+                VVector = Vector3.Up * 2f
             },
             1 => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(1f, -1f, -1f),
-                uVector = Vector3.Back * 2f,
-                vVector = Vector3.Up * 2f,
+                Id = id,
+                UvOrigin = new Vector3(1f, -1f, -1f),
+                UVector = Vector3.Back * 2f,
+                VVector = Vector3.Up * 2f,
 
             },
             2 => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(-1f, -1f, -1f),
-                uVector = Vector3.Back * 2f,
-                vVector = Vector3.Right * 2f,
+                Id = id,
+                UvOrigin = new Vector3(-1f, -1f, -1f),
+                UVector = Vector3.Back * 2f,
+                VVector = Vector3.Right * 2f,
 
             },
             3 => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(-1f, -1f, 1f),
-                uVector = Vector3.Up * 2f,
-                vVector = Vector3.Right * 2f,
+                Id = id,
+                UvOrigin = new Vector3(-1f, -1f, 1f),
+                UVector = Vector3.Up * 2f,
+                VVector = Vector3.Right * 2f,
 
             },
             4 => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(-1f, -1f, -1f),
-                uVector = Vector3.Up * 2f,
-                vVector = Vector3.Back * 2f,
+                Id = id,
+                UvOrigin = new Vector3(-1f, -1f, -1f),
+                UVector = Vector3.Up * 2f,
+                VVector = Vector3.Back * 2f,
 
             },
             _ => new Side
             {
-                id = id,
-                uvOrigin = new Vector3(-1f, 1f, -1f),
-                uVector = Vector3.Right * 2f,
-                vVector = Vector3.Back * 2f,
+                Id = id,
+                UvOrigin = new Vector3(-1f, 1f, -1f),
+                UVector = Vector3.Right * 2f,
+                VVector = Vector3.Back * 2f,
 
             }
         };

@@ -2,6 +2,7 @@ using Godot;
 using Planets.UI;
 using System;
 using System.Threading.Tasks;
+using Godot.Collections;
 using Planets.SystemGenerator;
 
 namespace Planets
@@ -97,8 +98,8 @@ namespace Planets
                 //UpDirection = _up;
                 if (direction != Vector3.Zero)
                 {
-                    var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
-                    var newX = newZ.Cross(_up).Normalized();
+                    Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+                    Vector3 newX = newZ.Cross(_up).Normalized();
                     direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
                     _targetVelocity = direction * Speed;
                     if (_jumped)
@@ -107,9 +108,6 @@ namespace Planets
                         _jumped = false;
                     }
                     Velocity = _targetVelocity;
-
-
-
                 }
                 else
                 {
@@ -135,9 +133,9 @@ namespace Planets
             MoveAndSlide();
             for (int i = 0; i < GetSlideCollisionCount(); i++)
             {
-                var collision = GetSlideCollision(i);
-                var collider = (Node)collision.GetCollider();
-                var cParent = collider.GetOwnerOrNull<PlanetNode>();
+                KinematicCollision3D collision = GetSlideCollision(i);
+                Node collider = (Node)collision.GetCollider();
+                PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
                 if (cParent is not null && MotionMode == MotionModeEnum.Floating)
                 {
                     MotionMode = MotionModeEnum.Grounded;
@@ -158,31 +156,33 @@ namespace Planets
                 }
             }
 
-            if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
+            if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
+            // var ground_normal = GetLastSlideCollision().GetNormal();
+            // UpDirection = ground_normal;
+            // ApplyFloorSnap();
+            // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
+            Vector3 dest = -_up * 20f;
+            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            // query.Exclude = [GetRid()];
+            query.CollisionMask = CollisionMask;
+            query.HitFromInside = true;
+            Dictionary result = spaceState.IntersectRay(query);
+                
+            if (result.Count == 0) return;
+                
+            Control debugUI = GetNode<Control>("%DebugUI");
+            if (debugUI != null)
             {
-                // var ground_normal = GetLastSlideCollision().GetNormal();
-                // UpDirection = ground_normal;
-                // ApplyFloorSnap();
-                // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
-                Vector3 dest = -_up * 20f;
-                var spaceState = GetWorld3D().DirectSpaceState;
-                var query = PhysicsRayQueryParameters3D.Create(Position, dest);
-                // query.Exclude = [GetRid()];
-                query.CollisionMask = CollisionMask;
-                query.HitFromInside = true;
-                var result = spaceState.IntersectRay(query);
-                Control debugUI = GetNode<Control>("%DebugUI");
-                if (debugUI != null)
-                {
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text = Position.ToString("F");
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
-                    GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
-                }
-                UpDirection = (Vector3)result["normal"];
-                ApplyFloorSnap();
-
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
+                    Position.ToString("F");
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
             }
+
+            UpDirection = (Vector3)result["normal"];
+            ApplyFloorSnap();
         }
 
 

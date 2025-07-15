@@ -2,6 +2,7 @@ using Godot;
 using Planets.SystemGenerator;
 using Planets.UI;
 using System;
+using System.Threading.Tasks;
 
 namespace Planets
 {
@@ -14,7 +15,7 @@ namespace Planets
         [Export]
         public int Resolution { get; set; } = 512;
         [Export]
-        public CharacterBody3D player { get; set; }
+        public CharacterBody3D Player { get; set; }
         // [Export]
         // public PackedScene UI { get; set; }
 
@@ -28,18 +29,22 @@ namespace Planets
             // AddChild(Ui);
             if (!Generated)
             {
-                PlanetNode p = SystemGenerator.PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
-                p.Position = new Vector3(0, 0, -1000);
-                GetNode<Node3D>("%World").AddChild(p);
-                var spawn = Planet.GetRandomSurfacePosition(Scale + 5);
-                spawn += p.Planet.MeshInstance.GlobalPosition;
-                player.GlobalPosition = spawn;
-                p.Save();
+                Task.Run(() =>
+                {
+                    PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
+                    p.Position = new Vector3(0, 0, -1000);
+                    Node3D worldNode = GetNode<Node3D>("%World");
+                    worldNode.CallDeferred(Node.MethodName.AddChild, p);
+                    // var spawn = Planet.GetRandomSurfacePosition(Scale + 5);
+                    // spawn += p.Planet.MeshInstance.GlobalPosition;
+                    // Player.GlobalPosition = spawn;
+                    p.Save();
+                });
             }
             else
             {
-                var sceneLoader = ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn", useSubThreads: true);
-                var scene = ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as PackedScene;
+                Error sceneLoader = ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn", useSubThreads: true);
+                PackedScene scene = ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as PackedScene;
                 GetNode("%World").AddChild(scene.Instantiate());
                 GD.Print("Planet loaded");
             }

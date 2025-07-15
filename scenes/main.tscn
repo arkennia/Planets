@@ -9,16 +9,16 @@ font_size = 12
 [sub_resource type="LabelSettings" id="LabelSettings_sugp2"]
 font_size = 12
 
-[node name="Main" type="Node" node_paths=PackedStringArray("player")]
+[node name="Main" type="Node" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_jyhfs")
-Generated = true
-player = NodePath("Player")
+Scale = 500
+Player = NodePath("Player")
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.8221054, 9.96845)
 directional_shadow_mode = 0
 
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]

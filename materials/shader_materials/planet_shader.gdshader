@@ -1,6 +1,5 @@
 shader_type spatial;
 
-uniform sampler3D noiseTexture;
 varying vec3 tex_pos;
 
 void vertex() {

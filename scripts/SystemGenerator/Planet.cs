@@ -1,44 +1,33 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Planets.SystemGenerator
 {
     [GlobalClass]
     public partial class Planet : Resource, ICelestialBody
     {
+        [Export] public string Name { get; set; } = "Earth";
+        [Export] public string Area3DName { get; private set; }
+        [Export] public int Area3DExtraSpace { get; set; } = 3000;
+        public MeshInstance3D MeshInstance { get; private set; }
+        [Export] public int Scale { get; set; }
+        [Export] public int Resolution { get; set; }
+        [Export] public bool Generated { get; private set; }
+        [Export] public float Gravity { get; set; } = 9.8f;
+        [Export] public Vector2 Sector { get; private set; } = Vector2.Zero;
+        [Export] public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
+        [Export] public NoiseTexture3D NoiseTexture { get; set; }
+
         [Export]
-        public string Name { get; set; } = "Earth";
-        [Export]
-        public string Area3DName { get; private set; }
-        [Export]
-        public int Area3DExtraSpace { get; set; } = 3000;
-        public MeshInstance3D MeshInstance { get; set; } = null;
-        [Export]
-        public int Scale { get; set; }
-        [Export]
-        public int Resolution { get; set; }
-        [Export]
-        public bool Generated { get; private set; }
-        [Export]
-        public float Gravity { get; set; } = 9.8f;
-        [Export]
-        public Vector2 Sector { get; private set; } = Vector2.Zero;
-        [Export]
-        public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
-        [Export]
-        public NoiseTexture3D NoiseTexture { get; set; }
-        [Export]
-        public ShaderMaterial ShaderMaterial { get; set; } = ResourceLoader.Load<ShaderMaterial>("res://materials/shader_materials/planet_material.tres");
+        public ShaderMaterial ShaderMaterial { get; set; } =
+            ResourceLoader.Load<ShaderMaterial>("res://materials/shader_materials/planet_material.tres");
 
         public const int NOISE_SIZE = 128;
 
         public Guid Guid { get; private set; } = Guid.Empty;
 
         // private Mesh _mesh;
-
-
 
 
         public Planet()
@@ -49,61 +38,62 @@ namespace Planets.SystemGenerator
             }
         }
 
-        public Planet(string name = "Earth", Mesh mesh = null, int scale = 20000, int resolution = 128)
+        public Planet(string name = "Earth", Mesh mesh = null, int scale = 500, int resolution = 128)
         {
             Name = name;
             if (mesh is not null)
             {
-                MeshInstance = new()
+                MeshInstance = new MeshInstance3D
                 {
                     Mesh = mesh,
                     Name = name
                 };
             }
+
             Scale = scale;
             Resolution = resolution;
-            Guid = new Guid();
+            Guid = Guid.Empty;
         }
 
         public PlanetNode Generate()
         {
-            Mesh m;
             if (MeshInstance == null)
             {
-                CubeSphere cs = new()
+                CubeSphere cs = new CubeSphere
                 {
                     Resolution = Resolution,
                     Scale = Scale
                 };
                 ArrayMesh arrayMesh = cs.Generate();
                 GD.Print("Mesh loaded.");
-                m = GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
+                Mesh m = GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
                 m.SurfaceSetMaterial(0, ShaderMaterial);
                 GD.Print("Noise generated");
-                MeshInstance = new()
+                MeshInstance = new MeshInstance3D
                 {
                     Name = Name,
-                    Mesh = m
+                    Mesh = m,
+                    //Scale = new Vector3(Scale, Scale, Scale),
                 };
             }
 
-            PlanetNode rootNode = new();
+            PlanetNode rootNode = new PlanetNode();
 
             // MeshInstance3D mI = new()
             // {
             //     Mesh = _mesh,
             //     Name = Name,
             // };
-            //MeshInstance = mI;
+            // MeshInstance = mI;
             MeshInstance.SetSurfaceOverrideMaterial(0, ShaderMaterial);
-            MeshInstance.SetInstanceShaderParameter("noiseTexture", NoiseTexture);
+            // MeshInstance.SetInstanceShaderParameter("noiseTexture", NoiseTexture);
 
-            StaticBody3D sB = new()
+            StaticBody3D sB = new StaticBody3D
             {
                 CollisionLayer = 0b10,
             };
 
-            Area3D area = new()
+            Area3D area = new Area3D
             {
                 GravitySpaceOverride = Area3D.SpaceOverride.Replace,
                 GravityPoint = true,
@@ -112,11 +102,11 @@ namespace Planets.SystemGenerator
                 GravityDirection = new Vector3(0, -1, 0)
             };
 
-            SphereShape3D areaColliderShape = new()
+            SphereShape3D areaColliderShape = new SphereShape3D
             {
                 Radius = Scale + Area3DExtraSpace
             };
-            CollisionShape3D areaCollider = new()
+            CollisionShape3D areaCollider = new CollisionShape3D
             {
                 Shape = areaColliderShape
             };
@@ -126,9 +116,9 @@ namespace Planets.SystemGenerator
             // {
             //     Radius = Scale + 8
             // };
-            ConcavePolygonShape3D colliderShape = new();
+            ConcavePolygonShape3D colliderShape = new ConcavePolygonShape3D();
             colliderShape.SetFaces(MeshInstance.Mesh.GetFaces());
-            CollisionShape3D collider = new()
+            CollisionShape3D collider = new CollisionShape3D
             {
                 Shape = colliderShape,
             };
@@ -151,15 +141,15 @@ namespace Planets.SystemGenerator
 
             Area3DName = area.Name;
             GD.Print("Planet generation complete.");
-            //_mesh = null;
+            // _mesh = null;
             return rootNode;
         }
 
         public static Vector3 GetRandomSurfacePosition(int scale)
         {
-            RandomNumberGenerator rng = new();
-            //var vert = rng.RandiRange(0, _mesh)
-            Vector3 v = new(rng.Randfn(), rng.Randfn(), rng.Randfn());
+            RandomNumberGenerator rng = new RandomNumberGenerator();
+            // var vert = rng.RandiRange(0, _mesh)
+            Vector3 v = new Vector3(rng.Randfn(), rng.Randfn(), rng.Randfn());
             v = v.Normalized();
             return v * scale;
         }
@@ -171,30 +161,41 @@ namespace Planets.SystemGenerator
 
         private ArrayMesh GenerateNoise(ArrayMesh arrayMesh)
         {
-            Vector3 vert;
-            float n;
-            Vector3 vert_n;
-            FastNoiseLite noise = new()
+            RandomNumberGenerator rng = new ();
+            FastNoiseLite noise1 = new()
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+                FractalGain = 0.4f,
+                FractalOctaves = 6,
+                Seed = (int)rng.Randi(),
+            };
+            FastNoiseLite noise2 = new()
             {
                 NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
-                FractalGain = 0.4f,
-                FractalOctaves = 3,
                 DomainWarpEnabled = true,
+                Seed = (int)rng.Randi(),
             };
-            NoiseTexture = new NoiseTexture3D() { Noise = noise };
-            RandomNumberGenerator rng = new();
-            MeshDataTool mdt = new();
-            mdt.CreateFromSurface(arrayMesh, 0);
-
-            for (int i = 0; i < mdt.GetVertexCount(); i++)
+            FastNoiseLite noise3 = new()
             {
-                vert = mdt.GetVertex(i);
-                n = SampleNoise(noise, vert);
-                //n /= (1.0f + 0.5f + 0.25f);
-                vert_n = mdt.GetVertexNormal(i);
-                vert += vert_n * Mathf.Pow(n * 1.1f, 9.0f) * 10f;
+                NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
+                DomainWarpEnabled = true,
+                Seed = (int)rng.Randi(),
+            };
+            // NoiseTexture = new NoiseTexture3D() { Noise = noise1 }
+
+            MeshDataTool mdt = new MeshDataTool();
+            mdt.CreateFromSurface(arrayMesh, 0);
+            Parallel.For(0, mdt.GetVertexCount(), i =>
+            {
+                Vector3 vert = mdt.GetVertex(i);
+                float n = SampleNoise(noise1, vert);
+                // n /= (1.0f + 0.5f + 0.25f);
+                Vector3 vertN = mdt.GetVertexNormal(i);
+                vert += vertN * Mathf.Pow(n * 1.2f, 8.0f) * 15f;
+                //vert += vertN * n;
                 mdt.SetVertex(i, vert);
-                // mdt.SetVertexNormal(i, Vector3.Zero);
+                mdt.SetVertexNormal(i, Vector3.Zero);
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (n <= 0.4)
                 {
                     mdt.SetVertexColor(i, new Color(0.1f, 0.3f, 0.5f));
@@ -203,59 +204,64 @@ namespace Planets.SystemGenerator
                 {
                     mdt.SetVertexColor(i, new Color("GREEN"));
                 }
-            }
-
-            // for (int i = 0; i < mdt.GetVertexCount() - 1; i++)
+            });
+            // for (int i = 0; i < mdt.GetVertexCount(); i++)
             // {
-            //     var v = mdt.GetVertex(i);
-            //     var faces = mdt.GetVertexFaces(i);
-            //     Vector3[] normals = new Vector3[faces.Length];
+            //     Vector3 vert = mdt.GetVertex(i);
+            //     float n = SampleNoise(noise1, vert);
+            //     // n /= (1.0f + 0.5f + 0.25f);
+            //     Vector3 vertN = mdt.GetVertexNormal(i);
+            //     vert += vertN * Mathf.Pow(n * 1.5f, 8.0f) * 10f;
+            //     //vert += vertN * n;
+            //     mdt.SetVertex(i, vert);
+            //     mdt.SetVertexNormal(i, Vector3.Zero);
+            //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            //     if (n <= 0.4)
+            //     {
+            //         mdt.SetVertexColor(i, new Color(0.1f, 0.3f, 0.5f));
+            //     }
+            //     else
+            //     {
+            //         mdt.SetVertexColor(i, new Color("GREEN"));
+            //     }
+            // }
+            
+            // for (int i = 0; i < mdt.GetVertexCount(); i++)
+            // {
+            //     //var v = mdt.GetVertex(i);
+            //     int[] faces = mdt.GetVertexFaces(i);
+            //     Vector3[] vNormals = new Vector3[faces.Length];
             //     for (int j = 0; j < faces.Length; j++)
             //     {
-            //         var a = mdt.GetFaceVertex(faces[j], 0);
-            //         var b = mdt.GetFaceVertex(faces[j], 1);
-            //         var c = mdt.GetFaceVertex(faces[j], 2);
-
-            //         var ap = mdt.GetVertex(a);
-            //         var bp = mdt.GetVertex(b);
-            //         var cp = mdt.GetVertex(c);
-
-            //         normals[j] = (bp - cp).Cross(ap - bp).Normalized();
+            //         vNormals[j] = mdt.GetFaceNormal(faces[j]);
             //     }
-            //     vert_n = Enumerable.Aggregate(normals, Vector3.Zero, (sum, x) => sum + x) / normals.Length;
-            //     mdt.SetVertexNormal(i, vert_n.Normalized());
+            //     Vector3 vertN = vNormals.Aggregate(Vector3.Zero, (sum, x) => sum + x);
+            //     mdt.SetVertexNormal(i, vertN.Normalized());
             // }
-            Godot.Collections.Array arrays = [];
-            arrays.Resize((int)Mesh.ArrayType.Max);
-            var verts = new List<Vector3>();
-            var normals = new List<Vector3>();
-            var uvs = new List<Vector2>();
-            var colors = new List<Color>();
-            for (int i = 0; i < mdt.GetFaceCount(); i++)
+            Parallel.For(0, mdt.GetFaceCount(), i =>
             {
-                for (int j = 0; j < 3; j++)
-                {
-                    int v = mdt.GetFaceVertex(i, j);
-                    verts.Add(mdt.GetVertex(v));
-                    uvs.Add(mdt.GetVertexUV(v));
-                    normals.Add(mdt.GetFaceNormal(i));
-                    colors.Add(mdt.GetVertexColor(v));
-                }
-            }
+                int ia = mdt.GetFaceVertex(i, 0);
+                int ib = mdt.GetFaceVertex(i, 1);
+                int ic = mdt.GetFaceVertex(i, 2);
+                
+                Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
+                Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
+                Vector3 normal = e1.Cross(e2);
+                
+                mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
+                mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
+                mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
+            });
+            // for (int i = 0; i < mdt.GetFaceCount(); i++)
+            // {
+            //     
+            // }
+
             arrayMesh.ClearSurfaces();
-
-            arrays[(int)Mesh.ArrayType.Normal] = normals.ToArray();
-            arrays[(int)Mesh.ArrayType.Vertex] = verts.ToArray();
-            arrays[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
-            arrays[(int)Mesh.ArrayType.Color] = colors.ToArray();
-            arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
-
-            //mdt.CommitToSurface(arrayMesh);
-
+            mdt.CommitToSurface(arrayMesh);
             return arrayMesh;
         }
 
         private static float SampleNoise(FastNoiseLite noise, Vector3 v) => (noise.GetNoise3Dv(v) + 1) / 2;
-
     }
 }
