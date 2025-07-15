@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Threading.Tasks;
+using Godot.Collections;
 
 namespace Planets.SystemGenerator
 {
@@ -66,6 +67,14 @@ namespace Planets.SystemGenerator
                 };
                 ArrayMesh arrayMesh = cs.Generate();
                 GD.Print("Mesh loaded.");
+                ImporterMesh im = new();
+                im.AddSurface(Mesh.PrimitiveType.Triangles, arrayMesh.SurfaceGetArrays(0));
+                im.GenerateLods(45.0f, 0, null);
+                arrayMesh.ClearSurfaces();
+                Dictionary lods = new();
+                Parallel.For(0, im.GetSurfaceLodCount(0), i => lods[im.GetSurfaceLodSize(0, i)] = im.GetSurfaceLodIndices(0, i));
+                GD.Print("Lods Generated.");
+                arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles,im.GetSurfaceArrays(0),null, lods);
                 Mesh m = GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
                 m.SurfaceSetMaterial(0, ShaderMaterial);
                 GD.Print("Noise generated");
@@ -162,11 +171,15 @@ namespace Planets.SystemGenerator
         private ArrayMesh GenerateNoise(ArrayMesh arrayMesh)
         {
             RandomNumberGenerator rng = new ();
+            rng.Seed = 42069;
             FastNoiseLite noise1 = new()
             {
-                NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Perlin,
                 FractalGain = 0.4f,
-                FractalOctaves = 6,
+                FractalOctaves = 3,
+                FractalLacunarity = 2.5f,
+                DomainWarpEnabled = true,
+                Frequency = 0.008f,
                 Seed = (int)rng.Randi(),
             };
             FastNoiseLite noise2 = new()
@@ -188,15 +201,18 @@ namespace Planets.SystemGenerator
             Parallel.For(0, mdt.GetVertexCount(), i =>
             {
                 Vector3 vert = mdt.GetVertex(i);
-                float n = SampleNoise(noise1, vert);
-                // n /= (1.0f + 0.5f + 0.25f);
+                float n1 = SampleNoise(noise1, vert);
+                float n2 = SampleNoise(noise2, vert * 2f);
+                float n3 = SampleNoise(noise3, vert * 4f);
+                float n = n1 * 1f + n2 * 0.2f + n3 * 0.1f;
+                n /= (1.0f + 0.2f + 0.1f);
                 Vector3 vertN = mdt.GetVertexNormal(i);
-                vert += vertN * Mathf.Pow(n * 1.2f, 8.0f) * 15f;
+                vert += vertN * Mathf.Pow(n * 1.2f, 6.0f) * 20f;
                 //vert += vertN * n;
                 mdt.SetVertex(i, vert);
                 mdt.SetVertexNormal(i, Vector3.Zero);
                 // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                if (n <= 0.4)
+                if (n1 <= 0.4)
                 {
                     mdt.SetVertexColor(i, new Color(0.1f, 0.3f, 0.5f));
                 }

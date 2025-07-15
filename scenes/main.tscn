@@ -18,7 +18,8 @@ Player = NodePath("Player")
 unique_name_in_owner = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.8221054, 9.96845)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 494.90793)
+light_angular_distance = 0.5
 directional_shadow_mode = 0
 
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
