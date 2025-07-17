@@ -49,7 +49,9 @@ public partial class Main : Node
             PackedScene scene =
                 ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
                     PackedScene;
-            GetNode("%World").AddChild(scene.Instantiate());
+            if (scene.Instantiate() is not Node3D sceneNode) return;
+            sceneNode.Position = new Vector3(0, 0, -500);
+            GetNode("%World").AddChild(sceneNode);
             GD.Print("Planet loaded");
         }
     }

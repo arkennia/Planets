@@ -24,7 +24,7 @@ public partial class Planet : Resource, ICelestialBody
     public float Gravity { get; set; } = 9.8f;
 
     [Export]
-    public int Scale { get; set; }
+    public int Radius { get; set; }
 
     [Export]
     public int Resolution { get; set; }
@@ -94,53 +94,56 @@ public partial class Planet : Resource, ICelestialBody
     private FastNoiseLite _noise3;
     private FastNoiseLite _moisture;
 
+    private Mesh _mesh;
+
     public Planet()
     {
         // if (Guid == Guid.Empty) Guid = Guid.NewGuid();
     }
 
-    public Planet(string name = "Earth", Mesh mesh = null, int scale = 500, int resolution = 128)
+    public Planet(string name = "Earth", Mesh mesh = null, int radius = 500, int resolution = 128)
     {
         Name = name;
-        if (mesh is not null)
-            MeshInstance = new MeshInstance3D
-            {
-                Mesh = mesh,
-                Name = name
-            };
-
-        Scale = scale;
+        _mesh = mesh;
+        Radius = radius;
         Resolution = resolution;
         Guid = Guid.Empty;
     }
 
     public PlanetNode Generate()
     {
-        if (MeshInstance == null)
+        ArrayMesh arrayMesh;
+        if (_mesh == null)
         {
             CubeSphere cs = new()
             {
                 Resolution = Resolution,
-                Scale = Scale
+                Radius = Radius
             };
-            ArrayMesh arrayMesh = cs.Generate();
-            GD.Print("Mesh loaded.");
-            if (GenerateLods) arrayMesh = _GenerateLoDs(arrayMesh);
-            Mesh m = _GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
-            m.SurfaceSetMaterial(0, ShaderMaterial);
-            // MeshInstance.SetInstanceShaderParameter("noise1", NoiseTexture1);
-            // MeshInstance.SetInstanceShaderParameter("noise2", NoiseTexture2);
-            // MeshInstance.SetInstanceShaderParameter("noise3", NoiseTexture3);
-            // MeshInstance.SetInstanceShaderParameter("moisture", MoistureTexture);
-            GD.Print("Noise generated");
-
-            MeshInstance = new MeshInstance3D
-            {
-                Name = Name,
-                Mesh = m
-                // Scale = new Vector3(Scale, Scale, Scale),
-            };
+            arrayMesh = cs.Generate();
         }
+        else
+        {
+            arrayMesh = new ArrayMesh();
+            arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, _mesh.SurfaceGetArrays(0));
+        }
+
+        GD.Print("Mesh loaded.");
+        if (GenerateLods) arrayMesh = _GenerateLoDs(arrayMesh);
+        Mesh m = _GenerateNoise((ArrayMesh)arrayMesh.Duplicate());
+        m.SurfaceSetMaterial(0, ShaderMaterial);
+        // MeshInstance.SetInstanceShaderParameter("noise1", NoiseTexture1);
+        // MeshInstance.SetInstanceShaderParameter("noise2", NoiseTexture2);
+        // MeshInstance.SetInstanceShaderParameter("noise3", NoiseTexture3);
+        // MeshInstance.SetInstanceShaderParameter("moisture", MoistureTexture);
+        GD.Print("Noise generated");
+
+        MeshInstance = new MeshInstance3D
+        {
+            Name = Name,
+            Mesh = m
+            // Scale = new Vector3(Scale, Scale, Scale),
+        };
 
         PlanetNode rootNode = new();
 
@@ -162,14 +165,14 @@ public partial class Planet : Resource, ICelestialBody
         {
             GravitySpaceOverride = Area3D.SpaceOverride.Replace,
             GravityPoint = true,
-            GravityPointUnitDistance = Scale,
+            GravityPointUnitDistance = Radius,
             Gravity = Gravity,
             GravityDirection = new Vector3(0, -1, 0)
         };
 
         SphereShape3D areaColliderShape = new()
         {
-            Radius = Scale + Area3DExtraSpace
+            Radius = Radius + Area3DExtraSpace
         };
         CollisionShape3D areaCollider = new()
         {
@@ -247,7 +250,7 @@ public partial class Planet : Resource, ICelestialBody
         _noise1 = new FastNoiseLite
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
-            FractalGain = 0.3f,
+            FractalGain = 0.4f,
             FractalOctaves = 3,
             FractalLacunarity = 2.0f,
             DomainWarpEnabled = true,
@@ -258,7 +261,7 @@ public partial class Planet : Resource, ICelestialBody
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             DomainWarpEnabled = true,
-            FractalLacunarity = 1.9f,
+            // FractalLacunarity = 1.9f,
             Frequency = 0.009f,
             Seed = (int)rng.Randi()
         };
@@ -266,15 +269,16 @@ public partial class Planet : Resource, ICelestialBody
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             DomainWarpEnabled = true,
-            FractalLacunarity = 1.9f,
+            // FractalLacunarity = 1.9f,
+            Frequency = 0.009f,
             Seed = (int)rng.Randi()
         };
         _moisture = new FastNoiseLite
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             // DomainWarpEnabled = true,
-            FractalOctaves = 7,
-            FractalGain = 0.5f,
+            FractalOctaves = 4,
+            // FractalGain = 0.5f,
             // Frequency = 0.007f,
             // FractalLacunarity = 1.9f,
             Seed = (int)rng.Randi()
@@ -286,20 +290,106 @@ public partial class Planet : Resource, ICelestialBody
         // NoiseTexture3 = new NoiseTexture3D { Noise = noise3 };
         // MoistureTexture = new NoiseTexture3D { Noise = moisture };
 
+        RenderingDevice rd = RenderingServer.CreateLocalRenderingDevice();
+        Gradient g = new();
+        g.AddPoint(0.6f, new Color(0.9f, 0.9f, 0.9f));
+        g.AddPoint(0.8f, new Color(1.0f, 1.0f, 1.0f));
+        g.Reverse();
+
+        GradientTexture1D gradTex = new()
+        {
+            Gradient = g
+        };
+
+        RDShaderFile shader =
+            ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_heightmap.glsl");
+        RDShaderSpirV shaderSpirv = shader.GetSpirV();
+        Rid shaderRid = rd.ShaderCreateFromSpirV(shaderSpirv);
+
+        RDTextureFormat heightmapFormat = new()
+        {
+            Format = RenderingDevice.DataFormat.R8Unorm,
+            Width = 262144/2,
+            Height = 262144/2,
+            UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit |
+                        RenderingDevice.TextureUsageBits.CanCopyFromBit
+        };
+
+        Rid heightmapRid = rd.TextureCreate(heightmapFormat, new RDTextureView());
+        RDUniform heightmapUnif = new()
+        {
+            UniformType = RenderingDevice.UniformType.Image,
+            Binding = 0
+        };
+        heightmapUnif.AddId(heightmapRid);
+
+        RDTextureFormat gradFormat = new()
+        {
+            Format = RenderingDevice.DataFormat.R8G8B8A8Unorm,
+            Width = (uint)gradTex.Width,
+            Height = 1,
+            UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit
+        };
+        Rid gradRid = rd.TextureCreate(gradFormat, new RDTextureView(), [gradTex.GetImage().GetData()]);
+        RDUniform gradUnif = new()
+        {
+            UniformType = RenderingDevice.UniformType.Image,
+            Binding = 1
+        };
+        gradUnif.AddId(gradRid);
+
+        Rid uniformSet = rd.UniformSetCreate([heightmapUnif, gradUnif], shaderRid, 0);
+        Rid pipeline = rd.ComputePipelineCreate(shaderRid);
+        // The things above are expensive to make and should be stored for future runs....somehow.
+        var img1 = _noise1.GetImage3D(64, 64, 64);
+        var imgBytes = new List<byte>();
+        foreach (Image img_x in img1) imgBytes.AddRange(img_x.GetData());
+
+        // imgTex1.Create(Image.Format.L8, 64, 64, 64, true, img1);
+
+
+        rd.TextureUpdate(heightmapRid, 0, imgBytes.ToArray());
+
+        long computeBegin = rd.ComputeListBegin();
+        rd.ComputeListBindComputePipeline(computeBegin, pipeline);
+        rd.ComputeListBindUniformSet(computeBegin, uniformSet, 0);
+        rd.ComputeListDispatch(computeBegin, 64 / 8, 64 / 8, 1);
+        rd.ComputeListEnd();
+        rd.Submit();
+        rd.Sync();
+        byte[] outBytes = rd.TextureGetData(heightmapRid, 0);
+        Godot.Collections.Array<Image> images = new();
+        for (int i = 0, idx = 0; i < outBytes.Length; i += 128, idx++)
+        {
+            images[idx] = Image.CreateFromData(64, 64, true, Image.Format.L8, outBytes[i..(i+128)]);
+        }
+
+
+        // var img1 = _noise1.GetImage3D(64, 64, 64);
+        // var img2 = _noise2.GetImage3D(64, 64, 64);
+        // var img3 = _noise3.GetImage3D(64, 64, 64);
+
+
         MeshDataTool mdt = new();
         mdt.CreateFromSurface(arrayMesh, 0);
         int vCount = mdt.GetVertexCount();
+
+#if DEBUG
+        GD.Print($"Num faces: {mdt.GetFaceCount()}");
+        GD.Print($"Num Vertices: {vCount}");
+#endif
+
         float[] heightMap = new float[vCount];
         Parallel.For(0, vCount, i =>
         {
             Vector3 vert = mdt.GetVertex(i);
-            float n1 = _SampleNoise(_noise1, vert);
-            float n2 = _SampleNoise(_noise2, vert);
-            float n3 = _SampleNoise(_noise3, vert);
+            float n1 = _SampleNoise(_noise1, vert * 1.1f);
+            float n2 = _SampleNoise(_noise2, vert * 0.9f);
+            float n3 = _SampleNoise(_noise3, vert * 0.9f);
 
             float n = n1 * 1.0f + n2 * 0.33f + n3 * 0.1f;
             n /= 1.0f + 0.33f + 0.1f;
-            float height = Mathf.Pow(n * 1.2f, 8.0f) * 20f;
+            float height = Mathf.Pow(n * 1.3f, 3.6f);
             heightMap[i] = height;
         });
         Parallel.For(0, vCount, i =>
@@ -308,7 +398,7 @@ public partial class Planet : Resource, ICelestialBody
             float height = _AdjustHeight(mdt, i, heightMap[i]);
             float m = _SampleNoise(_moisture, vert);
             Vector3 vertN = mdt.GetVertexNormal(i);
-            vert += vertN * height;
+            vert += vertN * height; // * 20f;
             // vert += vertN * n;
             mdt.SetVertex(i, vert);
             mdt.SetVertexNormal(i, Vector3.Zero);
@@ -340,31 +430,31 @@ public partial class Planet : Resource, ICelestialBody
 
     private float _AdjustHeight(MeshDataTool mdt, int vIdx, float height)
     {
-        int[] faces = mdt.GetVertexFaces(vIdx);
-        Vector3 v = mdt.GetVertex(vIdx);
-        HashSet<int> vertices = [];
-        foreach (int t in faces)
-            for (int j = 0; j < 3; j++)
-                vertices.Add(mdt.GetFaceVertex(t, j));
-
-
-        GD.Print($"Num Faces: {faces.Length}");
+        // int[] faces = mdt.GetVertexFaces(vIdx);
+        // Vector3 v = mdt.GetVertex(vIdx);
+        // HashSet<int> vertices = [];
+        // foreach (int t in faces)
+        //     for (int j = 0; j < 3; j++)
+        //         vertices.Add(mdt.GetFaceVertex(t, j));
+        // 
+        // 
+        // GD.Print($"Num Faces: {faces.Length}");
         return height;
     }
 
     private Color _GetColor(float height, float m)
     {
-        if (height < 0.3)
+        if (height < 0.1)
             return DeepWater;
-        if (height < 0.36)
+        if (height < 0.15)
             return Water;
-        if (height < 0.38)
+        if (height < 0.2)
             return Desert;
 
-        if (height > 0.6)
+        if (height > 0.8)
         {
             if (m < 0.2) return MountainSide;
-            return m < 0.5 ? Tundra : Snow;
+            return m < 0.6 ? Tundra : Snow;
         }
 
         if (height > 0.5)
@@ -388,4 +478,19 @@ public partial class Planet : Resource, ICelestialBody
     {
         return (noise.GetNoise3Dv(v) + 1) / 2;
     }
+
+    private static float _SampleNoise(Array<Image> img, Vector3 v, int width, int height = -1, int depth = -1)
+    {
+        // float nx = v.X / width;
+        // float ny = v.Y / (height != -1 ? height : width);
+        // float nz = v.Z / (depth != -1 ? depth : width);
+        // float texel = img[nz].GetPixel(nx, ny);
+        // img[0].SetP
+        return 0.0f;
+    }
+
+    // private static bool _IsPowerOfTwo(ulong x)
+    // {
+    //     return x != 0 && (x & (x - 1)) == 0;
+    // }
 }

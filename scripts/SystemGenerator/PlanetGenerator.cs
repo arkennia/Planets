@@ -6,20 +6,22 @@ namespace Planets.SystemGenerator;
 [Tool]
 public partial class PlanetGenerator : EditorScript
 {
-    [Export]
-    public string PlanetName { get; set; } = "Earth";
+    private string PlanetName { get; set; } = "Earth";
 
-    [Export]
-    public Mesh Mesh { get; set; } = null;
+    private Mesh Mesh { get; set; } // new SphereMesh
+    // {
+    //     Radius = 1.0f,
+    //     Height = 2.0f,
+    //     RadialSegments = 128,
+    //     Rings = 64
+    // };
 
-    [Export]
-    public int Scale { get; set; } = 1000;
-
-    public int Resolution { get; set; } = 64;
+    private int Radius { get; set; } = 2;
+    private int Resolution { get; set; } = 128;
 
     public override void _Run()
     {
-        PlanetNode p = GeneratePlanet(PlanetName, Mesh, Scale, Resolution);
+        PlanetNode p = GeneratePlanet(PlanetName, Mesh, Radius, Resolution);
         p.Save();
     }
 

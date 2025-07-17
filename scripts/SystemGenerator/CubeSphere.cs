@@ -4,18 +4,29 @@ using Godot;
 
 namespace Planets.SystemGenerator;
 
-public partial class CubeSphere(int scale = 1000, int resolution = 32, int sides = 6) : Mesh
+public partial class CubeSphere : Mesh
 {
-    public int Scale { get; set; } = scale;
+    public int Radius { get; set; } = 500;
 
-    public int Resolution { get; set; } = resolution;
+    public int Resolution { get; set; } = 512;
 
-    public int Sides { get; set; } = sides;
+    public int Sides { get; set; } = 6;
     public const string FOLDER_PATH = "res://meshes/planets";
 
     // public string MeshName { get; set; } = meshName;
 
     private static List<GeneratedCubeSphere> _generatedCubeSpheres;
+
+    public CubeSphere()
+    {
+    }
+
+    public CubeSphere(int radius = 500, int resolution = 512, int sides = 6)
+    {
+        Resolution = resolution;
+        Radius = radius;
+        Sides = sides;
+    }
 
 
     private struct Side
@@ -86,11 +97,11 @@ public partial class CubeSphere(int scale = 1000, int resolution = 32, int sides
             LoadGeneratedCubeSpheres();
         }
 
-        GeneratedCubeSphere csg = Exists(Scale, Resolution);
+        GeneratedCubeSphere csg = Exists(Radius, Resolution);
         if (csg != default)
         {
             _m = (ArrayMesh)ResourceLoader.Load(csg.Path);
-            GD.Print($"Cubesphere mesh found with {Scale} scale and {Resolution} resolution.");
+            GD.Print($"Cubesphere mesh found with {Radius} scale and {Resolution} resolution.");
         }
         else
         {
@@ -104,18 +115,18 @@ public partial class CubeSphere(int scale = 1000, int resolution = 32, int sides
 
             _m = surfaceTool.Commit();
             // _m = GenerateNoise(_m);
-            GD.Print($"Cubesphere mesh generated with {Scale} scale and {Resolution} resolution.");
+            GD.Print($"Cubesphere mesh generated with {Radius} scale and {Resolution} resolution.");
             Save();
         }
 
         // CallDeferred(MethodName.Save);
-        
+
         return _m;
     }
 
     private void Save()
     {
-        ResourceSaver.Save(_m, $"{FOLDER_PATH}/{Resolution}_{Scale}_CubeSphere.res");
+        ResourceSaver.Save(_m, $"{FOLDER_PATH}/{Resolution}_{Radius}_CubeSphere.res");
     }
 
     private SurfaceTool GenerateMesh(SurfaceTool surfaceTool)
@@ -141,16 +152,16 @@ public partial class CubeSphere(int scale = 1000, int resolution = 32, int sides
 
                 surfaceTool.SetUV(Vector2.Zero);
                 surfaceTool.SetSmoothGroup(1);
-                surfaceTool.AddVertex(pB * Scale);
+                surfaceTool.AddVertex(pB * Radius);
                 surfaceTool.SetUV(new Vector2(1f, 0f));
                 surfaceTool.SetSmoothGroup(1);
-                surfaceTool.AddVertex(pA * Scale);
+                surfaceTool.AddVertex(pA * Radius);
                 surfaceTool.SetUV(Vector2.One);
                 surfaceTool.SetSmoothGroup(1);
-                surfaceTool.AddVertex(pC * Scale);
+                surfaceTool.AddVertex(pC * Radius);
                 surfaceTool.SetUV(new Vector2(0f, 1f));
                 surfaceTool.SetSmoothGroup(1);
-                surfaceTool.AddVertex(pD * Scale);
+                surfaceTool.AddVertex(pD * Radius);
                 surfaceTool.AddIndex(vi + 3);
                 surfaceTool.AddIndex(vi + 2);
                 surfaceTool.AddIndex(vi);
