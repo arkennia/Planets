@@ -79,6 +79,12 @@ public partial class Planet : Resource, ICelestialBody
     [Export]
     public Color Snow { get; set; } = new(0.97f, 0.96f, 0.91f);
 
+    [Export]
+    public ImageTexture3D Before { get; private set; }
+
+    [Export]
+    public ImageTexture3D After { get; private set; }
+
 
     // public NoiseTexture3D NoiseTexture1 { get; private set; }
     // public NoiseTexture3D NoiseTexture2 { get; private set; }
@@ -309,8 +315,10 @@ public partial class Planet : Resource, ICelestialBody
         RDTextureFormat heightmapFormat = new()
         {
             Format = RenderingDevice.DataFormat.R8Unorm,
-            Width = 262144/2,
-            Height = 262144/2,
+            Width = 64,
+            Height = 64,
+            Depth = 64,
+            TextureType = RenderingDevice.TextureType.Type3D,
             UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit |
                         RenderingDevice.TextureUsageBits.CanCopyFromBit
         };
@@ -342,28 +350,35 @@ public partial class Planet : Resource, ICelestialBody
         Rid pipeline = rd.ComputePipelineCreate(shaderRid);
         // The things above are expensive to make and should be stored for future runs....somehow.
         var img1 = _noise1.GetImage3D(64, 64, 64);
-        var imgBytes = new List<byte>();
-        foreach (Image img_x in img1) imgBytes.AddRange(img_x.GetData());
+        Before = new ImageTexture3D();
+        Before.Create(Image.Format.L8, 64, 64, 64, false, img1);
+        List<byte> imgBytes = [];
+        foreach (Image imgX in img1) imgBytes.AddRange(imgX.GetData());
 
         // imgTex1.Create(Image.Format.L8, 64, 64, 64, true, img1);
-
 
         rd.TextureUpdate(heightmapRid, 0, imgBytes.ToArray());
 
         long computeBegin = rd.ComputeListBegin();
         rd.ComputeListBindComputePipeline(computeBegin, pipeline);
         rd.ComputeListBindUniformSet(computeBegin, uniformSet, 0);
-        rd.ComputeListDispatch(computeBegin, 64 / 8, 64 / 8, 1);
+        rd.ComputeListDispatch(computeBegin, 8, 8, 8);
         rd.ComputeListEnd();
         rd.Submit();
         rd.Sync();
         byte[] outBytes = rd.TextureGetData(heightmapRid, 0);
-        Godot.Collections.Array<Image> images = new();
-        for (int i = 0, idx = 0; i < outBytes.Length; i += 128, idx++)
+        Array<Image> images = new();
+        images.Resize(64);
+        const int wh = 64 * 64;
+        for (int z = 0; z < 64; z++)
         {
-            images[idx] = Image.CreateFromData(64, 64, true, Image.Format.L8, outBytes[i..(i+128)]);
+            byte[] buffer = new byte[wh];
+            System.Array.Copy(outBytes, z * wh, buffer, 0, wh);
+            images[z] = Image.CreateFromData(64, 64, false, Image.Format.L8, buffer);
         }
 
+        After = new ImageTexture3D();
+        After.Create(Image.Format.L8, 64, 64, 64, false, images);
 
         // var img1 = _noise1.GetImage3D(64, 64, 64);
         // var img2 = _noise2.GetImage3D(64, 64, 64);
