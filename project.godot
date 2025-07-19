@@ -41,8 +41,13 @@ version_control/autoload_on_startup=true
 [file_customization]
 
 folder_colors={
+"res://materials/": "red",
+"res://meshes/": "teal",
+"res://resources/": "orange",
+"res://scenes/": "blue",
 "res://scripts/": "yellow",
 "res://scripts/SystemGenerator/": "green",
+"res://scripts/SystemGenerator/Terrain/": "orange",
 "res://scripts/ui/": "orange"
 }
 
