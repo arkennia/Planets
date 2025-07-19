@@ -4,19 +4,25 @@
 // Invocations in the (x, y, z) dimension
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
-// Prepare memory for the image, which will be both read and written to
-// `restrict` is used to tell the compiler that the memory will only be accessed
-// by the `heightmap` variable.
-layout(r8, binding = 0) restrict uniform image3D heightmap;
-
 // `readonly` is used to tell the compiler that we will not write to this memory.
 // This allows the compiler to make some optimizations it couldn't otherwise.
-layout(rgba8, binding = 1) restrict readonly uniform image2D gradient;
+layout(rgba8, binding = 0) restrict readonly uniform image2D gradient;
+
+// Prepare memory for the image, which will be both read and written to
+// `restrict` is used to tell the compiler that the memory will only be accessed
+// by the `noise1` variable.
+layout(r8, binding = 1) restrict uniform image3D noise1;
+layout(r8, binding = 2) restrict uniform image3D noise2;
+layout(r8, binding = 3) restrict uniform image3D noise3;
+layout(r8, binding = 4) restrict uniform image3D moisture;
+layout(r8, binding = 5) restrict uniform image3D heightMap;
+
+
 
 // The code we want to execute in each invocation
 void main() {
     ivec3 coords = ivec3(gl_GlobalInvocationID.xyz);
-    ivec3 dim = imageSize(heightmap);
+    ivec3 dim = imageSize(noise1);
     // gl_GlobalInvocationID.x uniquely identifies this invocation across all work groups
     // data_buffer.data[gl_GlobalInvocationID.x] *= 2.0;
     ivec3 center = dim / 2;
@@ -32,8 +38,8 @@ void main() {
 
     // Even though the image format only has the red channel,
 	// this will still return a vec4: `vec4(red, 0.0, 0.0, 1.0)`
-    vec4 pixel = imageLoad(heightmap, coords);
-    // pixel.r *= gradient_color.r;
+    vec4 pixel = imageLoad(noise1, coords);
+    pixel.r *= gradient_color.r;
 
     // pixel.r = step(0.2, pixel.r) * pixel.r;
     // If the pixel is below a certain threshold, this sets it to 0.0.
@@ -48,5 +54,5 @@ void main() {
 	// WARNING: make sure you are writing to the same coordinate that you read from.
 	// If you don't, you may end up writing to a pixel, before that pixel is read
 	// by a different invocation and cause errors.
-	imageStore(heightmap, coords, pixel);
+	imageStore(noise1, coords, pixel);
 }

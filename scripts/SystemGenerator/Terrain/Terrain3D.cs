@@ -16,13 +16,6 @@ public abstract partial class Terrain3D : MeshInstance3D
 
     [Export]
     public ulong Seed { get; set; } = 69000;
-#if DEBUG
-    [Export]
-    public ImageTexture3D Before { get; protected set; }
-
-    [Export]
-    public ImageTexture3D After { get; protected set; }
-#endif
 
     protected Terrain3D()
     {

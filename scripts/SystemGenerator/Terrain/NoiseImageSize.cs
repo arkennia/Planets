@@ -2,6 +2,7 @@
 
 namespace Planets.SystemGenerator.Terrain;
 
+[GlobalClass]
 public partial class NoiseImageSize : Resource
 {
     [Export] public int Width;

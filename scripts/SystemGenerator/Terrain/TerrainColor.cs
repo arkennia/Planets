@@ -2,6 +2,7 @@ using Godot;
 
 namespace Planets.SystemGenerator.Terrain;
 
+[GlobalClass]
 public partial class TerrainColor : Resource
 {
     [ExportGroup("Biome Colors")]
