@@ -1,9 +1,11 @@
 using Godot;
+using Planets.SystemGenerator.Terrain;
 
 
 namespace Planets.SystemGenerator;
 
 [Tool]
+[GlobalClass]
 public partial class PlanetGenerator : EditorScript
 {
     private string PlanetName { get; set; } = "Earth";
@@ -28,13 +30,17 @@ public partial class PlanetGenerator : EditorScript
     public static PlanetNode GeneratePlanet(string name = "Earth", Mesh mesh = null, int scale = 1000,
         int resolution = 64)
     {
-        Planet planet = new(name, mesh, scale, resolution);
-        PlanetNode mI = planet.Generate();
+        Planet planet = new(name, null, scale, resolution);
+        PlanetNode mI = new()
+        {
+            Planet = planet
+        };
+        mI.Generate();
         return mI;
     }
 
-    public static PlanetNode GeneratePlanet(Planet p)
-    {
-        return p.Generate();
-    }
+    // public static PlanetNode GeneratePlanet(Planet p)
+    // {
+    //     return p.Generate();
+    // }
 }

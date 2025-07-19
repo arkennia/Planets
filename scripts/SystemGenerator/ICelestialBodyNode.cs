@@ -5,4 +5,5 @@ public interface ICelestialBodyNode<T> where T : ICelestialBody
     ICelestialBody CelestialBody { get; }
 
     public void Save(string path);
+    public void Generate();
 }

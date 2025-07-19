@@ -9,10 +9,9 @@ font_size = 12
 [sub_resource type="LabelSettings" id="LabelSettings_sugp2"]
 font_size = 12
 
-[node name="Main" type="Node" node_paths=PackedStringArray("Player")]
+[node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
 Scale = 500
-Player = NodePath("Player")
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true

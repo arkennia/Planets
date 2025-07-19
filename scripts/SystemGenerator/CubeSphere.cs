@@ -4,7 +4,8 @@ using Godot;
 
 namespace Planets.SystemGenerator;
 
-public partial class CubeSphere : Mesh
+[GlobalClass]
+public partial class CubeSphere : Resource
 {
     public int Radius { get; set; } = 500;
 
@@ -19,6 +20,7 @@ public partial class CubeSphere : Mesh
 
     public CubeSphere()
     {
+        // Generate();
     }
 
     public CubeSphere(int radius = 500, int resolution = 512, int sides = 6)
@@ -26,6 +28,7 @@ public partial class CubeSphere : Mesh
         Resolution = resolution;
         Radius = radius;
         Sides = sides;
+        // Generate();
     }
 
 
@@ -89,6 +92,7 @@ public partial class CubeSphere : Mesh
 
     private ArrayMesh _m;
 
+
     public ArrayMesh Generate()
     {
         if (_generatedCubeSpheres == null)
@@ -107,7 +111,7 @@ public partial class CubeSphere : Mesh
         {
             SurfaceTool surfaceTool = new();
 
-            surfaceTool.Begin(PrimitiveType.Triangles);
+            surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
             surfaceTool = GenerateMesh(surfaceTool);
             surfaceTool.GenerateNormals();
             surfaceTool.GenerateTangents();
