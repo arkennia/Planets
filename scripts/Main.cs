@@ -35,11 +35,12 @@ public partial class Main : Node
             PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
             GD.Print("Planet generation complete.");
             Node3D worldNode = GetNode<Node3D>("%World");
-            p.Position = new Vector3(0, 0, -1000);
             worldNode.AddChild(p);
             GD.Print("Planet added to scene.");
             p.Save();
             GD.Print("Planet saved.");
+            p.Scale *= 500f;
+            p.Position = new Vector3(0, 0, -1000);
         }
         else
         {

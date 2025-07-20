@@ -11,7 +11,8 @@ font_size = 12
 
 [node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
-Scale = 500
+Scale = 1
+Resolution = 64
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true

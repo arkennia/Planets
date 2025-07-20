@@ -5,9 +5,14 @@ namespace Planets.SystemGenerator.Terrain;
 [GlobalClass]
 public partial class NoiseImageSize : Resource
 {
-    [Export] public int Width;
-    [Export] public int Height;
-    [Export] public int Depth;
+    [Export]
+    public int Width { get; set; } = 64;
+
+    [Export]
+    public int Height { get; set; } = 64;
+
+    [Export]
+    public int Depth { get; set; } = 64;
 
     public NoiseImageSize(int dim)
     {
@@ -23,6 +28,5 @@ public partial class NoiseImageSize : Resource
 
     public NoiseImageSize()
     {
-        Width = Height = Depth = 64;
     }
 }

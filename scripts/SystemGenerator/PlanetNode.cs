@@ -47,7 +47,12 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         SimplexTerrain3D terrain = new()
         {
             Colors = Planet.Colors,
-            Mesh = new CubeSphere(Planet.Radius, Planet.Resolution).Generate()
+            Mesh = new CubeSphere(Planet.Radius, Planet.Resolution).Generate(),
+            HeightmapSize = new NoiseImageSize(256),
+            Noise1ImageSize = new NoiseImageSize(256),
+            Noise2ImageSize = new NoiseImageSize(256),
+            Noise3ImageSize = new NoiseImageSize(256),
+            MoistureImageSize = new NoiseImageSize(128)
         };
         terrain.Generate(false, Planet.ShaderMaterial);
 
@@ -93,6 +98,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         ConcavePolygonShape3D colliderShape = new();
 
         colliderShape.SetFaces(terrain.Mesh.GetFaces());
+
         CollisionShape3D collider = new()
         {
             Shape = colliderShape

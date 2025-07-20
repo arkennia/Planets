@@ -5,3 +5,15 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_2l3v4")
+shader_parameter/waterLevel = 0.25
+shader_parameter/mountainLevel = 0.8000000000029104
+shader_parameter/DeepWater = Color(0.026, 0.022, 0.512, 1)
+shader_parameter/Water = Color(0.123, 0.547, 0.957, 1)
+shader_parameter/Forest = Color(0.037, 0.313, 0.047, 1)
+shader_parameter/Grassland = Color(0.39, 0.824, 0.408, 1)
+shader_parameter/Jungle = Color(0.063, 0.637, 0.045, 1)
+shader_parameter/Savannah = Color(0.738, 0.672, 0.412, 1)
+shader_parameter/Desert = Color(0.895, 0.802, 0.625, 1)
+shader_parameter/MountainSide = Color(0.488, 0.488, 0.488, 1)
+shader_parameter/Snow = Color(1, 1, 1, 1)
+shader_parameter/Tundra = Color(0.56, 0.56, 0.56, 1)
