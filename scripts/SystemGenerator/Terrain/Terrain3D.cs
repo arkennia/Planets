@@ -11,6 +11,9 @@ public abstract partial class Terrain3D : MeshInstance3D
     [Export]
     public TerrainColor Colors { get; set; }
 
+    [Export]
+    public bool Generated { get; protected set; } = false;
+
     // [Export(PropertyHint.NodeType, $"{nameof(ArrayMesh)}")]
     // public new Mesh Mesh { get; set; }
 

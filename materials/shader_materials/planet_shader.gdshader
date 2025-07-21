@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode ensure_correct_normals, blend_mix, diffuse_lambert, specular_schlick_ggx;
+render_mode ensure_correct_normals;
 
 varying vec3 tex_pos;
 uniform sampler3D heightMap;
