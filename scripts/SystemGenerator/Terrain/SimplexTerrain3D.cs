@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
@@ -17,7 +18,6 @@ public partial class SimplexTerrain3D : Terrain3D
 
     [Export]
     public FastNoiseLite Noise2 { get; set; }
-
 
     [Export]
     public FastNoiseLite Noise3 { get; set; }
@@ -91,8 +91,8 @@ public partial class SimplexTerrain3D : Terrain3D
     private ShaderMaterial _material;
     private bool _generateLods;
     private bool _generateCalled;
-    private const int _NUM_NOISE_IMAGES = 4;
     private ArrayMesh _mesh;
+    private float[] _heights;
 
     public SimplexTerrain3D()
     {
@@ -102,7 +102,8 @@ public partial class SimplexTerrain3D : Terrain3D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        _CreateNoise();
+        if (Noise1 is null)
+            _CreateNoise();
         if (_generateCalled)
             _Generate();
     }
@@ -273,7 +274,7 @@ public partial class SimplexTerrain3D : Terrain3D
     //         System.Array.Copy(bytes, z * _wh, buffer, 0, _wh);
     //         images[z] = Image.CreateFromData(ImageSize.Width, ImageSize.Height, false, Image.Format.L8, buffer);
     //     }
-    // 
+    //
     //     return images;
     // }
 
@@ -282,17 +283,27 @@ public partial class SimplexTerrain3D : Terrain3D
         Array<Image>[] imgs = new Array<Image>[4];
         if (UseSeamless)
         {
-            imgs[(int)NoiseImage.Noise1] = _CreateNoiseImageSeamless(Noise1, Noise1ImageSize);
-            imgs[(int)NoiseImage.Noise2] = _CreateNoiseImageSeamless(Noise2, Noise2ImageSize);
-            imgs[(int)NoiseImage.Noise3] = _CreateNoiseImageSeamless(Noise3, Noise3ImageSize);
-            imgs[(int)NoiseImage.Moisture] = _CreateNoiseImageSeamless(Moisture, MoistureImageSize);
+            var n1 = Task.Run(() => _CreateNoiseImageSeamless(Noise1, Noise1ImageSize));
+            var n2 = Task.Run(() => _CreateNoiseImageSeamless(Noise2, Noise2ImageSize));
+            var n3 = Task.Run(() => _CreateNoiseImageSeamless(Noise3, Noise3ImageSize));
+            var m = Task.Run(() => _CreateNoiseImageSeamless(Moisture, MoistureImageSize));
+            Task.WaitAll(n1, n2, n3, m);
+            imgs[(int)NoiseImage.Noise1] = n1.Result;
+            imgs[(int)NoiseImage.Noise2] = n2.Result;
+            imgs[(int)NoiseImage.Noise3] = n3.Result;
+            imgs[(int)NoiseImage.Moisture] = m.Result;
         }
         else
         {
-            imgs[(int)NoiseImage.Noise1] = _CreateNoiseImage(Noise1, Noise1ImageSize);
-            imgs[(int)NoiseImage.Noise2] = _CreateNoiseImage(Noise2, Noise2ImageSize);
-            imgs[(int)NoiseImage.Noise3] = _CreateNoiseImage(Noise3, Noise3ImageSize);
-            imgs[(int)NoiseImage.Moisture] = _CreateNoiseImage(Moisture, MoistureImageSize);
+            var n1 = Task.Run(() => _CreateNoiseImage(Noise1, Noise1ImageSize));
+            var n2 = Task.Run(() => _CreateNoiseImage(Noise2, Noise2ImageSize));
+            var n3 = Task.Run(() => _CreateNoiseImage(Noise3, Noise3ImageSize));
+            var m = Task.Run(() => _CreateNoiseImage(Moisture, MoistureImageSize));
+            Task.WaitAll(n1, n2, n3, m);
+            imgs[(int)NoiseImage.Noise1] = n1.Result;
+            imgs[(int)NoiseImage.Noise2] = n2.Result;
+            imgs[(int)NoiseImage.Noise3] = n3.Result;
+            imgs[(int)NoiseImage.Moisture] = m.Result;
         }
 
         return imgs;
@@ -435,15 +446,9 @@ public partial class SimplexTerrain3D : Terrain3D
         MeshDataTool mdt = new();
         mdt.CreateFromSurface(arrayMesh, 0);
         int vCount = mdt.GetVertexCount();
-        // if (UseComputeSampler)
-        // {
-        //     heights = _ComputeNoiseWithSamplers(noiseImages, heightMap, mdt);
-        // }
-        // else
-        // {
         _ComputeNoiseWithImages(noiseImages, heightMap);
         GD.Print("Noise compute shader finished.");
-        float[] heights = _GetVertexHeights(vCount, mdt);
+        _heights = _GetVertexHeights(vCount, mdt);
 
 
         // }
@@ -455,7 +460,7 @@ public partial class SimplexTerrain3D : Terrain3D
         GD.Print($"Num Vertices: {vCount}");
 #endif
 
-        // 
+        //
         // for (int i = 0; i < heights.Length; i++)
         // {
         //     float height = heights[i];
@@ -472,7 +477,7 @@ public partial class SimplexTerrain3D : Terrain3D
         //     float n1 = _SampleNoise(Noise1, vert * 1.1f);
         //     float n2 = _SampleNoise(Noise2, vert * 0.9f);
         //     float n3 = _SampleNoise(Noise3, vert * 0.9f);
-        // 
+        //
         //     float n = n1 * 1.0f + n2 * 0.33f + n3 * 0.1f;
         //     n /= 1.0f + 0.33f + 0.1f;
         //     float height = Mathf.Pow(n * 1.3f, 3.6f);
@@ -484,24 +489,25 @@ public partial class SimplexTerrain3D : Terrain3D
         Parallel.For(0, vCount, i =>
         {
             Vector3 vert = mdt.GetVertex(i);
-            float height = heights[i];
+            float height = _heights[i];
             float m = _SampleNoise(Moisture, vert);
             Vector3 vertN = mdt.GetVertexNormal(i);
             vert += vertN * height * .1f;
             mdt.SetVertex(i, vert);
+            // mdt.SetVertexNormal(i, Vector3.Zero);
             // mdt.SetVertexColor(i, _GetColor(height, m));
         });
-        // // 
+        // //
         // Parallel.For(0, mdt.GetFaceCount(), i =>
         // {
         //     int ia = mdt.GetFaceVertex(i, 0);
         //     int ib = mdt.GetFaceVertex(i, 1);
         //     int ic = mdt.GetFaceVertex(i, 2);
-        // 
+
         //     Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
         //     Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
         //     Vector3 normal = e1.Cross(e2);
-        // 
+
         //     mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
         //     mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
         //     mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
@@ -607,15 +613,17 @@ public partial class SimplexTerrain3D : Terrain3D
 
     private float _AdjustHeight(MeshDataTool mdt, int vIdx, float height)
     {
-        // int[] faces = mdt.GetVertexFaces(vIdx);
-        // Vector3 v = mdt.GetVertex(vIdx);
-        // HashSet<int> vertices = [];
-        // foreach (int t in faces)
-        //     for (int j = 0; j < 3; j++)
-        //         vertices.Add(mdt.GetFaceVertex(t, j));
-        // 
-        // 
-        // GD.Print($"Num Faces: {faces.Length}");
+        int[] faces = mdt.GetVertexFaces(vIdx);
+        Vector3 v = mdt.GetVertex(vIdx);
+        HashSet<int> vertices = [];
+        foreach (int t in faces)
+            for (int j = 0; j < 3; j++)
+                vertices.Add(mdt.GetFaceVertex(t, j));
+        List<float> vList = vertices.Select(v => _heights[v]).ToList();
+        vList.Sort();
+        float h1 = vList[0];
+        float h2 = vList[1];
+
         return height;
     }
 

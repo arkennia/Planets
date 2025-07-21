@@ -17,8 +17,9 @@ public abstract partial class Terrain3D : MeshInstance3D
     [Export]
     public ulong Seed { get; set; } = 69000;
 
-    protected Terrain3D()
+    public Terrain3D() : base()
     {
+
     }
 
 
@@ -31,14 +32,14 @@ public abstract partial class Terrain3D : MeshInstance3D
     //         base._ValidateProperty(property);
     //         return;
     //     }
-    // 
+    //
     //     PropertyUsageFlags propertyUsageFlags = property["usage"].As<PropertyUsageFlags>();
-    // 
+    //
     //     if (_useGeneratedMesh)
     //         propertyUsageFlags |= PropertyUsageFlags.ReadOnly;
     //     else
     //         propertyUsageFlags &= ~PropertyUsageFlags.ReadOnly;
-    // 
+    //
     //     property["usage"] = (int)propertyUsageFlags;
     //     base._ValidateProperty(property);
     // }

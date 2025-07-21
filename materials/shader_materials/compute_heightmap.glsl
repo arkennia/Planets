@@ -46,23 +46,8 @@ void main() {
     vec4 hPixel = imageLoad(heightMap, coords);
     float n = pixel1 * 1.0 + pixel2 * 0.33 + pixel3 * 0.1;
     n /= 1.0 + 0.33 + 0.1;
-    if (n > 0.7)
-        n *= 2.0;
     n = pow(n * 1.2, 3.0);
     hPixel.r = n;
 
-    // hPixel.r = step(0.1, hPixel.r) * hPixel.r;
-    // If the pixel is below a certain threshold, this sets it to 0.0.
-	// The `step()` function is like `clamp()`, but it returns 0.0 if the value is
-	// below the threshold, or 1.0 if it is above.
-	//
-	// This is why we multiply it by the pixel's value again: to get the original
-	// value back if it is above the threshold. This shorthand replaces an `if`
-	// statement, which would cause branching and thus potentially slow down the
-	// shader.
-    // Store the pixel back into the image.
-	// WARNING: make sure you are writing to the same coordinate that you read from.
-	// If you don't, you may end up writing to a pixel, before that pixel is read
-	// by a different invocation and cause errors.
 	imageStore(heightMap, coords, hPixel);
 }

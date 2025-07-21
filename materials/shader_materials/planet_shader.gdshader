@@ -4,6 +4,7 @@ render_mode ensure_correct_normals, blend_mix, diffuse_lambert, specular_schlick
 varying vec3 tex_pos;
 uniform sampler3D heightMap;
 uniform sampler3D moisture;
+uniform sampler3D normalmap;
 uniform float waterLevel = 0.32;
 uniform float mountainLevel = 0.7;
 
@@ -52,23 +53,19 @@ vec4 GetColor(float height, float m) {
 }
 
 void vertex() {
-	// Called for every vertex the material is visible on.	
-	tex_pos = VERTEX.xyz/3.0 + 0.5;	
-	float n = texture(heightMap, tex_pos).x;
-	float m = texture(moisture, tex_pos).x;
-	COLOR = GetColor(n, m).xyzw;
+	// Called for every vertex the material is visible on.
+	tex_pos = VERTEX.xyz/3.0 + 0.5;
+
+	// COLOR = GetColor(n, m).xyzw;
 }
 
 void fragment() {
-	//// Called for every pixel the material is visible on.
+	// Called for every pixel the material is visible on.
 	// NORMAL_MAP = texture(heightMap, tex_pos).xyz;
-	//float n1 = texture(noise1, tex_pos).x; 
-	//float n2 = texture(noise2, tex_pos * 2.0f).x;
-	//float n3 = texture(noise3, tex_pos * 4.0f).x;
-	//
-	//float n = n1 * 1.0f + n2 * 0.33f + n3 * 0.1f;
-	//n /= 1.0f + 0.33f + 0.1f;		
-	ALBEDO = COLOR.xyz;
+	float n = texture(heightMap, tex_pos).x;
+	float m = texture(moisture, tex_pos).x;
+
+	ALBEDO = GetColor(n, m).xyz;
 }
 
 
