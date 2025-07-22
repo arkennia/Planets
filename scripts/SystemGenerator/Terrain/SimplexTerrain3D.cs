@@ -15,7 +15,7 @@ public partial class SimplexTerrain3D : Terrain3D
     public bool UseSeamless { get; set; } = true;
 
     [Export]
-    public float WaterLevel { get; set; } = 0.26f;
+    public float WaterLevel { get; set; } = 0.2f;
 
     [Export]
     public float MountainLevel { get; set; } = 0.7f;
@@ -746,10 +746,10 @@ public partial class SimplexTerrain3D : Terrain3D
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             FractalGain = 0.4f,
-            FractalOctaves = 4,
+            FractalOctaves = 6,
             FractalLacunarity = 2.0f,
             DomainWarpEnabled = true,
-            Frequency = 0.007f,
+            Frequency = 0.01f,
             Seed = (int)rng.Randi()
         };
 
@@ -758,7 +758,7 @@ public partial class SimplexTerrain3D : Terrain3D
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
-            Frequency = 0.01f,
+            Frequency = 0.03f,
             Seed = (int)rng.Randi()
         };
         Noise3 ??= new FastNoiseLite
@@ -766,7 +766,7 @@ public partial class SimplexTerrain3D : Terrain3D
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
-            Frequency = 0.03f,
+            Frequency = 0.06f,
             Seed = (int)rng.Randi()
         };
         Moisture ??= new FastNoiseLite

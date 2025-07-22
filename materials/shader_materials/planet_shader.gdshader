@@ -22,9 +22,9 @@ uniform vec4 Tundra : source_color = vec4(0.56, 0.56, 0.56, 1.0f);
 vec4 GetColor(float height, float m) {
 	if (height < 0.06)
         return DeepWater;
-    if (height < 0.2)
-        return Water;
     if (height < waterLevel)
+        return Water;
+    if (height < waterLevel + 0.07)
         return Desert;
 
     if (height > mountainLevel)
@@ -54,7 +54,7 @@ vec4 GetColor(float height, float m) {
 
 void vertex() {
 	// Called for every vertex the material is visible on.
-	tex_pos = VERTEX.xyz/3.0 + 0.5;	
+	tex_pos = VERTEX.xyz/3.0 + 0.5;
 	//float x0 = texture(heightMap, tex_pos + vec3(-1, 0, 0)).r; // Left
     //float x1 = texture(heightMap, tex_pos + vec3(1, 0, 0)).r; // Right
     //float hx = abs(x1 - x0); // Height difference
@@ -73,8 +73,8 @@ void fragment() {
 	// NORMAL_MAP = texture(heightMap, tex_pos).xyz;
 	// NORMAL_MAP = texture(normalMap, tex_pos).xyz;
 	float n = texture(heightMap, tex_pos).x;
-	float m = texture(moisture, tex_pos).x;	
-	// vec4 vc = normalize(vec4(size.zxy, z0 - z1));	
+	float m = texture(moisture, tex_pos).x;
+	// vec4 vc = normalize(vec4(size.zxy, z0 - z1));
 	ALBEDO = GetColor(n, m).xyz;
 	// ALBEDO = COLOR.xyz;
 }
