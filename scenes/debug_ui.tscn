@@ -1,0 +1,95 @@
+[gd_scene load_steps=3 format=3 uid="uid://wpa6nw1cmvpr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0wfyh"]
+font_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_sugp2"]
+font_size = 12
+
+[node name="DebugUI" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_bottom = 103.0
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+text = "Raycast Test"
+label_settings = SubResource("LabelSettings_0wfyh")
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "PlayerPosition:"
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="PlayerPosition" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Ray Dest: "
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="RayDest" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Up Vector:"
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="Up" type="Label" parent="VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "
+"
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Result:"
+label_settings = SubResource("LabelSettings_sugp2")
+
+[node name="Result" type="Label" parent="VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "
+"
+label_settings = SubResource("LabelSettings_sugp2")
