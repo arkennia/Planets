@@ -16,8 +16,8 @@ layout(set = 0, binding = 2, std430) restrict buffer VertexBuffer {
 
 void main()
 {
-    vec3 v = vertices.data[gl_GlobalInvocationID.x].xyz;
+    vec3 v0 = vertices.data[gl_GlobalInvocationID.x].xyz;
     float idx = vertices.data[gl_GlobalInvocationID.x].w;
-    float h = texture(heightMap, v/3.0 + 0.5).x;
+    float h = texture(heightMap, v0/3.0 + 0.5).x;
     heights.data[int(idx)] = h;
 }

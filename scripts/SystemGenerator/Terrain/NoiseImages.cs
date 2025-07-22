@@ -19,4 +19,7 @@ public partial class NoiseImages : Resource
 
     [Export]
     public ImageTexture3D HeightMap { get; set; }
+
+    [Export]
+    public ImageTexture3D NormalMap { get; set; }
 }

@@ -5,6 +5,7 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_2l3v4")
+shader_parameter/heightMapDim = 0
 shader_parameter/waterLevel = 0.25
 shader_parameter/mountainLevel = 0.8000000000029104
 shader_parameter/DeepWater = Color(0.026, 0.022, 0.512, 1)

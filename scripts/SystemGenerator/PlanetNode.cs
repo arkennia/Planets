@@ -48,10 +48,10 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         {
             Colors = Planet.Colors,
             Mesh = new CubeSphere(Planet.Radius, Planet.Resolution).Generate(),
-            HeightmapSize = new NoiseImageSize(256),
-            Noise1ImageSize = new NoiseImageSize(256),
-            Noise2ImageSize = new NoiseImageSize(256),
-            Noise3ImageSize = new NoiseImageSize(256),
+            HeightmapSize = new NoiseImageSize(128),
+            Noise1ImageSize = new NoiseImageSize(128),
+            Noise2ImageSize = new NoiseImageSize(128),
+            Noise3ImageSize = new NoiseImageSize(128),
             MoistureImageSize = new NoiseImageSize(128)
         };
         terrain.Generate(false, Planet.ShaderMaterial);

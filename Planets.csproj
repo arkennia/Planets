@@ -5,7 +5,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Content Include="materials\shader_materials\compute_heightmap.glsl"/>
-        <Content Include="materials\shader_materials\compute_heightmap_sampler.glsl"/>
+        <Content Include="materials\shader_materials\compute_normalmap.glsl"/>
         <Content Include="materials\shader_materials\get_vertex_heights.glsl"/>
     </ItemGroup>
 </Project>

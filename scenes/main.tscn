@@ -1,13 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=3 format=3 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_tbgi4"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_0wfyh"]
-font_size = 12
-
-[sub_resource type="LabelSettings" id="LabelSettings_sugp2"]
-font_size = 12
 
 [node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
@@ -27,92 +21,3 @@ directional_shadow_mode = 0
 [node name="Player" parent="." instance=ExtResource("3_tbgi4")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 15.413021)
 collision_mask = 2
-
-[node name="DebugUI" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 3
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
-grow_horizontal = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DebugUI"]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -260.0
-offset_bottom = 103.0
-grow_horizontal = 0
-
-[node name="Label" type="Label" parent="DebugUI/VBoxContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Raycast Test"
-label_settings = SubResource("LabelSettings_0wfyh")
-autowrap_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="DebugUI/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label2" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 6
-text = "PlayerPosition:"
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="PlayerPosition" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 6
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="DebugUI/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-text = "Ray Dest: "
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="RayDest" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="DebugUI/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer4"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-text = "Up Vector:"
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="Up" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer4"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "
-"
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="DebugUI/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer3"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-text = "Result:"
-label_settings = SubResource("LabelSettings_sugp2")
-
-[node name="Result" type="Label" parent="DebugUI/VBoxContainer/HBoxContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "
-"
-label_settings = SubResource("LabelSettings_sugp2")
