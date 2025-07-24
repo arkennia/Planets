@@ -27,7 +27,7 @@ void main() {
     float dx = distance(fx0, fx1);
     float dy = distance(fy0, fy1);
 
-    vec3 n = normalize(vec3(hx/dx, hy/(dy), pixel.r));
+    vec3 n = normalize(vec3(hx/dx, hy/(dy), pixel.r * 2.0));
 
     imageStore(normalMap, coords, vec4(n.xyz, 1.0));
 }

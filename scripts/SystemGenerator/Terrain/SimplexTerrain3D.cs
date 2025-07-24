@@ -88,24 +88,26 @@ public partial class SimplexTerrain3D : Terrain3D
     {
         if (_generateCalled && !Generated)
         {
-            if (Noise1 is null)
-                _CreateNoise();
-            _Generate();
+            // _Generate();
             Generated = true;
         }
-#if DEBUG
-        else
-        {
-            GD.Print($"{Name} already generated!");
-        }
     }
-#endif
+// #if DEBUG
+//         else
+//         {
+//             GD.Print($"{Name} already generated!");
+//         }
+//     }
+// #endif
 
     public override void Generate(bool generateLods, ShaderMaterial shaderMaterial)
     {
+        if (Noise1 is null)
+            _CreateNoise();
         _generateLods = generateLods;
         _material = shaderMaterial;
         _generateCalled = true;
+        _Generate();
     }
 
     private void _Generate()
@@ -116,14 +118,14 @@ public partial class SimplexTerrain3D : Terrain3D
         GD.Print("Mesh loaded.");
 
         if (_generateLods) _mesh = _GenerateLoDs(_mesh);
-        Mesh m = _GenerateNoise((ArrayMesh)_mesh.Duplicate());
+        Mesh = _GenerateNoise(_mesh);
         // m.SurfaceSetMaterial(0, _material);
         // MeshInstance.SetInstanceShaderParameter("noise1", NoiseTexture1);
         // MeshInstance.SetInstanceShaderParameter("noise2", NoiseTexture2);
         // MeshInstance.SetInstanceShaderParameter("noise3", NoiseTexture3);
         // MeshInstance.SetInstanceShaderParameter("moisture", MoistureTexture);
         GD.Print("Noise generated");
-        Mesh = m;
+        // Mesh = m;
         SetSurfaceOverrideMaterial(0, _material);
         // _material.SetShaderParameter("heightMapDim", HeightmapSize.Depth);
         _generateCalled = false;
@@ -199,42 +201,42 @@ public partial class SimplexTerrain3D : Terrain3D
         };
     }
 
-/*
-    private static ComputeShaderImage _CreateComputeShaderImageSampler(RenderingDevice rd, Array<Image> img,
-        NoiseImageSize size, int binding)
-    {
-        List<byte> imgBytes = _CreateImageByteArray(img);
-        RDTextureFormat format = new()
+    /*
+        private static ComputeShaderImage _CreateComputeShaderImageSampler(RenderingDevice rd, Array<Image> img,
+            NoiseImageSize size, int binding)
         {
-            Format = RenderingDevice.DataFormat.R8Unorm,
-            Width = (uint)size.Width,
-            Height = (uint)size.Height,
-            Depth = (uint)size.Depth,
-            TextureType = RenderingDevice.TextureType.Type3D,
-            UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit |
-                        RenderingDevice.TextureUsageBits.CanCopyFromBit | RenderingDevice.TextureUsageBits.SamplingBit
-        };
+            List<byte> imgBytes = _CreateImageByteArray(img);
+            RDTextureFormat format = new()
+            {
+                Format = RenderingDevice.DataFormat.R8Unorm,
+                Width = (uint)size.Width,
+                Height = (uint)size.Height,
+                Depth = (uint)size.Depth,
+                TextureType = RenderingDevice.TextureType.Type3D,
+                UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit |
+                            RenderingDevice.TextureUsageBits.CanCopyFromBit | RenderingDevice.TextureUsageBits.SamplingBit
+            };
 
-        Rid rid = rd.TextureCreate(format, new RDTextureView());
-        RDUniform unif = new()
-        {
-            UniformType = RenderingDevice.UniformType.SamplerWithTexture,
-            Binding = binding
-        };
-        RDSamplerState state = new();
-        Rid samplerRid = rd.SamplerCreate(state);
-        unif.AddId(samplerRid);
-        unif.AddId(rid);
-        return new ComputeShaderImage
-        {
-            Format = format,
-            Rid = rid,
-            Unif = unif,
-            ImgBytes = imgBytes,
-            Binding = binding,
-        };
-    }
-*/
+            Rid rid = rd.TextureCreate(format, new RDTextureView());
+            RDUniform unif = new()
+            {
+                UniformType = RenderingDevice.UniformType.SamplerWithTexture,
+                Binding = binding
+            };
+            RDSamplerState state = new();
+            Rid samplerRid = rd.SamplerCreate(state);
+            unif.AddId(samplerRid);
+            unif.AddId(rid);
+            return new ComputeShaderImage
+            {
+                Format = format,
+                Rid = rid,
+                Unif = unif,
+                ImgBytes = imgBytes,
+                Binding = binding,
+            };
+        }
+    */
 
     private static List<byte> _CreateImageByteArray(Array<Image> img)
     {
@@ -486,27 +488,28 @@ public partial class SimplexTerrain3D : Terrain3D
             float height = Heights[i];
             // float m = _SampleNoise(Moisture, vert);
             Vector3 vertN = mdt.GetVertexNormal(i);
-            if (height > WaterLevel)
-                vert += vertN * height * .1f;
+
+            vert += vertN * height * .5f;
+
             mdt.SetVertex(i, vert);
             mdt.SetVertexNormal(i, Vector3.Zero);
             // mdt.SetVertexColor(i, _GetColor(height, m));
         });
         // //
-        // Parallel.For(0, mdt.GetFaceCount(), i =>
-        // {
-        //     int ia = mdt.GetFaceVertex(i, 0);
-        //     int ib = mdt.GetFaceVertex(i, 1);
-        //     int ic = mdt.GetFaceVertex(i, 2);
-        // 
-        //     Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
-        //     Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
-        //     Vector3 normal = e1.Cross(e2);
-        // 
-        //     mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
-        //     mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
-        //     mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
-        // });
+        Parallel.For(0, mdt.GetFaceCount(), i =>
+        {
+            int ia = mdt.GetFaceVertex(i, 0);
+            int ib = mdt.GetFaceVertex(i, 1);
+            int ic = mdt.GetFaceVertex(i, 2);
+
+            Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
+            Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
+            Vector3 normal = e1.Cross(e2);
+
+            mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
+            mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
+            mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
+        });
         arrayMesh.ClearSurfaces();
         mdt.CommitToSurface(arrayMesh);
         return arrayMesh;
@@ -748,7 +751,7 @@ public partial class SimplexTerrain3D : Terrain3D
             FractalGain = 0.4f,
             FractalOctaves = 6,
             FractalLacunarity = 2.0f,
-            DomainWarpEnabled = true,
+            // DomainWarpEnabled = true,
             Frequency = 0.01f,
             Seed = (int)rng.Randi()
         };
@@ -756,7 +759,7 @@ public partial class SimplexTerrain3D : Terrain3D
         Noise2 ??= new FastNoiseLite
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
-            DomainWarpEnabled = true,
+            // DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
             Frequency = 0.03f,
             Seed = (int)rng.Randi()
@@ -764,7 +767,7 @@ public partial class SimplexTerrain3D : Terrain3D
         Noise3 ??= new FastNoiseLite
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
-            DomainWarpEnabled = true,
+            // DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
             Frequency = 0.06f,
             Seed = (int)rng.Randi()

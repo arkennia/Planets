@@ -1,7 +1,22 @@
-[gd_scene load_steps=3 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=8 format=3 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
+[ext_resource type="Shader" uid="uid://dwrhjeby47kqr" path="res://materials/shader_materials/visual_mesh_shader.tres" id="2_sugp2"]
+[ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_tbgi4"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jyhfs"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tbgi4"]
+width = 1024
+height = 1024
+noise = SubResource("FastNoiseLite_jyhfs")
+in_3d_space = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
+render_priority = 0
+shader = ExtResource("2_sugp2")
+shader_parameter/NoiseTexture = SubResource("NoiseTexture2D_tbgi4")
 
 [node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
@@ -12,9 +27,14 @@ Resolution = 64
 unique_name_in_owner = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 494.90793)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 378.86688)
 light_angular_distance = 0.5
 directional_shadow_mode = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="World"]
+transform = Transform3D(499.99994, 0, 0, 0, 499.99997, 0, 0, 0, 499.99994, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_tefeu")
+mesh = ExtResource("3_jyhfs")
 
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
 

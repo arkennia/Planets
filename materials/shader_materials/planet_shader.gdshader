@@ -5,7 +5,7 @@ uniform uint heightMapDim;
 uniform sampler3D heightMap;
 uniform sampler3D moisture;
 uniform sampler3D normalMap;
-uniform float waterLevel = 0.32;
+uniform float waterLevel;
 uniform float mountainLevel = 0.7;
 
 uniform vec4 DeepWater : source_color = vec4(0.026, 0.022, 0.512, 1.0f);
@@ -55,17 +55,6 @@ vec4 GetColor(float height, float m) {
 void vertex() {
 	// Called for every vertex the material is visible on.
 	tex_pos = VERTEX.xyz/3.0 + 0.5;
-	//float x0 = texture(heightMap, tex_pos + vec3(-1, 0, 0)).r; // Left
-    //float x1 = texture(heightMap, tex_pos + vec3(1, 0, 0)).r; // Right
-    //float hx = abs(x1 - x0); // Height difference
-    //
-    //vec3 x0w = (tex_pos + vec3(-1, 0, 0)) * 3.0 - 0.5; // x0 in world coordinates
-    //vec3 x1w = (tex_pos + vec3(1, 0, 0)) * 3.0 - 0.5; // x1 in world coordinates
-	//float dx = distance(x0w, x1w);
-	//
-	//float slope = hx/dx;
-	//COLOR = vec4(vec3(hx), 1.0);
-	NORMAL = texture(normalMap, tex_pos).xyz * VERTEX.xyz;
 }
 
 void fragment() {

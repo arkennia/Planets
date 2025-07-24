@@ -29,32 +29,33 @@ public partial class Main : Node
     {
         Ui = (MainUi)GetNode<InstancePlaceholder>("UI").CreateInstance();
         UiManager.Instance.Ui = Ui;
+        // Mesh m = new CubeSphereV2();
         // AddChild(Ui);
-        if (!Generated)
-        {
-            PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
-            GD.Print("Planet generation complete.");
-            Node3D worldNode = GetNode<Node3D>("%World");
-            worldNode.AddChild(p);
-            GD.Print("Planet added to scene.");
-            p.Save();
-            GD.Print("Planet saved.");
-            p.Scale *= 500f;
-            p.Position = new Vector3(0, 0, -1000);
-        }
-        else
-        {
-            Error sceneLoader =
-                ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn",
-                    useSubThreads: true);
-            PackedScene scene =
-                ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
-                    PackedScene;
-            if (scene?.Instantiate() is not Node3D sceneNode) return;
-            sceneNode.Position = new Vector3(0, 0, -500);
-            GetNode("%World").AddChild(sceneNode);
-            GD.Print("Planet loaded");
-        }
+        // if (!Generated)
+        // {
+        //     PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
+        //     GD.Print("Planet generation complete.");
+        //     Node3D worldNode = GetNode<Node3D>("%World");
+        //     worldNode.AddChild(p);
+        //     GD.Print("Planet added to scene.");
+        //     p.Save();
+        //     GD.Print("Planet saved.");
+        //     p.Scale *= 500f;
+        //     p.Position = new Vector3(0, 0, -550);
+        // }
+        // else
+        // {
+        //     Error sceneLoader =
+        //         ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn",
+        //             useSubThreads: true);
+        //     PackedScene scene =
+        //         ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
+        //             PackedScene;
+        //     if (scene?.Instantiate() is not Node3D sceneNode) return;
+        //     sceneNode.Position = new Vector3(0, 0, -500);
+        //     GetNode("%World").AddChild(sceneNode);
+        //     GD.Print("Planet loaded");
+        // }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

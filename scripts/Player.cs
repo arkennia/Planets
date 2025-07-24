@@ -168,7 +168,7 @@ public partial class Player : CharacterBody3D
 
         if (result.Count == 0) return;
 
-        Control debugUI = GetNode<Control>("%DebugUI");
+        Control debugUI = GetNodeOrNull<Control>("%DebugUI");
         if (debugUI != null)
         {
             GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =

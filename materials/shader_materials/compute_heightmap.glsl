@@ -44,9 +44,9 @@ void main() {
     float pixel2 = imageLoad(noise2, coords).x;
     float pixel3 = imageLoad(noise3, coords).x;
     vec4 hPixel = imageLoad(heightMap, coords);
-    float n = pixel1 * 1.0 + pixel2 * 0.33 + pixel3 * 0.1;
-    n /= 1.0 + 0.33 + 0.1;
-    n = pow(n * 1.2, 3.0);
+    float n = pixel1 * 1.0 + pixel2 * 0.3 + pixel3 * 0.1;
+    n /= 1.0 + 0.3 + 0.1;
+    n = pow(n * 1.2, 2.0);
     hPixel.r = n;
 
 	imageStore(heightMap, coords, hPixel);

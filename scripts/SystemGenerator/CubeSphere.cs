@@ -166,12 +166,12 @@ public partial class CubeSphere : Resource
                 surfaceTool.SetUV(new Vector2(0f, 1f));
                 surfaceTool.SetSmoothGroup(1);
                 surfaceTool.AddVertex(pD * Radius);
-                surfaceTool.AddIndex(vi + 3);
-                surfaceTool.AddIndex(vi + 2);
-                surfaceTool.AddIndex(vi);
-                surfaceTool.AddIndex(vi + 2);
-                surfaceTool.AddIndex(vi + 1);
-                surfaceTool.AddIndex(vi);
+                // surfaceTool.AddIndex(vi + 3);
+                // surfaceTool.AddIndex(vi + 2);
+                // surfaceTool.AddIndex(vi);
+                // surfaceTool.AddIndex(vi + 2);
+                // surfaceTool.AddIndex(vi + 1);
+                // surfaceTool.AddIndex(vi);
 
                 pA = pC;
                 pB = pD;

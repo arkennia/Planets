@@ -47,12 +47,14 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         SimplexTerrain3D terrain = new()
         {
             Colors = Planet.Colors,
-            Mesh = new CubeSphere(Planet.Radius, Planet.Resolution).Generate(),
-            HeightmapSize = new NoiseImageSize(256),
-            Noise1ImageSize = new NoiseImageSize(256),
-            Noise2ImageSize = new NoiseImageSize(256),
-            Noise3ImageSize = new NoiseImageSize(256),
-            MoistureImageSize = new NoiseImageSize(256)
+            Mesh = new CubeSphereV2(),
+            HeightmapSize = new NoiseImageSize(128),
+            Noise1ImageSize = new NoiseImageSize(128),
+            Noise2ImageSize = new NoiseImageSize(128),
+            Noise3ImageSize = new NoiseImageSize(128),
+            MoistureImageSize = new NoiseImageSize(128),
+            WaterLevel = 0.2f,
+            UseSeamless = false
         };
         terrain.Generate(false, Planet.ShaderMaterial);
 
