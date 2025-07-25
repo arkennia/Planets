@@ -1,0 +1,101 @@
+[gd_resource type="VisualShader" load_steps=7 format=3 uid="uid://dwrhjeby47kqr"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_52gju"]
+input_name = "color"
+
+[sub_resource type="VisualShaderNodeExpression" id="VisualShaderNodeExpression_52gju"]
+size = Vector2(479.99997, 320)
+expression = "v = normalize(v);
+uv.x = 0.5 + atan(v.z,v.x)/ (PI * 2.0);
+uv.y = 0.5 + asin(v.y)/PI;
+// uv *= 5.0;"
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_vmccc"]
+input_name = "vertex"
+
+[sub_resource type="VisualShaderNodeVaryingSetter" id="VisualShaderNodeVaryingSetter_52gju"]
+varying_name = "uv"
+varying_type = 3
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_vmccc"]
+parameter_name = "NoiseTexture"
+texture_type = 1
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_6ip21"]
+source = 5
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+
+// Varyings
+varying vec2 var_uv;
+
+uniform sampler2D NoiseTexture : source_color;
+
+
+
+void vertex() {
+// Input:6
+	vec3 n_out6p0 = VERTEX;
+
+
+	vec2 n_out5p0;
+// Expression:5
+	n_out5p0 = vec2(0.0, 0.0);
+	{
+		n_out6p0 = normalize(n_out6p0);
+		n_out5p0.x = 0.5 + atan(n_out6p0.z,n_out6p0.x)/ (PI * 2.0);
+		n_out5p0.y = 0.5 + asin(n_out6p0.y)/PI;
+		// n_out5p0 *= 5.0;
+	}
+
+
+	vec4 n_out9p0;
+// Texture2D:9
+	n_out9p0 = texture(NoiseTexture, n_out5p0);
+
+
+// Output:0
+	COLOR.rgb = vec3(n_out9p0.xyz);
+
+
+	var_uv = vec2(0.0);
+}
+
+void fragment() {
+// Input:2
+	vec4 n_out2p0 = COLOR;
+
+
+// Output:0
+	ALBEDO = vec3(n_out2p0.xyz);
+
+
+}
+"
+varyings/uv = "0,3"
+nodes/vertex/0/position = Vector2(1240, 100)
+nodes/vertex/5/node = SubResource("VisualShaderNodeExpression_52gju")
+nodes/vertex/5/position = Vector2(100, 20)
+nodes/vertex/5/size = Vector2(479.99997, 320)
+nodes/vertex/5/input_ports = "0,4,v;"
+nodes/vertex/5/output_ports = "0,3,uv;"
+nodes/vertex/5/expression = "v = normalize(v);
+uv.x = 0.5 + atan(v.z,v.x)/ (PI * 2.0);
+uv.y = 0.5 + asin(v.y)/PI;
+// uv *= 5.0;"
+nodes/vertex/6/node = SubResource("VisualShaderNodeInput_vmccc")
+nodes/vertex/6/position = Vector2(-320, 40)
+nodes/vertex/7/node = SubResource("VisualShaderNodeVaryingSetter_52gju")
+nodes/vertex/7/position = Vector2(860, 140)
+nodes/vertex/8/node = SubResource("VisualShaderNodeTexture2DParameter_vmccc")
+nodes/vertex/8/position = Vector2(-300, 220)
+nodes/vertex/9/node = SubResource("VisualShaderNodeTexture_6ip21")
+nodes/vertex/9/position = Vector2(780, 280)
+nodes/vertex/connections = PackedInt32Array(6, 0, 5, 0, 8, 0, 9, 2, 5, 0, 9, 0, 9, 0, 0, 6)
+nodes/fragment/0/position = Vector2(1020, 20)
+nodes/fragment/2/node = SubResource("VisualShaderNodeInput_52gju")
+nodes/fragment/2/position = Vector2(-317.42358, -61.73458)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0)

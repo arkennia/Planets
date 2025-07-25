@@ -6,6 +6,8 @@
     <ItemGroup>
         <Content Include="materials\shader_materials\compute_heightmap.glsl"/>
         <Content Include="materials\shader_materials\compute_normalmap.glsl"/>
+        <Content Include="materials\shader_materials\generate_heightmap.glsl"/>
         <Content Include="materials\shader_materials\get_vertex_heights.glsl"/>
+        <Content Include="materials\shader_materials\get_vertex_heights_2d.glsl"/>
     </ItemGroup>
 </Project>

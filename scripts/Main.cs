@@ -3,6 +3,7 @@ using Planets.SystemGenerator;
 using Planets.UI;
 using System;
 using System.Threading.Tasks;
+using Planets.SystemGenerator.Terrain;
 
 namespace Planets;
 
@@ -56,6 +57,10 @@ public partial class Main : Node
         //     GetNode("%World").AddChild(sceneNode);
         //     GD.Print("Planet loaded");
         // }
+        PackedScene ps = new PackedScene();
+        ps.Pack(GetNode<Noise2DTerrain>("World/Noise2DTerrain"));
+        Error e = ResourceSaver.Save(ps, "res://scenes/planets/noise_tests.tscn");
+        GD.Print(e != Error.Ok ? $"Error saving scene: {e.ToString()}" : "Scene saved.");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

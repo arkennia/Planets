@@ -1,9 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=11 format=3 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
 [ext_resource type="Shader" uid="uid://dwrhjeby47kqr" path="res://materials/shader_materials/visual_mesh_shader.tres" id="2_sugp2"]
 [ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_tbgi4"]
+[ext_resource type="Script" uid="uid://d1sl118s0tsgf" path="res://scripts/SystemGenerator/Terrain/Noise2DTerrain.cs" id="4_tefeu"]
+[ext_resource type="Script" uid="uid://b2mtao5dki0cn" path="res://scripts/SystemGenerator/Terrain/TerrainColor.cs" id="5_o6xl0"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_jyhfs"]
 
@@ -17,6 +19,10 @@ in_3d_space = true
 render_priority = 0
 shader = ExtResource("2_sugp2")
 shader_parameter/NoiseTexture = SubResource("NoiseTexture2D_tbgi4")
+
+[sub_resource type="Resource" id="Resource_tipki"]
+script = ExtResource("5_o6xl0")
+metadata/_custom_type_script = "uid://b2mtao5dki0cn"
 
 [node name="Main" type="Node"]
 script = ExtResource("1_jyhfs")
@@ -33,8 +39,15 @@ directional_shadow_mode = 0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="World"]
 transform = Transform3D(499.99994, 0, 0, 0, 499.99997, 0, 0, 0, 499.99994, 0, 0, 0)
+visible = false
 material_override = SubResource("ShaderMaterial_tefeu")
 mesh = ExtResource("3_jyhfs")
+
+[node name="Noise2DTerrain" type="MeshInstance3D" parent="World"]
+mesh = ExtResource("3_jyhfs")
+script = ExtResource("4_tefeu")
+Colors = SubResource("Resource_tipki")
+metadata/_custom_type_script = "uid://d1sl118s0tsgf"
 
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
 
