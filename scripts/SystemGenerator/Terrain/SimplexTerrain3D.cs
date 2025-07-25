@@ -98,6 +98,7 @@ public partial class SimplexTerrain3D : Terrain3D
         _generateLods = generateLods;
         _material = shaderMaterial;
         _generateCalled = true;
+        Images = new NoiseImages();
         _Generate();
     }
 
@@ -109,12 +110,13 @@ public partial class SimplexTerrain3D : Terrain3D
         GD.Print("Mesh loaded.");
 
         if (_generateLods) _mesh = _GenerateLoDs(_mesh);
-        Mesh = _GenerateNoise(_mesh);
+        Mesh = _GenerateNoise(_mesh.Duplicate() as ArrayMesh);
         // m.SurfaceSetMaterial(0, _material);
         // MeshInstance.SetInstanceShaderParameter("noise1", NoiseTexture1);
         // MeshInstance.SetInstanceShaderParameter("noise2", NoiseTexture2);
         // MeshInstance.SetInstanceShaderParameter("noise3", NoiseTexture3);
-        // MeshInstance.SetInstanceShaderParameter("moisture", MoistureTexture);
+        _material.SetShaderParameter("Moisture", Images.Moisture);
+        _material.SetShaderParameter("Heights", Heights);
         GD.Print("Noise generated");
         // Mesh = m;
         SetSurfaceOverrideMaterial(0, _material);
@@ -419,6 +421,10 @@ public partial class SimplexTerrain3D : Terrain3D
         MeshDataTool mdt = new();
         mdt.CreateFromSurface(arrayMesh, 0);
         int vCount = mdt.GetVertexCount();
+        Images.Moisture = new ImageTexture3D();
+        Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
+            MoistureImageSize.Depth, false,
+            Moisture.GetImage3D(MoistureImageSize.Width, MoistureImageSize.Height, MoistureImageSize.Depth));
         // _ComputeNoiseWithImages(noiseImages, heightMap);
         // GD.Print("Noise compute shader finished.");
         // Heights = _GetVertexHeights(vCount, mdt);
@@ -440,24 +446,27 @@ public partial class SimplexTerrain3D : Terrain3D
         GD.Print($"Num faces: {mdt.GetFaceCount()}");
         GD.Print($"Num Vertices: {vCount}");
 #endif
-
+        _material.SetShaderParameter("VertexCount", vCount);
+        Heights = new float[vCount];
         Parallel.For(0, vCount, i =>
         {
             Vector3 vert = mdt.GetVertex(i);
-            float height = Heights[i];
+            // float height = Heights[i];
             float n1 = _SampleNoise(Noise1, vert);
-            float n2 = _SampleNoise(Noise2, vert);
-            float n3 = _SampleNoise(Noise3, vert);
+            float n2 = _SampleNoise(Noise2, vert * 2f);
+            float n3 = _SampleNoise(Noise3, vert * 3f);
             // float m = _SampleNoise(Moisture, vert);
+            float h = n1 * 1f + n2 * 0.2f + n3 * 0.1f;
             Vector3 vertN = mdt.GetVertexNormal(i);
+            Heights[i] = h;
 
-            vert += vertN * height * .5f;
+            vert += vertN * h * .5f;
 
             mdt.SetVertex(i, vert);
             mdt.SetVertexNormal(i, Vector3.Zero);
             // mdt.SetVertexColor(i, _GetColor(height, m));
         });
-        // //
+
         Parallel.For(0, mdt.GetFaceCount(), i =>
         {
             int ia = mdt.GetFaceVertex(i, 0);

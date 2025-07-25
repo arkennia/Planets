@@ -30,7 +30,7 @@ public partial class PlanetGenerator : EditorScript
     public static PlanetNode GeneratePlanet(string name = "Earth", Mesh mesh = null, int scale = 1000,
         int resolution = 64)
     {
-        Planet planet = new(name, null, scale, resolution);
+        Planet planet = new(name, mesh, scale, resolution);
         PlanetNode mI = new()
         {
             Planet = planet

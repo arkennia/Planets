@@ -47,7 +47,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         SimplexTerrain3D terrain = new()
         {
             Colors = Planet.Colors,
-            Mesh = new CubeSphereV2(),
+            Mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
             HeightmapSize = new NoiseImageSize(128),
             Noise1ImageSize = new NoiseImageSize(128),
             Noise2ImageSize = new NoiseImageSize(128),

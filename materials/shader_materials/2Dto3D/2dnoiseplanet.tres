@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cnhb3wyj4543f"]
+
+[ext_resource type="Shader" uid="uid://cdkwoq4e2535m" path="res://materials/shader_materials/2Dto3D/noise2d.tres" id="1_wtgut"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_wtgut")
