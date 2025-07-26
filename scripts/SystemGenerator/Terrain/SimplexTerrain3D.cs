@@ -419,35 +419,35 @@ public partial class SimplexTerrain3D : Terrain3D
             Vector3 vertN = mdt.GetVertexNormal(i);
             Heights[i] = h;
             if (h > MountainLevel)
-                vert += vertN * h * 15f;
+                vert += vertN * h * 13f;
             else vert += vertN * h * 10f;
             mdt.SetVertex(i, vert);
             mdt.SetVertexNormal(i, Vector3.Zero);
             mdt.SetVertexColor(i, _GetColor(h, m));
         });
 
-        Parallel.For(0, vCount, i =>
-        {
-            List<int> verts = [];
-            Vector3 vertex = mdt.GetVertex(i);
-            int[] edges = mdt.GetVertexEdges(i);
-            int v1;
-            int v2;
-            foreach (int edge in edges)
-            {
-                v1 = mdt.GetEdgeVertex(edge, 0);
-                v2 = mdt.GetEdgeVertex(edge, 1);
-                if (v1 == i)
-                    verts.Add(v2);
-                else verts.Add(v1);
-            }
-            verts.Sort((v1, v2) => v1.CompareTo(v2));
-            v1 = verts[0];
-            v2 = verts[1];
-            vertex = vertex + mdt.GetVertex(v1) + mdt.GetVertex(v2);
-            vertex /= 3.0f;
-            mdt.SetVertex(i, vertex);
-        });
+        // Parallel.For(0, vCount, i =>
+        // {
+        //     List<int> verts = [];
+        //     Vector3 vertex = mdt.GetVertex(i);
+        //     int[] edges = mdt.GetVertexEdges(i);
+        //     int v1;
+        //     int v2;
+        //     foreach (int edge in edges)
+        //     {
+        //         v1 = mdt.GetEdgeVertex(edge, 0);
+        //         v2 = mdt.GetEdgeVertex(edge, 1);
+        //         if (v1 == i)
+        //             verts.Add(v2);
+        //         else verts.Add(v1);
+        //     }
+        //     verts.Sort((v1, v2) => v1.CompareTo(v2));
+        //     v1 = verts[0];
+        //     v2 = verts[1];
+        //     vertex = vertex + mdt.GetVertex(v1) + mdt.GetVertex(v2);
+        //     vertex /= 3.0f;
+        //     // mdt.SetVertex(i, vertex);
+        // });
 
         Parallel.For(0, mdt.GetFaceCount(), i =>
         {

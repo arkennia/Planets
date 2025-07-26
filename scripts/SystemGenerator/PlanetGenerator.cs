@@ -10,7 +10,6 @@ public partial class PlanetGenerator : EditorScript
 {
     private string PlanetName { get; set; } = "Earth";
 
-    private Mesh Mesh { get; set; } // new SphereMesh
     // {
     //     Radius = 1.0f,
     //     Height = 2.0f,
@@ -18,19 +17,18 @@ public partial class PlanetGenerator : EditorScript
     //     Rings = 64
     // };
 
-    private int Radius { get; set; } = 2;
+    private int Scale { get; set; } = 2;
     private int Resolution { get; set; } = 128;
 
     public override void _Run()
     {
-        PlanetNode p = GeneratePlanet(PlanetName, Mesh, Radius, Resolution);
+        PlanetNode p = GeneratePlanet(PlanetName, Scale);
         p.Save();
     }
 
-    public static PlanetNode GeneratePlanet(string name = "Earth", Mesh mesh = null, int scale = 1000,
-        int resolution = 64)
+    public static PlanetNode GeneratePlanet(string name = "Earth", int scale = 1000)
     {
-        Planet planet = new(name, mesh, scale, resolution);
+        Planet planet = new(name, scale);
         PlanetNode mI = new()
         {
             Planet = planet

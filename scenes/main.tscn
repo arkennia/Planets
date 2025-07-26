@@ -6,8 +6,7 @@
 
 [node name="Main" type="Node" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_jyhfs")
-Scale = 1
-Resolution = 64
+Scale = 250
 Player = NodePath("Player")
 Mesh = ExtResource("2_sugp2")
 

@@ -16,9 +16,6 @@ public partial class Main : Node
     public int Scale { get; set; } = 1000;
 
     [Export]
-    public int Resolution { get; set; } = 512;
-
-    [Export]
     public CharacterBody3D Player { get; set; }
 
     [Export]
@@ -36,7 +33,7 @@ public partial class Main : Node
         Mesh m = Mesh;
         if (!Generated)
         {
-            PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale, resolution: Resolution);
+            PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale);
             GD.Print("Planet generation complete.");
             Node3D worldNode = GetNode<Node3D>("%World");
             worldNode.AddChild(p);
@@ -44,7 +41,7 @@ public partial class Main : Node
             p.Save();
             GD.Print("Planet saved.");
             // p.Scale *= 500f;
-            p.Position = new Vector3(0, 0, -60);
+            p.Position = new Vector3(0, 0, -15000);
         }
         else
         {

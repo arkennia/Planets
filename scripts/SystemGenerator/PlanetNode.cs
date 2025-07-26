@@ -22,6 +22,13 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public ICelestialBody CelestialBody => Planet;
 
+    private Mesh _mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res");
+
+    // private Mesh _mesh = new SphereMesh
+    // {
+    //     Radius = 60,
+    //     Height = 120,
+    // };
 
     public override void _Ready()
     {
@@ -78,14 +85,14 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         {
             GravitySpaceOverride = Area3D.SpaceOverride.Replace,
             GravityPoint = true,
-            GravityPointUnitDistance = Planet.Radius,
+            GravityPointUnitDistance = (float)_mesh.GetMeta("Radius"),
             Gravity = Planet.Gravity,
             GravityDirection = new Vector3(0, -1, 0)
         };
 
         SphereShape3D areaColliderShape = new()
         {
-            Radius = Planet.Radius + Planet.Area3DExtraSpace
+            Radius = (float)_mesh.GetMeta("Radius") + Planet.Area3DExtraSpace
         };
         CollisionShape3D areaCollider = new()
         {
@@ -125,6 +132,8 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         PlanetArea = area;
 
         PlanetTerrain = terrain;
+
+        Scale *= (float)Planet.Scale;
 
         // _mesh = null;
         // return rootNode;
