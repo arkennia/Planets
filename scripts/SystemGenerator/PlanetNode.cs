@@ -53,7 +53,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             Noise2ImageSize = new NoiseImageSize(128),
             Noise3ImageSize = new NoiseImageSize(128),
             MoistureImageSize = new NoiseImageSize(128),
-            WaterLevel = 0.2f,
+            WaterLevel = 0.3f,
             UseSeamless = false
         };
         terrain.Generate(false, Planet.ShaderMaterial);

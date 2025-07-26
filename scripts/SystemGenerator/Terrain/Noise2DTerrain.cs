@@ -45,7 +45,7 @@ public partial class Noise2DTerrain : Terrain3D
     public ImageTexture HeightMap { get; private set; }
 
 
-    private ComputeShaderImage _hShaderImage, _nShaderImage1, _nShaderImage2;
+    private ComputeShaderImage _hShaderImage;//_nShaderImage1, _nShaderImage2;
     private NoiseImageSize _hSize, _mSize;
     private FastNoiseLite _noise1, _noise2, _mNoise;
     private ImageTexture _heightMap, _moistureMap, _nImage1, _nImage2;
@@ -134,9 +134,9 @@ public partial class Noise2DTerrain : Terrain3D
         //     float height = _heights[i];
         //     // float m = _SampleNoise(Moisture, vert);
         //     Vector3 vertN = mdt.GetVertexNormal(i);
-        // 
+        //
         //     vert += vertN * height * .5f;
-        // 
+        //
         //     mdt.SetVertex(i, vert);
         //     mdt.SetVertexNormal(i, Vector3.Zero);
         //     // mdt.SetVertexColor(i, _GetColor(height, m));
@@ -147,11 +147,11 @@ public partial class Noise2DTerrain : Terrain3D
         //     int ia = mdt.GetFaceVertex(i, 0);
         //     int ib = mdt.GetFaceVertex(i, 1);
         //     int ic = mdt.GetFaceVertex(i, 2);
-        // 
+        //
         //     Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
         //     Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
         //     Vector3 normal = e1.Cross(e2);
-        // 
+        //
         //     mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
         //     mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
         //     mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());

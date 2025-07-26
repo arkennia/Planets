@@ -44,7 +44,7 @@ public partial class Main : Node
             p.Save();
             GD.Print("Planet saved.");
             // p.Scale *= 500f;
-            // p.Position = new Vector3(0, 0, -550);
+            p.Position = new Vector3(0, 0, -60);
         }
         else
         {

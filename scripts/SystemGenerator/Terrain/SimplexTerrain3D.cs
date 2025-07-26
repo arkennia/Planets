@@ -83,13 +83,13 @@ public partial class SimplexTerrain3D : Terrain3D
             Generated = true;
         }
     }
-// #if DEBUG
-//         else
-//         {
-//             GD.Print($"{Name} already generated!");
-//         }
-//     }
-// #endif
+    // #if DEBUG
+    //         else
+    //         {
+    //             GD.Print($"{Name} already generated!");
+    //         }
+    //     }
+    // #endif
 
     public override void Generate(bool generateLods, ShaderMaterial shaderMaterial)
     {
@@ -232,7 +232,7 @@ public partial class SimplexTerrain3D : Terrain3D
     //         System.Array.Copy(bytes, z * _wh, buffer, 0, _wh);
     //         images[z] = Image.CreateFromData(ImageSize.Width, ImageSize.Height, false, Image.Format.L8, buffer);
     //     }
-    // 
+    //
     //     return images;
     // }
 
@@ -390,34 +390,6 @@ public partial class SimplexTerrain3D : Terrain3D
 
     private ArrayMesh _GenerateNoise(ArrayMesh arrayMesh)
     {
-        // Array<Image> img1 = Noise1.GetImage3D(64, 64, 64);
-
-        // List<byte> imgBytes = [];
-        // foreach (Image imgX in img1) imgBytes.AddRange(imgX.GetData());
-
-        // NoiseImageSize size = new(64);
-        // Array<Image> img1 = _CreateNoiseImage(Noise1, size);
-
-        // _wh = HeightmapSize.Width * HeightmapSize.Height;
-        // Array<Image>[] noiseImages = _CreateNoiseImages();
-        // GD.Print("Noise Images created.");
-        // 
-        // Array<Image> normalMap = new();
-        // normalMap.Resize(HeightmapSize.Depth);
-        // Parallel.For(0, HeightmapSize.Depth,
-        //     i => normalMap[i] = Image.CreateEmpty(HeightmapSize.Width, HeightmapSize.Height,
-        //         false, Image.Format.Rgba8));
-        // 
-        // 
-        // Array<Image> heightMap = new();
-        // heightMap.Resize(HeightmapSize.Depth);
-        // Parallel.For(0, HeightmapSize.Depth,
-        //     i => heightMap[i] = Image.CreateEmpty(HeightmapSize.Width, HeightmapSize.Height,
-        //         false, Image.Format.L8));
-        // _SetNoiseImages(noiseImages, heightMap, normalMap);
-        // GD.Print("Noise and heightmap set.");
-        // 
-        // _rd = RenderingServer.CreateLocalRenderingDevice();
         MeshDataTool mdt = new();
         mdt.CreateFromSurface(arrayMesh, 0);
         int vCount = mdt.GetVertexCount();
@@ -425,22 +397,7 @@ public partial class SimplexTerrain3D : Terrain3D
         Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
             MoistureImageSize.Depth, false,
             Moisture.GetImage3D(MoistureImageSize.Width, MoistureImageSize.Height, MoistureImageSize.Depth));
-        // _ComputeNoiseWithImages(noiseImages, heightMap);
-        // GD.Print("Noise compute shader finished.");
-        // Heights = _GetVertexHeights(vCount, mdt);
-        // // normalMap = _ComputeNormals();
-        // // ImageTexture3D nMap = new();
-        // // nMap.Create(Image.Format.Rgba8, HeightmapSize.Width, HeightmapSize.Height, HeightmapSize.Depth,
-        // //     false, normalMap
-        // // );
-        // 
-        // // }
-        // _ComputeNormals();
-        // _material.SetShaderParameter("heightMap", Images.HeightMap);
-        // _material.SetShaderParameter("moisture", Images.Moisture);
-        // _material.SetShaderParameter("normalMap", Images.NormalMap);
-        // _material.SetShaderParameter("waterLevel", WaterLevel);
-        // _material.SetShaderParameter("mountainLevel", MountainLevel);
+
 
 #if DEBUG
         GD.Print($"Num faces: {mdt.GetFaceCount()}");
@@ -454,17 +411,42 @@ public partial class SimplexTerrain3D : Terrain3D
             // float height = Heights[i];
             float n1 = _SampleNoise(Noise1, vert);
             float n2 = _SampleNoise(Noise2, vert * 2f);
-            float n3 = _SampleNoise(Noise3, vert * 3f);
-            // float m = _SampleNoise(Moisture, vert);
-            float h = n1 * 1f + n2 * 0.2f + n3 * 0.1f;
+            float n3 = _SampleNoise(Noise3, vert * 4f);
+            float m = _SampleNoise(Moisture, vert);
+            float h = n1 * 1f + n2 * 0.33f + n3 * 0.1f;
+            h /= 1f + 0.33f + 0.1f;
+            h = (float)Mathf.Pow(h * 1.3f, 2.0);
             Vector3 vertN = mdt.GetVertexNormal(i);
             Heights[i] = h;
-
-            vert += vertN * h * .5f;
-
+            if (h > MountainLevel)
+                vert += vertN * h * 15f;
+            else vert += vertN * h * 10f;
             mdt.SetVertex(i, vert);
             mdt.SetVertexNormal(i, Vector3.Zero);
-            // mdt.SetVertexColor(i, _GetColor(height, m));
+            mdt.SetVertexColor(i, _GetColor(h, m));
+        });
+
+        Parallel.For(0, vCount, i =>
+        {
+            List<int> verts = [];
+            Vector3 vertex = mdt.GetVertex(i);
+            int[] edges = mdt.GetVertexEdges(i);
+            int v1;
+            int v2;
+            foreach (int edge in edges)
+            {
+                v1 = mdt.GetEdgeVertex(edge, 0);
+                v2 = mdt.GetEdgeVertex(edge, 1);
+                if (v1 == i)
+                    verts.Add(v2);
+                else verts.Add(v1);
+            }
+            verts.Sort((v1, v2) => v1.CompareTo(v2));
+            v1 = verts[0];
+            v2 = verts[1];
+            vertex = vertex + mdt.GetVertex(v1) + mdt.GetVertex(v2);
+            vertex /= 3.0f;
+            mdt.SetVertex(i, vertex);
         });
 
         Parallel.For(0, mdt.GetFaceCount(), i =>
@@ -677,18 +659,18 @@ public partial class SimplexTerrain3D : Terrain3D
         // _rd.FreeRid(uniformSet);
     }
 
-    /*private Color _GetColor(float height, float m)
+    private Color _GetColor(float height, float m)
     {
-        if (height < 0.1)
+        if (height < 0.18)
             return Colors.DeepWater;
-        if (height < 0.15)
-            return Colors.Water;
         if (height < WaterLevel)
+            return Colors.Water;
+        if (height < WaterLevel + 0.07)
             return Colors.Savannah;
 
-        if (height > MountainStart)
+        if (height > MountainLevel)
         {
-            if (m < 0.1) return Colors.Savannah;
+            // if (m < 0.1) return Colors.Savannah;
             if (m < 0.2) return Colors.MountainSide;
             return m < 0.6 ? Colors.Tundra : Colors.Snow;
         }
@@ -708,19 +690,20 @@ public partial class SimplexTerrain3D : Terrain3D
 
         if (m < 0.16) return Colors.Savannah;
         return m < 0.33 ? Colors.Grassland : Colors.Jungle;
-    }*/
+    }
 
     private void _CreateNoise()
     {
-        RandomNumberGenerator rng = new();
-
-        rng.Seed = Seed;
+        RandomNumberGenerator rng = new()
+        {
+            Seed = Seed
+        };
 
         Noise1 ??= new FastNoiseLite
         {
-            NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
-            FractalGain = 0.4f,
-            FractalOctaves = 6,
+            NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+            FractalGain = 0.3f,
+            FractalOctaves = 4,
             FractalLacunarity = 2.0f,
             // DomainWarpEnabled = true,
             Frequency = 0.01f,
@@ -729,7 +712,7 @@ public partial class SimplexTerrain3D : Terrain3D
 
         Noise2 ??= new FastNoiseLite
         {
-            NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
+            NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
             // DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
             Frequency = 0.03f,
@@ -737,7 +720,7 @@ public partial class SimplexTerrain3D : Terrain3D
         };
         Noise3 ??= new FastNoiseLite
         {
-            NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
+            NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
             // DomainWarpEnabled = true,
             // FractalLacunarity = 1.9f,
             Frequency = 0.06f,
@@ -747,7 +730,7 @@ public partial class SimplexTerrain3D : Terrain3D
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth,
             // DomainWarpEnabled = true,
-            FractalOctaves = 4,
+            FractalOctaves = 5,
             // FractalGain = 0.5f,
             // Frequency = 0.007f,
             // FractalLacunarity = 1.9f,

@@ -46,14 +46,14 @@ _subresources={
 }
 },
 "meshes": {
-"planet_Sphere": {
-"generate/lightmap_uv": 1,
+"planet_Icosphere": {
+"generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://meshes/planets/UVSphere.res",
-"save_to_file/path": "uid://cdv1m1n5ii26x"
+"save_to_file/fallback_path": "res://meshes/planets/Icosphere.res",
+"save_to_file/path": "uid://bqsqy10qwo6xa"
 }
 }
 }
