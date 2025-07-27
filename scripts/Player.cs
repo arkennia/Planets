@@ -13,10 +13,10 @@ public partial class Player : CharacterBody3D
     public int Speed { get; set; } = 20;
 
     [Export]
-    public int JumpSpeed { get; set; } = 3;
+    public int JumpSpeed { get; set; } = 5;
 
     [Export]
-    public float MouseSensitivty { get; set; } = 0.01f;
+    public float MouseSensitivty { get; set; } = 0.005f;
 
     private Vector3 _targetVelocity = Vector3.Zero;
 
@@ -74,11 +74,19 @@ public partial class Player : CharacterBody3D
                 Vector2 mouseMovement = motionEvent.ScreenRelative;
                 _rotation.X = -mouseMovement.X * MouseSensitivty;
                 _rotation.Y = -mouseMovement.Y * MouseSensitivty;
+                float currentRotation = _camera.Rotation.X;
                 // Transform3D t = _pivot.Transform;
                 // t.Basis = Basis.Identity;
                 // _pivot.Transform = t;
                 _pivot.Rotate(Vector3.Up, _rotation.X);
-                _camera.Rotate(Vector3.Right, (float)Mathf.Clamp(_rotation.Y, -Math.PI / 2, Math.PI / 2));
+                if (Mathf.Abs(currentRotation + _rotation.Y) > MathF.PI / 2f)
+                {
+                    _rotation.Y = 0f;
+                }
+                else
+                {
+                    _camera.Rotate(Vector3.Right, _rotation.Y);
+                }
             }
     }
 
@@ -158,10 +166,10 @@ public partial class Player : CharacterBody3D
         // UpDirection = ground_normal;
         // ApplyFloorSnap();
         // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
-        Vector3 dest = -_up * 20f;
+        Vector3 dest = -_up * 100f;
         PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
         PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
-        // query.Exclude = [GetRid()];
+        query.Exclude = [GetRid()];
         query.CollisionMask = CollisionMask;
         query.HitFromInside = true;
         Dictionary result = spaceState.IntersectRay(query);
@@ -235,7 +243,8 @@ public partial class Player : CharacterBody3D
             }
         }
 
-        if (Input.IsActionPressed("MoveDown") && !IsOnWall()) direction.Y -= 1.0f;
+        if (Input.IsActionPressed("MoveDown") &&
+            MotionMode != MotionModeEnum.Grounded) direction.Y -= 1.0f;
         return direction.Normalized();
     }
 }
