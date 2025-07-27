@@ -2,3 +2,5 @@
 .godot/
 /android/
 *.avi
+/.idea/
+Planets.sln.DotSettings.user

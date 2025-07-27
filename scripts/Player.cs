@@ -2,227 +2,240 @@ using Godot;
 using Planets.UI;
 using System;
 using System.Threading.Tasks;
+using Godot.Collections;
+using Planets.SystemGenerator;
 
-namespace Planets
+namespace Planets;
+
+public partial class Player : CharacterBody3D
 {
-    public partial class Player : CharacterBody3D
+    [Export]
+    public int Speed { get; set; } = 20;
+
+    [Export]
+    public int JumpSpeed { get; set; } = 3;
+
+    [Export]
+    public float MouseSensitivty { get; set; } = 0.01f;
+
+    private Vector3 _targetVelocity = Vector3.Zero;
+
+    private Vector2 _rotation = new();
+
+    private bool _movementDisabled = false;
+
+    private Camera3D _camera;
+
+    private Node3D _pivot;
+
+    private Vector3 _up = Vector3.Up;
+
+    private Node3D _planet;
+
+    private float _gravity;
+
+    private bool _isInAir = false;
+
+    private bool _jumped = false;
+
+    public override void _Ready()
     {
-        [Export]
-        public int Speed { get; set; } = 20;
-        [Export]
-        public int JumpSpeed { get; set; } = 3;
-        [Export]
-        public float MouseSensitivty { get; set; } = 0.01f;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+        _camera = GetNode<Camera3D>("./Pivot/MainCamera");
+        _pivot = GetNode<Node3D>("Pivot");
+        MotionMode = MotionModeEnum.Floating;
+        _ = InitUiSignals();
+        FloorSnapLength = 0.5f;
+    }
 
-        private Vector3 _targetVelocity = Vector3.Zero;
+    private async Task InitUiSignals()
+    {
+        await ToSignal(GetNode<Node>("/root/Main"), Node.SignalName.Ready);
+        UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
+        UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
+        GD.Print("Signals connected to UI.");
+    }
 
-        private Vector2 _rotation = new();
 
-        private bool _movementDisabled = false;
-
-        private Camera3D _camera;
-
-        private Node3D _pivot;
-
-        private Vector3 _up = Vector3.Up;
-
-        private Node3D _planet;
-
-        private float _gravity;
-
-        private bool _isInAir = false;
-
-        private bool _jumped = false;
-
-        public override void _Ready()
+    public override void _Input(InputEvent @event)
+    {
+        if (@event.IsActionPressed("UnlockMouse"))
         {
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            _camera = GetNode<Camera3D>("./Pivot/MainCamera");
-            _pivot = GetNode<Node3D>("Pivot");
-            MotionMode = MotionModeEnum.Floating;
-            _ = InitUiSignals();
+            _movementDisabled = !_movementDisabled;
+            if (_movementDisabled)
+                Input.MouseMode = Input.MouseModeEnum.Visible;
+            else
+                Input.MouseMode = Input.MouseModeEnum.Captured;
         }
 
-        private async Task InitUiSignals()
-        {
-            await ToSignal(GetNode<Node>("/root/Main"), Node.SignalName.Ready);
-            UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
-            UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
-            GD.Print("Signals connected to UI.");
-        }
-
-
-        public override void _Input(InputEvent @event)
-        {
-            if (@event.IsActionPressed("UnlockMouse"))
+        if (!_movementDisabled)
+            if (@event is InputEventMouseMotion motionEvent)
             {
-                _movementDisabled = !_movementDisabled;
-                if (_movementDisabled)
-                {
-                    Input.MouseMode = Input.MouseModeEnum.Visible;
-                }
-                else
-                {
-                    Input.MouseMode = Input.MouseModeEnum.Captured;
-                }
-
+                Vector2 mouseMovement = motionEvent.ScreenRelative;
+                _rotation.X = -mouseMovement.X * MouseSensitivty;
+                _rotation.Y = -mouseMovement.Y * MouseSensitivty;
+                // Transform3D t = _pivot.Transform;
+                // t.Basis = Basis.Identity;
+                // _pivot.Transform = t;
+                _pivot.Rotate(Vector3.Up, _rotation.X);
+                _camera.Rotate(Vector3.Right, (float)Mathf.Clamp(_rotation.Y, -Math.PI / 2, Math.PI / 2));
             }
+    }
 
-            if (!_movementDisabled)
-            {
-                if (@event is InputEventMouseMotion motionEvent)
-                {
-                    Vector2 mouseMovement = motionEvent.ScreenRelative;
-                    _rotation.X = -mouseMovement.X * MouseSensitivty;
-                    _rotation.Y = -mouseMovement.Y * MouseSensitivty;
-                    // Transform3D t = _pivot.Transform;
-                    // t.Basis = Basis.Identity;
-                    // _pivot.Transform = t;
-                    _pivot.Rotate(Vector3.Up, _rotation.X);
-                    _camera.RotateX((float)Mathf.Clamp(_rotation.Y, -Math.PI / 2, Math.PI / 2));
-                }
-            }
-        }
+    public override void _PhysicsProcess(double delta)
+    {
+        Vector3 direction = GetDirection();
 
-        public override void _PhysicsProcess(double delta)
+        if (MotionMode == MotionModeEnum.Grounded)
         {
-
-            Vector3 direction = GetDirection();
-
-            if (MotionMode == MotionModeEnum.Grounded)
+            _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
+            // UpDirection = _up;
+            if (direction != Vector3.Zero)
             {
-                _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
-                //UpDirection = _up;
-                if (direction != Vector3.Zero)
+                Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+                Vector3 newX = newZ.Cross(_up).Normalized();
+                direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
+                _targetVelocity = direction * Speed;
+                if (_jumped)
                 {
-                    var newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
-                    var newX = newZ.Cross(_up).Normalized();
-                    direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
-                    _targetVelocity = direction * Speed;
-                    if (_jumped)
-                    {
-                        _targetVelocity += _up * JumpSpeed;
-                        _jumped = false;
-                    }
-                    Velocity = _targetVelocity;
+                    _targetVelocity += _up * JumpSpeed;
+                    _jumped = false;
+                }
 
-                }
-                else
-                {
-                    Velocity = Vector3.Zero;
-                }
-                RotatePlayer((float)delta);
-                if (_isInAir)
-                {
-                    Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 3f * (float)delta;
-                }
+                Velocity = _targetVelocity;
             }
             else
             {
-                if (direction != Vector3.Zero)
-                {
-                    direction = direction.Normalized();
-                    // _pivot.Basis = Basis.LookingAt(direction);
-                    _targetVelocity = _camera.GlobalBasis * direction * Speed;
-                    Velocity = _targetVelocity;
-                    RotatePlayer((float)delta);
-                }
+                Velocity = Vector3.Zero;
             }
-            MoveAndSlide();
-            for (int i = 0; i < GetSlideCollisionCount(); i++)
-            {
-                var collision = GetSlideCollision(i);
-                var collider = (Node)collision.GetCollider();
-                var cParent = collider.GetOwnerOrNull<PlanetNode>();
-                if (cParent is not null && MotionMode == MotionModeEnum.Floating)
-                {
-                    MotionMode = MotionModeEnum.Grounded;
-                    Velocity = Vector3.Zero;
-                    _up = -(cParent.GlobalPosition - GlobalPosition).Normalized();
-                    _planet = cParent;
-                    _camera.Basis = Basis.Identity;
-                    GD.Print("Motion mode set to grounded.");
-                    GD.Print($"{_planet.Name}");
-                    _gravity = cParent.PlanetArea.Gravity;
-                    GD.Print($"Current gravity: {cParent.PlanetArea.Gravity} {cParent.PlanetArea.GravityDirection}");
-                    //ApplyFloorSnap();
-                }
-                else if (MotionMode == MotionModeEnum.Grounded && cParent is PlanetNode && _isInAir)
-                {
-                    _isInAir = false;
-                    GD.Print($"Is in air: {_isInAir}");
-                }
-            }
-        }
 
-        public void DisableMovement()
+            RotatePlayer((float)delta);
+            if (!IsOnFloor())
+                Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f *
+                            (float)delta;
+        }
+        else
         {
-            _movementDisabled = true;
-            Input.MouseMode = Input.MouseModeEnum.Visible;
+            if (direction != Vector3.Zero)
+            {
+                direction = direction.Normalized();
+                // _pivot.Basis = Basis.LookingAt(direction);
+                _targetVelocity = _camera.GlobalBasis * direction * Speed * 2f;
+                Velocity = _targetVelocity;
+                RotatePlayer((float)delta);
+            }
         }
 
-        public void EnableMovement()
+
+        MoveAndSlide();
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
         {
-            _movementDisabled = false;
-            Input.MouseMode = Input.MouseModeEnum.Captured;
+            KinematicCollision3D collision = GetSlideCollision(i);
+            Node collider = (Node)collision.GetCollider();
+            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
+            if (cParent is not null && MotionMode == MotionModeEnum.Floating)
+            {
+                MotionMode = MotionModeEnum.Grounded;
+                Velocity = Vector3.Zero;
+                _up = -(cParent.GlobalPosition - GlobalPosition).Normalized();
+                _planet = cParent;
+                _camera.Basis = Basis.Identity;
+                GD.Print("Motion mode set to grounded.");
+                GD.Print($"{_planet.Name}");
+                _gravity = cParent.PlanetArea.Gravity;
+                GD.Print($"Current gravity: {cParent.PlanetArea.Gravity} {cParent.PlanetArea.GravityDirection}");
+                // ApplyFloorSnap();
+            }
+            else if (MotionMode == MotionModeEnum.Grounded && cParent is not null && _isInAir)
+            {
+                _isInAir = false;
+                GD.Print($"Is in air: {_isInAir}");
+            }
         }
-        private void RotatePlayer(float delta)
+
+        if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
+        // var ground_normal = GetLastSlideCollision().GetNormal();
+        // UpDirection = ground_normal;
+        // ApplyFloorSnap();
+        // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
+        Vector3 dest = -_up * 20f;
+        PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+        // query.Exclude = [GetRid()];
+        query.CollisionMask = CollisionMask;
+        query.HitFromInside = true;
+        Dictionary result = spaceState.IntersectRay(query);
+
+        if (result.Count == 0) return;
+
+        Control debugUI = GetNodeOrNull<Control>("%DebugUI");
+        if (debugUI != null)
         {
-            Transform3D target = new();
-            target.Origin = GlobalPosition;
-            Vector3 left = _up.Cross(GlobalBasis.Z).Normalized();
-            Vector3 z = GlobalTransform.Basis.Z;
-            target.Basis = new Basis(left, _up, z).Orthonormalized();
-            Quaternion currentRotation = GlobalBasis.GetRotationQuaternion().Normalized();
-            Quaternion targetRotation = target.Basis.GetRotationQuaternion().Normalized();
-
-            Quaternion r = currentRotation.Slerp(targetRotation, 1f).Normalized();
-            GlobalBasis = new Basis(r);
+            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
+                Position.ToString("F");
+            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
+            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
         }
 
-        private Vector3 GetDirection()
+        UpDirection = (Vector3)result["normal"];
+        ApplyFloorSnap();
+    }
+
+
+    public void DisableMovement()
+    {
+        _movementDisabled = true;
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+    }
+
+    public void EnableMovement()
+    {
+        _movementDisabled = false;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+    }
+
+    private void RotatePlayer(float delta)
+    {
+        Transform3D target = new();
+        target.Origin = GlobalPosition;
+        Vector3 left = _up.Cross(GlobalBasis.Z).Normalized();
+        Vector3 z = GlobalTransform.Basis.Z;
+        target.Basis = new Basis(left, _up, z).Orthonormalized();
+        Quaternion currentRotation = GlobalBasis.GetRotationQuaternion().Normalized();
+        Quaternion targetRotation = target.Basis.GetRotationQuaternion().Normalized();
+
+        Quaternion r = currentRotation.Slerp(targetRotation, 1f).Normalized();
+        GlobalBasis = new Basis(r);
+    }
+
+    private Vector3 GetDirection()
+    {
+        Vector3 direction = Vector3.Zero;
+        if (Input.IsActionPressed("MoveLeft")) direction.X -= 1.0f;
+        if (Input.IsActionPressed("MoveRight")) direction.X += 1.0f;
+        if (Input.IsActionPressed("MoveForward")) direction.Z -= 1.0f;
+        if (Input.IsActionPressed("MoveBackward")) direction.Z += 1.0f;
+        if (Input.IsActionPressed("MoveUp"))
         {
-
-            Vector3 direction = Vector3.Zero;
-            if (Input.IsActionPressed("MoveLeft"))
+            if (MotionMode == MotionModeEnum.Grounded && !_isInAir)
             {
-                direction.X -= 1.0f;
+                _isInAir = true;
+                GD.Print($"Is in air: {_isInAir}");
+                _jumped = true;
+                direction.Y += 1.0f;
             }
-            if (Input.IsActionPressed("MoveRight"))
+            else if (MotionMode == MotionModeEnum.Floating)
             {
-                direction.X += 1.0f;
+                direction.Y += 1.0f;
             }
-            if (Input.IsActionPressed("MoveForward"))
+            else
             {
-                direction.Z -= 1.0f;
+                direction.Y += 0.0f;
             }
-            if (Input.IsActionPressed("MoveBackward"))
-            {
-                direction.Z += 1.0f;
-            }
-            if (Input.IsActionPressed("MoveUp"))
-            {
-                if (MotionMode == MotionModeEnum.Grounded && !_isInAir)
-                {
-                    _isInAir = true;
-                    GD.Print($"Is in air: {_isInAir}");
-                    _jumped = true;
-                    direction.Y += 1.0f;
-                }
-                else if (MotionMode == MotionModeEnum.Floating)
-                {
-                    direction.Y += 1.0f;
-                }
-                else
-                {
-                    direction.Y += 0.0f;
-                }
-            }
-            if (Input.IsActionPressed("MoveDown") && !IsOnWall())
-            {
-                direction.Y -= 1.0f;
-            }
-            return direction.Normalized();
         }
+
+        if (Input.IsActionPressed("MoveDown") && !IsOnWall()) direction.Y -= 1.0f;
+        return direction.Normalized();
     }
 }

@@ -1,6 +1,13 @@
-<Project Sdk="Godot.NET.Sdk/4.5.0-beta.1">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
-  </PropertyGroup>
+<Project Sdk="Godot.NET.Sdk/4.5.0-beta.3">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+    </PropertyGroup>
+    <ItemGroup>
+        <Content Include="materials\shader_materials\compute_heightmap.glsl"/>
+        <Content Include="materials\shader_materials\compute_normalmap.glsl"/>
+        <Content Include="materials\shader_materials\generate_heightmap.glsl"/>
+        <Content Include="materials\shader_materials\get_vertex_heights.glsl"/>
+        <Content Include="materials\shader_materials\get_vertex_heights_2d.glsl"/>
+    </ItemGroup>
 </Project>

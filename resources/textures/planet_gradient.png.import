@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd42h2b5yeep6"
-path.bptc="res://.godot/imported/461223167.jpg-e0010e2ef905ba54d79ccb397ee38625.bptc.ctex"
+uid="uid://d3f1v66uxyas5"
+path.s3tc="res://.godot/imported/planet_gradient.png-a3ca9e75084386ed8dfb454da8c12123.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,14 +11,16 @@ metadata={
 
 [deps]
 
-source_file="res://textures/461223167.jpg"
-dest_files=["res://.godot/imported/461223167.jpg-e0010e2ef905ba54d79ccb397ee38625.bptc.ctex"]
+source_file="res://resources/textures/planet_gradient.png"
+dest_files=["res://.godot/imported/planet_gradient.png-a3ca9e75084386ed8dfb454da8c12123.s3tc.ctex"]
 
 [params]
 
 compress/mode=2
-compress/high_quality=true
+compress/high_quality=false
 compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
@@ -26,6 +28,10 @@ mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false

@@ -1,47 +1,31 @@
 {
-    "version": "2.0.0",
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Play in Editor",
-            "type": "godot-mono",
-            "mode": "playInEditor",
-            "request": "launch"
-        },
-        {
-            "name": "Launch",
-            "type": "godot-mono",
+            "name": "Play",
+            "type": "coreclr",
             "request": "launch",
-            "mode": "executable",
             "preLaunchTask": "build",
-            "executable": "D:\\Godot_v4.4.1-stable_mono_win64\\Godot_v4.4.1-stable_mono_win64.exe",
-            // See which arguments are available here:
-            // https://docs.godotengine.org/en/stable/getting_started/editor/command_line_tutorial.html
-            "executableArguments": [
-                "--path",
-                "${workspaceRoot}"
-            ]
-        },
-        {
-            "name": "Launch (Select Scene)",
-            "type": "godot-mono",
-            "request": "launch",
-            "mode": "executable",
-            "preLaunchTask": "build",
-            "executable": "D:\\Godot_v4.4.1-stable_mono_win64\\Godot_v4.4.1-stable_mono_win64.exe",
-            // See which arguments are available here:
-            // https://docs.godotengine.org/en/stable/getting_started/editor/command_line_tutorial.html
-            "executableArguments": [
-                "--path",
-                "${workspaceRoot}",
-                "${command:SelectLaunchScene}"
-            ]
+            "program": "D:/Godot_v4.5-beta1_mono_win64/Godot_v4.5-beta1_mono_win64.exe",
+            "args": ["--debug", "--remote-debug" ,"tcp://127.0.0.1:6007"],
+            "symbolOptions": {
+                "searchPaths": ["D:\\GodotProjects\\planets\\.godot\\mono\\temp\\bin\\Debug"],
+                "searchMicrosoftSymbolServer": true,
+                "searchNuGetOrgSymbolServer": false
+            },
+            "logging": {"diagnosticsLog": {}},
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
         },
         {
             "name": "Attach",
-            "type": "godot-mono",
+            "type": "coreclr",
             "request": "attach",
-            "address": "localhost",
-            "port": 6007
+            "processId": "${command:pickProcess}"
         }
     ]
 }

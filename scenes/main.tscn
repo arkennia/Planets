@@ -1,18 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=4 format=3 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Main.cs" id="1_jyhfs"]
+[ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_tbgi4"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_jyhfs")
-Generated = true
+Scale = 250
+Player = NodePath("Player")
+Mesh = ExtResource("2_sugp2")
 
 [node name="World" type="Node3D" parent="."]
 unique_name_in_owner = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 396.939, 1122.13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 378.86688)
+light_angular_distance = 0.5
+directional_shadow_mode = 0
 
 [node name="UI" parent="." instance_placeholder="res://scenes/ui.tscn"]
 
 [node name="Player" parent="." instance=ExtResource("3_tbgi4")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 15.413021)
+collision_mask = 2
