@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://c57gjaubkht8n"
+path="res://.godot/imported/compute_heightmap.glsl-44b22c9680c7764d41473cb4ea975986.res"
+
+[deps]
+
+source_file="res://materials/shader_materials/compute/compute_heightmap.glsl"
+dest_files=["res://.godot/imported/compute_heightmap.glsl-44b22c9680c7764d41473cb4ea975986.res"]
+
+[params]
+
