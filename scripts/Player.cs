@@ -75,9 +75,6 @@ public partial class Player : CharacterBody3D
                 _rotation.X = -mouseMovement.X * MouseSensitivty;
                 _rotation.Y = -mouseMovement.Y * MouseSensitivty;
                 float currentRotation = _camera.Rotation.X;
-                // Transform3D t = _pivot.Transform;
-                // t.Basis = Basis.Identity;
-                // _pivot.Transform = t;
                 _pivot.Rotate(Vector3.Up, _rotation.X);
                 if (Mathf.Abs(currentRotation + _rotation.Y) > MathF.PI / 2f)
                 {
@@ -97,7 +94,6 @@ public partial class Player : CharacterBody3D
         if (MotionMode == MotionModeEnum.Grounded)
         {
             _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
-            // UpDirection = _up;
             if (direction != Vector3.Zero)
             {
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
@@ -162,10 +158,6 @@ public partial class Player : CharacterBody3D
         }
 
         if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
-        // var ground_normal = GetLastSlideCollision().GetNormal();
-        // UpDirection = ground_normal;
-        // ApplyFloorSnap();
-        // GD.Print($"We snappin. Is on floor?: {IsOnFloor()}");
         Vector3 dest = -_up * 100f;
         PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
         PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);

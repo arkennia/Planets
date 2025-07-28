@@ -20,17 +20,13 @@ public partial class Main : Node
 
     [Export]
     public Mesh Mesh { get; set; }
-    // [Export]
-    // public PackedScene UI { get; set; }
 
     public MainUi Ui { get; private set; } = null;
-    // Called when the node enters the scene tree for the first time.
 
     public override void _Ready()
     {
         Ui = (MainUi)GetNode<InstancePlaceholder>("UI").CreateInstance();
         UiManager.Instance.Ui = Ui;
-        Mesh m = Mesh;
         if (!Generated)
         {
             PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale);
@@ -56,15 +52,5 @@ public partial class Main : Node
             GetNode("%World").AddChild(sceneNode);
             GD.Print("Planet loaded");
         }
-
-        // PackedScene ps = new PackedScene();
-        // ps.Pack(GetNode<Noise2DTerrain>("World/Noise2DTerrain"));
-        // Error e = ResourceSaver.Save(ps, "res://scenes/planets/noise_tests.tscn");
-        // GD.Print(e != Error.Ok ? $"Error saving scene: {e.ToString()}" : "Scene saved.");
-    }
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-    {
     }
 }

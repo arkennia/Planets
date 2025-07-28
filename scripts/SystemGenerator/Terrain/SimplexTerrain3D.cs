@@ -83,13 +83,6 @@ public partial class SimplexTerrain3D : Terrain3D
             Generated = true;
         }
     }
-    // #if DEBUG
-    //         else
-    //         {
-    //             GD.Print($"{Name} already generated!");
-    //         }
-    //     }
-    // #endif
 
     public override void Generate(bool generateLods, ShaderMaterial shaderMaterial)
     {
@@ -104,7 +97,6 @@ public partial class SimplexTerrain3D : Terrain3D
 
     private void _Generate()
     {
-        // _material = shaderMaterial;
         _mesh = new ArrayMesh();
         _mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, Mesh.SurfaceGetArrays(0));
         GD.Print("Mesh loaded.");
@@ -129,7 +121,6 @@ public partial class SimplexTerrain3D : Terrain3D
         Gradient g = new();
         g.AddPoint(0.5f, new Color(0.9f, 0.9f, 0.9f));
         g.AddPoint(0.8f, new Color(1.0f, 1.0f, 1.0f));
-        // g.Reverse();
         return g;
     }
 
@@ -152,53 +143,6 @@ public partial class SimplexTerrain3D : Terrain3D
         return (noise.GetNoise3Dv(v) + 1) / 2;
     }
 
-    // private static float _SampleNoise(Array<Image> img, Vector3 v, int width, int height = -1, int depth = -1)
-    // {
-    //     // float nx = v.X / width;
-    //     // float ny = v.Y / (height != -1 ? height : width);
-    //     // float nz = v.Z / (depth != -1 ? depth : width);
-    //     // float texel = img[nz].GetPixel(nx, ny);
-    //     // img[0].SetP
-    //     return 0.0f;
-    // }
-
-    /*
-        private static ComputeShaderImage _CreateComputeShaderImageSampler(RenderingDevice rd, Array<Image> img,
-            NoiseImageSize size, int binding)
-        {
-            List<byte> imgBytes = _CreateImageByteArray(img);
-            RDTextureFormat format = new()
-            {
-                Format = RenderingDevice.DataFormat.R8Unorm,
-                Width = (uint)size.Width,
-                Height = (uint)size.Height,
-                Depth = (uint)size.Depth,
-                TextureType = RenderingDevice.TextureType.Type3D,
-                UsageBits = RenderingDevice.TextureUsageBits.StorageBit | RenderingDevice.TextureUsageBits.CanUpdateBit |
-                            RenderingDevice.TextureUsageBits.CanCopyFromBit | RenderingDevice.TextureUsageBits.SamplingBit
-            };
-
-            Rid rid = rd.TextureCreate(format, new RDTextureView());
-            RDUniform unif = new()
-            {
-                UniformType = RenderingDevice.UniformType.SamplerWithTexture,
-                Binding = binding
-            };
-            RDSamplerState state = new();
-            Rid samplerRid = rd.SamplerCreate(state);
-            unif.AddId(samplerRid);
-            unif.AddId(rid);
-            return new ComputeShaderImage
-            {
-                Format = format,
-                Rid = rid,
-                Unif = unif,
-                ImgBytes = imgBytes,
-                Binding = binding,
-            };
-        }
-    */
-
     private static List<byte> _CreateImageByteArray(Array<Image> img)
     {
         List<byte> imgBytes = [];
@@ -220,21 +164,6 @@ public partial class SimplexTerrain3D : Terrain3D
     {
         rd.TextureUpdate(tex.Rid, 0, tex.ImgBytes.ToArray());
     }
-
-    // private Array<Image> _GetImageFromGPU(RenderingDevice rd, ComputeShaderImage noiseTex, uint layer = 0)
-    // {
-    //     byte[] bytes = rd.TextureGetData(noiseTex.Rid, layer);
-    //     Array<Image> images = [];
-    //     images.Resize(ImageSize.Depth);
-    //     for (int z = 0; z < ImageSize.Depth; z++)
-    //     {
-    //         byte[] buffer = new byte[_wh];
-    //         System.Array.Copy(bytes, z * _wh, buffer, 0, _wh);
-    //         images[z] = Image.CreateFromData(ImageSize.Width, ImageSize.Height, false, Image.Format.L8, buffer);
-    //     }
-    //
-    //     return images;
-    // }
 
     private Array<Image>[] _CreateNoiseImages()
     {
@@ -425,29 +354,6 @@ public partial class SimplexTerrain3D : Terrain3D
             mdt.SetVertexNormal(i, Vector3.Zero);
             mdt.SetVertexColor(i, _GetColor(h, m));
         });
-
-        // Parallel.For(0, vCount, i =>
-        // {
-        //     List<int> verts = [];
-        //     Vector3 vertex = mdt.GetVertex(i);
-        //     int[] edges = mdt.GetVertexEdges(i);
-        //     int v1;
-        //     int v2;
-        //     foreach (int edge in edges)
-        //     {
-        //         v1 = mdt.GetEdgeVertex(edge, 0);
-        //         v2 = mdt.GetEdgeVertex(edge, 1);
-        //         if (v1 == i)
-        //             verts.Add(v2);
-        //         else verts.Add(v1);
-        //     }
-        //     verts.Sort((v1, v2) => v1.CompareTo(v2));
-        //     v1 = verts[0];
-        //     v2 = verts[1];
-        //     vertex = vertex + mdt.GetVertex(v1) + mdt.GetVertex(v2);
-        //     vertex /= 3.0f;
-        //     // mdt.SetVertex(i, vertex);
-        // });
 
         Parallel.For(0, mdt.GetFaceCount(), i =>
         {

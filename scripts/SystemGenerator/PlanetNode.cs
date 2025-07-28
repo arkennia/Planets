@@ -24,12 +24,6 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     private Mesh _mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res");
 
-    // private Mesh _mesh = new SphereMesh
-    // {
-    //     Radius = 60,
-    //     Height = 120,
-    // };
-
     public override void _Ready()
     {
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
@@ -45,12 +39,6 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public void Generate()
     {
-        // MeshInstance = new MeshInstance3D
-        // {
-        //     Name = Name,
-        //     Mesh = m
-        //     // Scale = new Vector3(Scale, Scale, Scale),
-        // };
         SimplexTerrain3D terrain = new()
         {
             Colors = Planet.Colors,
@@ -64,17 +52,6 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             UseSeamless = false
         };
         terrain.Generate(false, Planet.ShaderMaterial);
-
-        // PlanetNode rootNode = new();
-
-        // if (ShaderMaterial.Duplicate() is ShaderMaterial material)
-        // {
-        //     MeshInstance.SetSurfaceOverrideMaterial(0, material);
-        //     material.SetShaderParameter("noise1", NoiseTexture1);
-        //     material.SetShaderParameter("noise2", NoiseTexture2);
-        //     material.SetShaderParameter("noise3", NoiseTexture3);
-        //     material.SetShaderParameter("moisture", MoistureTexture);
-        // }
 
         StaticBody3D sB = new()
         {
@@ -114,7 +91,6 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         };
         collider.Scale *= 1.001f;
 
-        // rootNode.Planet = this;
         AddChild(terrain);
         AddChild(area);
         area.Owner = this;
@@ -135,8 +111,5 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         PlanetTerrain = terrain;
 
         Scale *= (float)Planet.Scale;
-
-        // _mesh = null;
-        // return rootNode;
     }
 }
