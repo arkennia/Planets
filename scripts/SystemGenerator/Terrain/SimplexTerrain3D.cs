@@ -8,73 +8,103 @@ using Godot.Collections;
 
 namespace Planets.SystemGenerator.Terrain;
 
+/** <summary>
+ * Class <c>SimplexTerrain3D</c> uses the Fast Noise Lite library to create terrain using
+ * simplex noise.
+ * <br/>
+ * Note: The majority of the work is CPU bound.
+ * </summary>
+ */
 [GlobalClass]
 public partial class SimplexTerrain3D : Terrain3D
 {
+    /// <summary>
+    /// Use seamless images.
+    /// </summary>
     [Export]
     public bool UseSeamless { get; set; } = true;
 
+    /// <summary>
+    /// Set the maximum height for water level. [0, 1.0]
+    /// </summary>
     [Export]
     public float WaterLevel { get; set; } = 0.2f;
 
+    /// <summary>
+    /// The minimum height for the
+    /// </summary>
     [Export]
     public float MountainLevel { get; set; } = 0.7f;
 
+    // These were for when I was using compute shaders.
+    // [Export]
+    // public RDShaderFile ComputeShaderImages { get; set; } =
+    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_heightmap.glsl");
 
-    [Export]
-    public RDShaderFile ComputeShaderImages { get; set; } =
-        ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_heightmap.glsl");
+    // [Export]
+    // public RDShaderFile VertexHeightShader { get; set; } =
+    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/get_vertex_heights.glsl");
 
-    [Export]
-    public RDShaderFile VertexHeightShader { get; set; } =
-        ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/get_vertex_heights.glsl");
-
-    [Export]
-    public RDShaderFile ComputerNormalsShader { get; set; } =
-        ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_normalmap.glsl");
+    // [Export]
+    // public RDShaderFile ComputerNormalsShader { get; set; } =
+    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_normalmap.glsl");
 
 
+    /// <summary>
+    /// The size in pixels of the heightmap.
+    /// </summary>
     [ExportGroup("Image Sizes")]
     [Export]
     public NoiseImageSize HeightmapSize { get; set; } = new();
 
-    [Export]
-    public NoiseImageSize Noise1ImageSize { get; set; } = new();
+    // [Export]
+    // public NoiseImageSize Noise1ImageSize { get; set; } = new();
 
-    [Export]
-    public NoiseImageSize Noise2ImageSize { get; set; } = new();
+    // [Export]
+    // public NoiseImageSize Noise2ImageSize { get; set; } = new();
 
-    [Export]
-    public NoiseImageSize Noise3ImageSize { get; set; } = new();
+    // [Export]
+    // public NoiseImageSize Noise3ImageSize { get; set; } = new();
 
+    /// <summary>
+    /// The size in pixels of the moisture noise image.
+    /// </summary>
     [Export]
     public NoiseImageSize MoistureImageSize { get; set; } = new();
 
-    // ReSharper disable once MemberCanBePrivate.Global
+    /// <summary>
+    /// The heights by vertex index.
+    /// </summary>
     public float[] Heights { get; private set; }
+
+    // The noise declarations and the noise images.
     private FastNoiseLite Noise1 { get; set; }
     private FastNoiseLite Noise2 { get; set; }
     private FastNoiseLite Noise3 { get; set; }
     private FastNoiseLite Moisture { get; set; }
     private NoiseImages Images { get; set; }
-    private Gradient Gradient { get; set; } = _CreateDefaultGradient();
+    // private Gradient Gradient { get; set; } = _CreateDefaultGradient();
 
-    private enum NoiseImage
-    {
-        Noise1 = 0,
-        Noise2 = 1,
-        Noise3 = 2,
-        Moisture = 3
-    }
+    // private enum NoiseImage
+    // {
+    //     Noise1 = 0,
+    //     Noise2 = 1,
+    //     Noise3 = 2,
+    //     Moisture = 3
+    // }
 
-    private RenderingDevice _rd;
-    private int _wh;
+    // private RenderingDevice _rd;
+    // private int _wh;
     private ShaderMaterial _material;
     private bool _generateLods;
     private bool _generateCalled;
     private ArrayMesh _mesh;
 
     // Called when the node enters the scene tree for the first time.
+
+    /// <summary>
+    /// Called when the node enters the scene. Checks if this node has been generated or not yet.
+    /// </summary>
     public override void _Ready()
     {
         if (_generateCalled && !Generated)
@@ -83,8 +113,7 @@ public partial class SimplexTerrain3D : Terrain3D
             Generated = true;
         }
     }
-
-    public override void Generate(bool generateLods, ShaderMaterial shaderMaterial)
+    public override void Generate(bool generateLods, ShaderMaterial shaderMaterial = null)
     {
         if (Noise1 is null)
             _CreateNoise();
@@ -165,7 +194,7 @@ public partial class SimplexTerrain3D : Terrain3D
         rd.TextureUpdate(tex.Rid, 0, tex.ImgBytes.ToArray());
     }
 
-    private Array<Image>[] _CreateNoiseImages()
+    /* private Array<Image>[] _CreateNoiseImages()
     {
         Array<Image>[] imgs = new Array<Image>[4];
         if (UseSeamless)
@@ -194,40 +223,40 @@ public partial class SimplexTerrain3D : Terrain3D
         }
 
         return imgs;
-    }
+    } */
 
-    private void _SetNoiseImages(Array<Image>[] imgs, Array<Image> heightMap, Array<Image> normalMap)
-    {
-        Images = new NoiseImages();
-        Images.Noise1 = new ImageTexture3D();
+    /*  private void _SetNoiseImages(Array<Image>[] imgs, Array<Image> heightMap, Array<Image> normalMap)
+     {
+         Images = new NoiseImages();
+         Images.Noise1 = new ImageTexture3D();
 
-        Images.Noise1.Create(Image.Format.L8, Noise1ImageSize.Width, Noise1ImageSize.Height, Noise1ImageSize.Depth,
-            false, imgs[0]);
+         Images.Noise1.Create(Image.Format.L8, Noise1ImageSize.Width, Noise1ImageSize.Height, Noise1ImageSize.Depth,
+             false, imgs[0]);
 
-        Images.Noise2 = new ImageTexture3D();
-        Images.Noise2.Create(Image.Format.L8, Noise2ImageSize.Width, Noise2ImageSize.Height, Noise2ImageSize.Depth,
-            false, imgs[1]);
+         Images.Noise2 = new ImageTexture3D();
+         Images.Noise2.Create(Image.Format.L8, Noise2ImageSize.Width, Noise2ImageSize.Height, Noise2ImageSize.Depth,
+             false, imgs[1]);
 
-        Images.Noise3 = new ImageTexture3D();
-        Images.Noise3.Create(Image.Format.L8, Noise3ImageSize.Width, Noise3ImageSize.Height, Noise3ImageSize.Depth,
-            false, imgs[2]);
+         Images.Noise3 = new ImageTexture3D();
+         Images.Noise3.Create(Image.Format.L8, Noise3ImageSize.Width, Noise3ImageSize.Height, Noise3ImageSize.Depth,
+             false, imgs[2]);
 
-        Images.Moisture = new ImageTexture3D();
-        Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
-            MoistureImageSize.Depth, false, imgs[3]);
+         Images.Moisture = new ImageTexture3D();
+         Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
+             MoistureImageSize.Depth, false, imgs[3]);
 
-        Images.HeightMap = new ImageTexture3D();
-        Images.HeightMap.Create(Image.Format.L8, HeightmapSize.Width, HeightmapSize.Height, HeightmapSize.Depth, false,
-            heightMap);
+         Images.HeightMap = new ImageTexture3D();
+         Images.HeightMap.Create(Image.Format.L8, HeightmapSize.Width, HeightmapSize.Height, HeightmapSize.Depth, false,
+             heightMap);
 
-        Images.NormalMap = new ImageTexture3D();
-        Images.NormalMap.Create(Image.Format.Rgba8, HeightmapSize.Width, HeightmapSize.Height, HeightmapSize.Depth,
-            false,
-            normalMap);
-    }
+         Images.NormalMap = new ImageTexture3D();
+         Images.NormalMap.Create(Image.Format.Rgba8, HeightmapSize.Width, HeightmapSize.Height, HeightmapSize.Depth,
+             false,
+             normalMap);
+     } */
 
 
-    private void _ComputeNoiseWithImages(Array<Image>[] noiseImages, Array<Image> heightMap)
+    /* private void _ComputeNoiseWithImages(Array<Image>[] noiseImages, Array<Image> heightMap)
     {
         RDShaderFile shader = ComputeShaderImages;
         RDShaderSpirV shaderSpirv = shader.GetSpirV();
@@ -314,7 +343,7 @@ public partial class SimplexTerrain3D : Terrain3D
         _rd.FreeRid(shaderRid);
         // _rd.FreeRid(pipeline);
         // _rd.FreeRid(uniformSet);
-    }
+    } */
 
 
     private ArrayMesh _GenerateNoise(ArrayMesh arrayMesh)
@@ -374,7 +403,7 @@ public partial class SimplexTerrain3D : Terrain3D
         return arrayMesh;
     }
 
-    private float[] _GetVertexHeights(int vertexCount, MeshDataTool mdt)
+    /* private float[] _GetVertexHeights(int vertexCount, MeshDataTool mdt)
     {
         float[] heights = new float[vertexCount];
         float[] verts = new float[vertexCount * 4];
@@ -475,7 +504,8 @@ public partial class SimplexTerrain3D : Terrain3D
         return heights;
     }
 
-    private void _ComputeNormals()
+ */
+    /* private void _ComputeNormals()
     {
         RDShaderFile shader = ComputerNormalsShader;
         RDShaderSpirV shaderSpirv = shader.GetSpirV();
@@ -563,7 +593,7 @@ public partial class SimplexTerrain3D : Terrain3D
         _rd.FreeRid(shaderRid);
         // _rd.FreeRid(pipeline);
         // _rd.FreeRid(uniformSet);
-    }
+    } */
 
     private Color _GetColor(float height, float m)
     {

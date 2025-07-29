@@ -4,6 +4,9 @@ using Planets.SystemGenerator.Terrain;
 
 namespace Planets.SystemGenerator;
 
+/// <summary>
+/// PlanetGenerator generates a planet node to be placed into the scenetree. It can be run in the editor.
+/// </summary>
 [Tool]
 [GlobalClass]
 public partial class PlanetGenerator : EditorScript
@@ -11,7 +14,6 @@ public partial class PlanetGenerator : EditorScript
     private string PlanetName { get; set; } = "Earth";
 
     private int Scale { get; set; } = 2;
-    private int Resolution { get; set; } = 128;
 
     public override void _Run()
     {

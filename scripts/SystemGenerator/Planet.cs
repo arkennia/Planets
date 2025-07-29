@@ -1,12 +1,12 @@
-using Godot;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-// ReSharper disable once RedundantUsingDirective
-using Godot.Collections;
+using Godot;
 
 namespace Planets.SystemGenerator;
 
+/// <summary>
+/// The <c>Planet</c> class inherits Resource, and implements ICelestialBody. It contains all of the data describing a Planet. <br/>
+/// To be used in conjunction with the PlanetNode class.
+/// </summary>
 [GlobalClass]
 public partial class Planet : Resource, ICelestialBody
 {
@@ -15,13 +15,21 @@ public partial class Planet : Resource, ICelestialBody
 
     [Export]
     public string Area3DName { get; private set; }
-
+    /// <summary>
+    /// The buffer space for the area3D which acts as a way to trigger gravity acting on a body that enters it.
+    /// </summary>
     [Export]
     public int Area3DExtraSpace { get; set; } = 3000;
 
+    /// <summary>
+    /// The acceleration due to gravity.
+    /// </summary>
     [Export]
     public float Gravity { get; set; } = 9.8f;
 
+    /// <summary>
+    /// The amount to scale the Planet object.
+    /// </summary>
     [Export]
     public int Scale { get; set; }
 

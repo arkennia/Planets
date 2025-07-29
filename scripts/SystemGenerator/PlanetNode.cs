@@ -3,6 +3,10 @@ using Planets.SystemGenerator.Terrain;
 
 namespace Planets.SystemGenerator;
 
+/// <summary>
+/// PlanetNode is a holder for a Planet object, and implements both Node3D and ICelestialBodyNode. The
+/// purpose of this class is to add a Planet to the scene tree and display it.
+/// </summary>
 public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 {
     [Export]
@@ -44,9 +48,9 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             Colors = Planet.Colors,
             Mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
             HeightmapSize = new NoiseImageSize(128),
-            Noise1ImageSize = new NoiseImageSize(128),
-            Noise2ImageSize = new NoiseImageSize(128),
-            Noise3ImageSize = new NoiseImageSize(128),
+            // Noise1ImageSize = new NoiseImageSize(128),
+            // Noise2ImageSize = new NoiseImageSize(128),
+            // Noise3ImageSize = new NoiseImageSize(128),
             MoistureImageSize = new NoiseImageSize(128),
             WaterLevel = 0.3f,
             UseSeamless = false

@@ -1,17 +1,26 @@
-using Godot;
-using Planets.UI;
 using System;
 using System.Threading.Tasks;
+using Godot;
 using Godot.Collections;
 using Planets.SystemGenerator;
+using Planets.UI;
 
 namespace Planets;
 
+/// <summary>
+/// Player inherits CharacterBody3D and is the controller for the player character.
+/// </summary>
 public partial class Player : CharacterBody3D
 {
+    /// <summary>
+    /// Speed of the player.
+    /// </summary>
     [Export]
     public int Speed { get; set; } = 20;
 
+    /// <summary>
+    /// Upward momentary speed when jumping.
+    /// </summary>
     [Export]
     public int JumpSpeed { get; set; } = 5;
 
@@ -76,6 +85,7 @@ public partial class Player : CharacterBody3D
                 _rotation.Y = -mouseMovement.Y * MouseSensitivty;
                 float currentRotation = _camera.Rotation.X;
                 _pivot.Rotate(Vector3.Up, _rotation.X);
+                // Prevents the camera for doing a 360 spin and going upside down.
                 if (Mathf.Abs(currentRotation + _rotation.Y) > MathF.PI / 2f)
                 {
                     _rotation.Y = 0f;
@@ -96,6 +106,7 @@ public partial class Player : CharacterBody3D
             _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
             if (direction != Vector3.Zero)
             {
+                // Translate the input direction(s) to actual world direction while on a planet.
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                 Vector3 newX = newZ.Cross(_up).Normalized();
                 direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
@@ -114,12 +125,14 @@ public partial class Player : CharacterBody3D
             }
 
             RotatePlayer((float)delta);
+            // Apply gravity when not on the ground.
             if (!IsOnFloor())
                 Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f *
                             (float)delta;
         }
         else
         {
+            // Control the floating movement when not tied to a planet.
             if (direction != Vector3.Zero)
             {
                 direction = direction.Normalized();
@@ -157,6 +170,7 @@ public partial class Player : CharacterBody3D
             }
         }
 
+        // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
         if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
         Vector3 dest = -_up * 100f;
         PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;

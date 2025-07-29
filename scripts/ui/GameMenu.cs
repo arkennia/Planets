@@ -1,9 +1,12 @@
-using Godot;
 using System;
 using System.Threading.Tasks;
+using Godot;
 
 namespace Planets.UI;
 
+/// <summary>
+/// GameMenu is the menu that appears when the Esc key is pressed.
+/// </summary>
 public partial class GameMenu : Control
 {
     [Export]
