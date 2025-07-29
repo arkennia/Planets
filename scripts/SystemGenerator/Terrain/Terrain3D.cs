@@ -27,6 +27,11 @@ public abstract partial class Terrain3D : MeshInstance3D
     [Export]
     public ulong Seed { get; set; } = 69000;
 
+    public Node3D[] SpawnPoints => _spawnPoints;
+
+    public const int NUM_SPAWN_POINTS = 10;
+    protected Node3D[] _spawnPoints = new Node3D[NUM_SPAWN_POINTS];
+
     /// <summary>
     /// Generates the terrain.
     /// </summary>
@@ -36,5 +41,17 @@ public abstract partial class Terrain3D : MeshInstance3D
     /// <param name="generateLods">Optional, generate LODs.</param>
     /// <param name="shaderMaterial">The shader material to use.</param>
     public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial = null);
+
+    protected void _GenerateSpawnPoints(MeshDataTool mdt, int vCount)
+    {
+        RandomNumberGenerator rng = new();
+        for (int i = 0; i < NUM_SPAWN_POINTS; i++)
+        {
+            _spawnPoints[i] = new()
+            {
+                Position = mdt.GetVertex(rng.RandiRange(0, vCount)),
+            };
+        }
+    }
 
 }

@@ -36,35 +36,12 @@ public partial class SimplexTerrain3D : Terrain3D
     [Export]
     public float MountainLevel { get; set; } = 0.7f;
 
-    // These were for when I was using compute shaders.
-    // [Export]
-    // public RDShaderFile ComputeShaderImages { get; set; } =
-    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_heightmap.glsl");
-
-    // [Export]
-    // public RDShaderFile VertexHeightShader { get; set; } =
-    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/get_vertex_heights.glsl");
-
-    // [Export]
-    // public RDShaderFile ComputerNormalsShader { get; set; } =
-    //     ResourceLoader.Load<RDShaderFile>("res://materials/shader_materials/compute_normalmap.glsl");
-
-
     /// <summary>
     /// The size in pixels of the heightmap.
     /// </summary>
     [ExportGroup("Image Sizes")]
     [Export]
     public NoiseImageSize HeightmapSize { get; set; } = new();
-
-    // [Export]
-    // public NoiseImageSize Noise1ImageSize { get; set; } = new();
-
-    // [Export]
-    // public NoiseImageSize Noise2ImageSize { get; set; } = new();
-
-    // [Export]
-    // public NoiseImageSize Noise3ImageSize { get; set; } = new();
 
     /// <summary>
     /// The size in pixels of the moisture noise image.
@@ -83,24 +60,10 @@ public partial class SimplexTerrain3D : Terrain3D
     private FastNoiseLite Noise3 { get; set; }
     private FastNoiseLite Moisture { get; set; }
     private NoiseImages Images { get; set; }
-    // private Gradient Gradient { get; set; } = _CreateDefaultGradient();
-
-    // private enum NoiseImage
-    // {
-    //     Noise1 = 0,
-    //     Noise2 = 1,
-    //     Noise3 = 2,
-    //     Moisture = 3
-    // }
-
-    // private RenderingDevice _rd;
-    // private int _wh;
     private ShaderMaterial _material;
     private bool _generateLods;
     private bool _generateCalled;
     private ArrayMesh _mesh;
-
-    // Called when the node enters the scene tree for the first time.
 
     /// <summary>
     /// Called when the node enters the scene. Checks if this node has been generated or not yet.
@@ -398,6 +361,7 @@ public partial class SimplexTerrain3D : Terrain3D
             mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
             mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
         });
+        _GenerateSpawnPoints(mdt, vCount);
         arrayMesh.ClearSurfaces();
         mdt.CommitToSurface(arrayMesh);
         return arrayMesh;

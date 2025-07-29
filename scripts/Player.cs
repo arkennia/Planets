@@ -182,15 +182,15 @@ public partial class Player : CharacterBody3D
 
         if (result.Count == 0) return;
 
-        Control debugUI = GetNodeOrNull<Control>("%DebugUI");
-        if (debugUI != null)
-        {
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
-                Position.ToString("F");
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
-        }
+        // Control debugUI = GetNodeOrNull<Control>("%DebugUI");
+        // if (debugUI != null)
+        // {
+        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
+        //         Position.ToString("F");
+        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
+        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
+        // }
 
         UpDirection = (Vector3)result["normal"];
         ApplyFloorSnap();

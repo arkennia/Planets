@@ -33,6 +33,12 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
     }
 
+    public Vector3 GetSpawnPoint()
+    {
+        RandomNumberGenerator rng = new();
+        return PlanetTerrain.SpawnPoints[rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS)].Position;
+    }
+
     public void Save(string path = "res://scenes/planets")
     {
         Name = new StringName($"{Planet.Guid}");
@@ -73,7 +79,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
         SphereShape3D areaColliderShape = new()
         {
-            Radius = (float)_mesh.GetMeta("Radius") + Planet.Area3DExtraSpace
+            Radius = (float)_mesh.GetMeta("Radius") + Planet.Area3DExtraSpace,
         };
         CollisionShape3D areaCollider = new()
         {
@@ -114,6 +120,6 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
         PlanetTerrain = terrain;
 
-        Scale *= (float)Planet.Scale;
+        Scale *= Planet.Scale;
     }
 }

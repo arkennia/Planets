@@ -1,9 +1,8 @@
+using System;
+using System.Threading.Tasks;
 using Godot;
 using Planets.SystemGenerator;
 using Planets.UI;
-using System;
-using System.Threading.Tasks;
-using Planets.SystemGenerator.Terrain;
 
 namespace Planets;
 
@@ -38,6 +37,11 @@ public partial class Main : Node
             GD.Print("Planet saved.");
             // p.Scale *= 500f;
             p.Position = new Vector3(0, 0, -13800);
+            Vector3 spawn = p.GetSpawnPoint();
+            GD.Print($"Global Position:{Player.GlobalPosition}");
+            GD.Print($"Spawn: {spawn}");
+            Player.GlobalPosition = spawn;
+            GD.Print($"New Global Position:{Player.GlobalPosition}");
         }
         else
         {
