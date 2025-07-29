@@ -1,13 +1,17 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Godot;
-using Godot.Collections;
 
 namespace Planets.SystemGenerator.Terrain;
 
+/// <summary>
+/// Abstract class for procedural terrain.
+/// Inherits <c>MeshInstance3D</c>.
+/// </summary>
 [GlobalClass]
 public abstract partial class Terrain3D : MeshInstance3D
 {
+    /// <summary>
+    /// The <c>TerrainColor</c> object to use for coloring the Terrain.
+    /// </summary>
     [Export]
     public TerrainColor Colors { get; set; }
 
@@ -17,28 +21,20 @@ public abstract partial class Terrain3D : MeshInstance3D
     // [Export(PropertyHint.NodeType, $"{nameof(ArrayMesh)}")]
     // public new Mesh Mesh { get; set; }
 
+    /// <summary>
+    /// The random seed to initialize with.
+    /// </summary>
     [Export]
     public ulong Seed { get; set; } = 69000;
 
+    /// <summary>
+    /// Generates the terrain.
+    /// </summary>
+    /// <remarks>
+    /// If <paramref name="shaderMaterial"/> is not null, you must set the shader params manually in this method.
+    /// </remarks>
+    /// <param name="generateLods">Optional, generate LODs.</param>
+    /// <param name="shaderMaterial">The shader material to use.</param>
+    public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial = null);
 
-    public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial);
-
-    // public override void _ValidateProperty(Dictionary property)
-    // {
-    //     if (property["name"].AsStringName() != PropertyName.Mesh)
-    //     {
-    //         base._ValidateProperty(property);
-    //         return;
-    //     }
-    // 
-    //     PropertyUsageFlags propertyUsageFlags = property["usage"].As<PropertyUsageFlags>();
-    // 
-    //     if (_useGeneratedMesh)
-    //         propertyUsageFlags |= PropertyUsageFlags.ReadOnly;
-    //     else
-    //         propertyUsageFlags &= ~PropertyUsageFlags.ReadOnly;
-    // 
-    //     property["usage"] = (int)propertyUsageFlags;
-    //     base._ValidateProperty(property);
-    // }
 }

@@ -4,7 +4,9 @@ using Godot;
 using Godot.Collections;
 
 namespace Planets.SystemGenerator.Terrain;
-
+/// <summary>
+/// Holds the necessary objects for using image3D in a compute shader.
+/// </summary>
 public struct ComputeShaderImage
 {
     public Rid Rid;

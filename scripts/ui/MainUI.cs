@@ -1,8 +1,11 @@
-using Godot;
 using System;
+using Godot;
 
 namespace Planets.UI;
 
+/// <summary>
+/// The main UI object for the game.
+/// </summary>
 public partial class MainUi : Control
 {
     [Export]

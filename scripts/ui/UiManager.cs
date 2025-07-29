@@ -1,8 +1,11 @@
-using Godot;
 using System;
+using Godot;
 
 namespace Planets.UI;
 
+/// <summary>
+/// This class is an autoload. It enables connections from the UI to other nodes as needed.
+/// </summary>
 public partial class UiManager : Node
 {
     private Main MainNode { get; set; } = null;
