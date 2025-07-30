@@ -65,7 +65,7 @@ public partial class Game : Node
         GD.Print($"Global Position:{Player.GlobalPosition}");
         GD.Print($"Spawn: {spawn}");
         // Player.GlobalPosition = spawn;
-        Player.Spawn(spawn);
+        Player.Spawn(spawn, _planetNode);
         GD.Print($"New Global Position:{Player.GlobalPosition}");
     }
 }

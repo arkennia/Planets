@@ -61,11 +61,18 @@ public partial class Player : CharacterBody3D
     /// </summary>
     /// <remarks><paramref name="coords"/> is in Global coordinates.
     /// <param name="coords">The spawn location.</param>
-    public void Spawn(Vector3 coords)
+    public void Spawn(Vector3 coords, PlanetNode planet)
     {
+        DisableMovement();
         GlobalPosition = coords;
+        Vector3 dir = (GlobalPosition - planet.GlobalPosition).Normalized();
         GD.Print($"Global Position: {GlobalPosition} Spawn point: {coords}");
+        _ChangeMotionMode(planet);
         // RotatePlayer(0.0f);
+        float angle = GlobalPosition.AngleTo(_up);
+        GD.Print($"Angle to up: {Mathf.RadToDeg(angle)}");
+        RotateX(angle);
+        // GlobalBasis = new Basis(p);
     }
 
     private async Task InitUiSignals()
@@ -138,8 +145,8 @@ public partial class Player : CharacterBody3D
             RotatePlayer((float)delta);
             // Apply gravity when not on the ground.
             if (!IsOnFloor())
-                Velocity += (Planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * Gravity * 50f *
-                            (float)delta;
+                Velocity += (Planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() *
+                            Gravity * 50f * (float)delta;
         }
         else
         {
@@ -156,26 +163,30 @@ public partial class Player : CharacterBody3D
 
 
         MoveAndSlide();
-        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        if (_movementDisabled == false)
         {
-            KinematicCollision3D collision = GetSlideCollision(i);
-            Node collider = (Node)collision.GetCollider();
-            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
-            _ChangeMotionMode(cParent);
-        }
-        // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
-        if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
-        Vector3 dest = -_up * 100f;
-        PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
-        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
-        query.Exclude = [GetRid()];
-        query.CollisionMask = CollisionMask;
-        query.HitFromInside = true;
-        Dictionary result = spaceState.IntersectRay(query);
+            for (int i = 0; i < GetSlideCollisionCount(); i++)
+            {
+                KinematicCollision3D collision = GetSlideCollision(i);
+                Node collider = (Node)collision.GetCollider();
+                PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
+                _ChangeMotionMode(cParent);
+            }
+            // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
 
-        if (result.Count == 0) return;
-        UpDirection = (Vector3)result["normal"];
-        ApplyFloorSnap();
+            if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
+            Vector3 dest = -_up * 100f;
+            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            query.Exclude = [GetRid()];
+            query.CollisionMask = CollisionMask;
+            query.HitFromInside = true;
+            Dictionary result = spaceState.IntersectRay(query);
+
+            if (result.Count == 0) return;
+            UpDirection = (Vector3)result["normal"];
+            ApplyFloorSnap();
+        }
     }
 
     public void DisableMovement()
