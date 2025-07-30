@@ -58,7 +58,7 @@ public partial class Player : CharacterBody3D
 
     private async Task InitUiSignals()
     {
-        await ToSignal(GetNode<Node>("/root/Main"), Node.SignalName.Ready);
+        await ToSignal(GetTree().Root.GetNode<Node>("/root/Main"), Node.SignalName.Ready);
         UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
         UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
         GD.Print("Signals connected to UI.");

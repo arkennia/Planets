@@ -6,7 +6,7 @@ namespace Planets.UI;
 /// <summary>
 /// The main UI object for the game.
 /// </summary>
-public partial class MainUi : Control
+public partial class GameUi : Control
 {
     [Export]
     public PackedScene GameMenu { get; set; }

@@ -47,7 +47,7 @@ public abstract partial class Terrain3D : MeshInstance3D
         RandomNumberGenerator rng = new();
         for (int i = 0; i < NUM_SPAWN_POINTS; i++)
         {
-            int vIdx = rng.RandiRange(0, vCount);
+            int vIdx = rng.RandiRange(0, vCount - 1);
             Vector3 vertex = mdt.GetVertex(vIdx);
             Vector3 normal = mdt.GetVertexNormal(vIdx);
             vertex += normal * -5f;

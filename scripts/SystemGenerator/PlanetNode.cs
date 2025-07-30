@@ -36,7 +36,8 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
     public Vector3 GetSpawnPoint()
     {
         RandomNumberGenerator rng = new();
-        return PlanetTerrain.SpawnPoints[rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS) - 1].Position;
+        int idx = rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS - 1);
+        return PlanetTerrain.SpawnPoints[idx].Position;
     }
 
     public void Save(string path = "res://scenes/planets")
