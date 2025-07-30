@@ -50,11 +50,12 @@ public abstract partial class Terrain3D : MeshInstance3D
             int vIdx = rng.RandiRange(0, vCount - 1);
             Vector3 vertex = mdt.GetVertex(vIdx);
             Vector3 normal = mdt.GetVertexNormal(vIdx);
-            vertex += normal * -5f;
+            // vertex += normal * -20f;
             _spawnPoints[i] = new()
             {
                 Position = vertex,
             };
+            AddChild(_spawnPoints[i]);
         }
     }
 

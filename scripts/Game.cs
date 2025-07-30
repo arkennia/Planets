@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Godot;
+using Planets;
 using Planets.SystemGenerator;
 
 public partial class Game : Node
@@ -10,15 +12,20 @@ public partial class Game : Node
     public int Scale { get; set; } = 1000;
 
     [Export]
-    public CharacterBody3D Player { get; set; }
+    public Player Player { get; set; }
 
     [Export]
     public Mesh Mesh { get; set; }
+
+    private PlanetNode _planetNode;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         _Load();
+        _SetSpawnPoint();
     }
+
 
     private void _Load()
     {
@@ -31,13 +38,9 @@ public partial class Game : Node
             GD.Print("Planet added to scene.");
             p.Save();
             GD.Print("Planet saved.");
+            _planetNode = p;
+            _planetNode.Position = new Vector3(0, 0, -13800);
             // p.Scale *= 500f;
-            p.Position = new Vector3(0, 0, -13800);
-            Vector3 spawn = p.GetSpawnPoint();
-            GD.Print($"Global Position:{Player.GlobalPosition}");
-            GD.Print($"Spawn: {spawn}");
-            Player.GlobalPosition = spawn;
-            GD.Print($"New Global Position:{Player.GlobalPosition}");
         }
         else
         {
@@ -54,5 +57,15 @@ public partial class Game : Node
             GetNode("%World").AddChild(sceneNode);
             GD.Print("Planet loaded");
         }
+    }
+
+    private void _SetSpawnPoint()
+    {
+        Vector3 spawn = _planetNode.GetSpawnPoint().GlobalPosition;
+        GD.Print($"Global Position:{Player.GlobalPosition}");
+        GD.Print($"Spawn: {spawn}");
+        // Player.GlobalPosition = spawn;
+        Player.Spawn(spawn);
+        GD.Print($"New Global Position:{Player.GlobalPosition}");
     }
 }

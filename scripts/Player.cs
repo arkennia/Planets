@@ -56,6 +56,18 @@ public partial class Player : CharacterBody3D
         FloorSnapLength = 0.5f;
     }
 
+    /// <summary>
+    /// Spawn the character at <paramref name="coords"/>.
+    /// </summary>
+    /// <remarks><paramref name="coords"/> is in Global coordinates.
+    /// <param name="coords">The spawn location.</param>
+    public void Spawn(Vector3 coords)
+    {
+        GlobalPosition = coords;
+        GD.Print($"Global Position: {GlobalPosition} Spawn point: {coords}");
+        // RotatePlayer(0.0f);
+    }
+
     private async Task InitUiSignals()
     {
         await ToSignal(GetTree().Root.GetNode<Node>("/root/Main"), Node.SignalName.Ready);
@@ -162,17 +174,6 @@ public partial class Player : CharacterBody3D
         Dictionary result = spaceState.IntersectRay(query);
 
         if (result.Count == 0) return;
-
-        // Control debugUI = GetNodeOrNull<Control>("%DebugUI");
-        // if (debugUI != null)
-        // {
-        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
-        //         Position.ToString("F");
-        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
-        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
-        //     GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
-        // }
-
         UpDirection = (Vector3)result["normal"];
         ApplyFloorSnap();
     }
