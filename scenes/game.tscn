@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://sh8ma8d41jnk"]
+
+[ext_resource type="PackedScene" uid="uid://wpa6nw1cmvpr" path="res://scenes/debug_ui.tscn" id="1_uwrxv"]
+[ext_resource type="Script" uid="uid://b8ovwpsgexm14" path="res://scripts/Game.cs" id="1_yqjtg"]
+[ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="2_lnu2h"]
+[ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_lbhrr"]
+
+[node name="Game" type="Node" node_paths=PackedStringArray("Player")]
+script = ExtResource("1_yqjtg")
+Scale = 250
+Player = NodePath("Player")
+Mesh = ExtResource("2_lnu2h")
+
+[node name="World" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 378.86688)
+light_angular_distance = 0.5
+directional_shadow_mode = 0
+
+[node name="Player" parent="." instance=ExtResource("3_lbhrr")]
+unique_name_in_owner = true
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 15.413021)
+
+[node name="DebugUI" parent="." instance=ExtResource("1_uwrxv")]
+unique_name_in_owner = true

@@ -22,10 +22,13 @@ public partial class Player : CharacterBody3D
     /// Upward momentary speed when jumping.
     /// </summary>
     [Export]
-    public int JumpSpeed { get; set; } = 5;
+    public int JumpSpeed { get; set; } = 90;
 
     [Export]
     public float MouseSensitivty { get; set; } = 0.005f;
+    public float Gravity { get; set; }
+    public Node3D Planet { get; set; }
+
 
     private Vector3 _targetVelocity = Vector3.Zero;
 
@@ -38,10 +41,6 @@ public partial class Player : CharacterBody3D
     private Node3D _pivot;
 
     private Vector3 _up = Vector3.Up;
-
-    private Node3D _planet;
-
-    private float _gravity;
 
     private bool _isInAir = false;
 
@@ -103,14 +102,14 @@ public partial class Player : CharacterBody3D
 
         if (MotionMode == MotionModeEnum.Grounded)
         {
-            _up = -(_planet.GlobalPosition - GlobalPosition).Normalized();
+            _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
             if (direction != Vector3.Zero)
             {
                 // Translate the input direction(s) to actual world direction while on a planet.
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                 Vector3 newX = newZ.Cross(_up).Normalized();
                 direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
-                _targetVelocity = direction * Speed;
+                _targetVelocity = _targetVelocity.Lerp(direction * Speed, (float)delta * 0.7f);
                 if (_jumped)
                 {
                     _targetVelocity += _up * JumpSpeed;
@@ -127,7 +126,7 @@ public partial class Player : CharacterBody3D
             RotatePlayer((float)delta);
             // Apply gravity when not on the ground.
             if (!IsOnFloor())
-                Velocity += (_planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * _gravity * 10f *
+                Velocity += (Planet.GlobalTransform.Origin - GlobalTransform.Origin).Normalized() * Gravity * 50f *
                             (float)delta;
         }
         else
@@ -150,26 +149,8 @@ public partial class Player : CharacterBody3D
             KinematicCollision3D collision = GetSlideCollision(i);
             Node collider = (Node)collision.GetCollider();
             PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
-            if (cParent is not null && MotionMode == MotionModeEnum.Floating)
-            {
-                MotionMode = MotionModeEnum.Grounded;
-                Velocity = Vector3.Zero;
-                _up = -(cParent.GlobalPosition - GlobalPosition).Normalized();
-                _planet = cParent;
-                _camera.Basis = Basis.Identity;
-                GD.Print("Motion mode set to grounded.");
-                GD.Print($"{_planet.Name}");
-                _gravity = cParent.PlanetArea.Gravity;
-                GD.Print($"Current gravity: {cParent.PlanetArea.Gravity} {cParent.PlanetArea.GravityDirection}");
-                // ApplyFloorSnap();
-            }
-            else if (MotionMode == MotionModeEnum.Grounded && cParent is not null && _isInAir)
-            {
-                _isInAir = false;
-                GD.Print($"Is in air: {_isInAir}");
-            }
+            _ChangeMotionMode(cParent);
         }
-
         // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
         if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
         Vector3 dest = -_up * 100f;
@@ -196,7 +177,6 @@ public partial class Player : CharacterBody3D
         ApplyFloorSnap();
     }
 
-
     public void DisableMovement()
     {
         _movementDisabled = true;
@@ -207,6 +187,28 @@ public partial class Player : CharacterBody3D
     {
         _movementDisabled = false;
         Input.MouseMode = Input.MouseModeEnum.Captured;
+    }
+
+    private void _ChangeMotionMode(PlanetNode node)
+    {
+        if (node is not null && MotionMode == MotionModeEnum.Floating)
+        {
+            MotionMode = MotionModeEnum.Grounded;
+            Velocity = Vector3.Zero;
+            _up = -(node.GlobalPosition - GlobalPosition).Normalized();
+            Planet = node;
+            _camera.Basis = Basis.Identity;
+            GD.Print("Motion mode set to grounded.");
+            GD.Print($"{Planet.Name}");
+            Gravity = node.PlanetArea.Gravity;
+            GD.Print($"Current gravity: {node.PlanetArea.Gravity} {node.PlanetArea.GravityDirection}");
+            // ApplyFloorSnap();
+        }
+        else if (MotionMode == MotionModeEnum.Grounded && node is not null && _isInAir)
+        {
+            _isInAir = false;
+            GD.Print($"Is in air: {_isInAir}");
+        }
     }
 
     private void RotatePlayer(float delta)

@@ -36,7 +36,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
     public Vector3 GetSpawnPoint()
     {
         RandomNumberGenerator rng = new();
-        return PlanetTerrain.SpawnPoints[rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS)].Position;
+        return PlanetTerrain.SpawnPoints[rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS) - 1].Position;
     }
 
     public void Save(string path = "res://scenes/planets")
@@ -121,5 +121,23 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         PlanetTerrain = terrain;
 
         Scale *= Planet.Scale;
+
+        PlanetArea.BodyEntered += body =>
+        {
+            if (body is Player p)
+            {
+                p.Gravity = Planet.Gravity;
+                p.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
+                p.Planet = this;
+            }
+        };
+
+        PlanetArea.BodyExited += body =>
+        {
+            if (body is Player p)
+            {
+                p.MotionMode = CharacterBody3D.MotionModeEnum.Floating;
+            }
+        };
     }
 }
