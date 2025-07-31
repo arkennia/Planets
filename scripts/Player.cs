@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using Planets.SystemGenerator;
+using Planets.SystemGenerator.Terrain;
 using Planets.UI;
 
 namespace Planets;
@@ -61,12 +62,12 @@ public partial class Player : CharacterBody3D
     /// </summary>
     /// <remarks><paramref name="coords"/> is in Global coordinates.
     /// <param name="coords">The spawn location.</param>
-    public void Spawn(Vector3 coords, PlanetNode planet)
+    public void Spawn(Terrain3D.SpawnPoint sp, PlanetNode planet)
     {
         DisableMovement();
-        GlobalPosition = coords;
+        GlobalPosition = sp.Node.GlobalPosition;
         Vector3 dir = (GlobalPosition - planet.GlobalPosition).Normalized();
-        GD.Print($"Global Position: {GlobalPosition} Spawn point: {coords}");
+        GD.Print($"Global Position: {GlobalPosition} Spawn point: {sp.Node.GlobalPosition}");
         _ChangeMotionMode(planet);
         // RotatePlayer(0.0f);
         float angle = GlobalPosition.AngleTo(_up);

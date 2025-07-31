@@ -33,7 +33,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
     }
 
-    public Node3D GetSpawnPoint()
+    public Terrain3D.SpawnPoint GetSpawnPoint()
     {
         RandomNumberGenerator rng = new();
         int idx = rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS - 1);

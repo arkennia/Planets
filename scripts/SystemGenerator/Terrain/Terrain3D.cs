@@ -9,6 +9,12 @@ namespace Planets.SystemGenerator.Terrain;
 [GlobalClass]
 public abstract partial class Terrain3D : MeshInstance3D
 {
+
+    public class SpawnPoint
+    {
+        public Node3D Node { get; set; }
+        public Vector3 Normal { get; set; }
+    }
     /// <summary>
     /// The <c>TerrainColor</c> object to use for coloring the Terrain.
     /// </summary>
@@ -27,10 +33,13 @@ public abstract partial class Terrain3D : MeshInstance3D
     [Export]
     public ulong Seed { get; set; } = 69000;
 
-    public Node3D[] SpawnPoints => _spawnPoints;
+    /// <summary>
+    /// Randomly generated spawn points.
+    /// </summary>
+    public SpawnPoint[] SpawnPoints => _spawnPoints;
 
     public const int NUM_SPAWN_POINTS = 10;
-    protected Node3D[] _spawnPoints = new Node3D[NUM_SPAWN_POINTS];
+    protected SpawnPoint[] _spawnPoints = new SpawnPoint[NUM_SPAWN_POINTS];
 
     /// <summary>
     /// Generates the terrain.
@@ -51,11 +60,16 @@ public abstract partial class Terrain3D : MeshInstance3D
             Vector3 vertex = mdt.GetVertex(vIdx);
             Vector3 normal = mdt.GetVertexNormal(vIdx);
             // vertex += normal * -20f;
-            _spawnPoints[i] = new()
+            Node3D node = new()
             {
                 Position = vertex,
             };
-            AddChild(_spawnPoints[i]);
+            _spawnPoints[i] = new()
+            {
+                Node = node,
+                Normal = normal
+            };
+            AddChild(_spawnPoints[i].Node);
         }
     }
 

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Godot;
 using Planets;
 using Planets.SystemGenerator;
+using Planets.SystemGenerator.Terrain;
 
 public partial class Game : Node
 {
@@ -61,7 +62,7 @@ public partial class Game : Node
 
     private void _SetSpawnPoint()
     {
-        Vector3 spawn = _planetNode.GetSpawnPoint().GlobalPosition;
+        Terrain3D.SpawnPoint spawn = _planetNode.GetSpawnPoint();
         GD.Print($"Global Position:{Player.GlobalPosition}");
         GD.Print($"Spawn: {spawn}");
         // Player.GlobalPosition = spawn;
