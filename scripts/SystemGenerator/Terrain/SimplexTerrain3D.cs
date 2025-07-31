@@ -326,9 +326,11 @@ public partial class SimplexTerrain3D : Terrain3D
 #endif
         _material.SetShaderParameter("VertexCount", vCount);
         Heights = new float[vCount];
+        CoordinateOrigin = mdt.GetVertex(0);
         Parallel.For(0, vCount, i =>
         {
             Vector3 vert = mdt.GetVertex(i);
+
             // float height = Heights[i];
             float n1 = _SampleNoise(Noise1, vert);
             float n2 = _SampleNoise(Noise2, vert * 2f);

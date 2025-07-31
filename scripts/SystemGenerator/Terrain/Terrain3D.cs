@@ -34,6 +34,11 @@ public abstract partial class Terrain3D : MeshInstance3D
     public ulong Seed { get; set; } = 69000;
 
     /// <summary>
+    /// The origin to use to calculate surface coordinates.
+    /// </summary>
+    public Vector3 CoordinateOrigin { get; protected set; }
+
+    /// <summary>
     /// Randomly generated spawn points.
     /// </summary>
     public SpawnPoint[] SpawnPoints => _spawnPoints;

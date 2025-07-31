@@ -68,10 +68,8 @@ public partial class Player : CharacterBody3D
         GlobalPosition = sp.Node.GlobalPosition;
         Vector3 dir = sp.Normal; //-(planet.GlobalPosition - GlobalPosition).Normalized();
         _up = UpDirection = dir;
-        GD.Print($"Global Position: {GlobalPosition} Spawn point: {sp.Node.GlobalPosition}");
         _ChangeMotionMode(planet, sp.Normal);
         float angle = GlobalPosition.AngleTo(_up);
-        GD.Print($"Angle to up: {Mathf.RadToDeg(angle)}");
     }
 
     private async Task InitUiSignals()
@@ -218,7 +216,7 @@ public partial class Player : CharacterBody3D
             Planet = node;
             _camera.Basis = Basis.Identity;
             GD.Print("Motion mode set to grounded.");
-            GD.Print($"{Planet.Name}");
+            GD.Print($"Current Planet GUID: {Planet.Name}");
             Gravity = node.PlanetArea.Gravity;
             GD.Print($"Current gravity: {node.PlanetArea.Gravity} {node.PlanetArea.GravityDirection}");
             // ApplyFloorSnap();
@@ -226,7 +224,7 @@ public partial class Player : CharacterBody3D
         else if (MotionMode == MotionModeEnum.Grounded && node is not null && _isInAir)
         {
             _isInAir = false;
-            GD.Print($"Is in air: {_isInAir}");
+            // GD.Print($"Is in air: {_isInAir}");
         }
     }
 
@@ -256,7 +254,6 @@ public partial class Player : CharacterBody3D
             if (MotionMode == MotionModeEnum.Grounded && !_isInAir)
             {
                 _isInAir = true;
-                GD.Print($"Is in air: {_isInAir}");
                 _jumped = true;
                 direction.Y += 1.0f;
             }
