@@ -10,7 +10,7 @@ public partial class UiManager : Node
 {
     private Main MainNode { get; set; } = null;
 
-    public MainUi Ui { get; set; } = null;
+    public GameUi Ui { get; set; } = null;
 
     public static UiManager Instance { get; private set; }
 

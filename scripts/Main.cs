@@ -1,56 +1,94 @@
-using Godot;
-using Planets.SystemGenerator;
-using Planets.UI;
-using System;
 using System.Threading.Tasks;
-using Planets.SystemGenerator.Terrain;
+using Godot;
+using Planets.UI;
+using Array = Godot.Collections.Array;
 
 namespace Planets;
 
 public partial class Main : Node
 {
     [Export]
-    public bool Generated { get; set; } = false;
+    public PackedScene LoadingScreenScene { get; set; }
+    [Export]
+    public PackedScene MainMenuScene { get; set; }
 
     [Export]
-    public int Scale { get; set; } = 1000;
+    public PackedScene GameUiScene { get; set; }
+    [Export(PropertyHint.FilePath, "*.tscn,*.scn,")]
+    public string Game { get; private set; }
 
-    [Export]
-    public CharacterBody3D Player { get; set; }
+    public GameUi Ui { get; private set; } = null;
 
-    [Export]
-    public Mesh Mesh { get; set; }
+    private bool _loading;
 
-    public MainUi Ui { get; private set; } = null;
+    private Control _loadingScreen;
+
+    private Node _gameNode;
 
     public override void _Ready()
     {
-        Ui = (MainUi)GetNode<InstancePlaceholder>("UI").CreateInstance();
+        if (LoadingScreenScene?.Instantiate() is Control node)
+        {
+            AddChild(node);
+            _loadingScreen = node;
+        }
+        if (_gameNode is null)
+            _LoadGame();
+    }
+
+    public override void _Process(double _)
+    {
+        if (_loading)
+        {
+            Array progress = [];
+            if (ResourceLoader.LoadThreadedGetStatus(Game, progress) == ResourceLoader.ThreadLoadStatus.Loaded)
+            {
+                GD.Print($"Progress: {progress}");
+                if (_GetLoadedPackedScene(Game) is not Node sceneNode)
+                {
+                    GD.PrintErr($"Failed to load scene {Game}.");
+                }
+                else
+                {
+                    AddChild(sceneNode);
+                    RemoveChild(_loadingScreen);
+                    GD.Print("Game Scene loaded");
+                    _gameNode = sceneNode;
+                    _LoadGameUi();
+                }
+                _loading = false;
+            }
+        }
+    }
+
+
+    private void _LoadGameUi()
+    {
+        Ui = GameUiScene.Instantiate<GameUi>();
+        AddChild(Ui);
         UiManager.Instance.Ui = Ui;
-        if (!Generated)
-        {
-            PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale);
-            GD.Print("Planet generation complete.");
-            Node3D worldNode = GetNode<Node3D>("%World");
-            worldNode.AddChild(p);
-            GD.Print("Planet added to scene.");
-            p.Save();
-            GD.Print("Planet saved.");
-            // p.Scale *= 500f;
-            p.Position = new Vector3(0, 0, -13800);
-        }
-        else
-        {
-            Error sceneLoader =
-                ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn",
-                    useSubThreads: true);
-            PackedScene scene =
-                ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
+    }
+
+    private void _LoadGame()
+    {
+        _BeginLoadPackedScene(Game);
+        _loading = true;
+    }
+
+    private static void _BeginLoadPackedScene(string path)
+    {
+        Error sceneLoader =
+                ResourceLoader.LoadThreadedRequest(path);
+        if (sceneLoader != Error.Ok)
+            GD.PrintErr(sceneLoader);
+    }
+
+    private static Node _GetLoadedPackedScene(string path)
+    {
+        PackedScene scene =
+                ResourceLoader.LoadThreadedGet(path) as
                     PackedScene;
-            if (scene?.Instantiate() is not Node3D sceneNode) return;
-            sceneNode.Position = new Vector3(0, 0, -500);
-            GetNode("%World").AddChild(sceneNode);
-            GD.Print("Planet loaded");
-        }
+        if (scene?.Instantiate() is not Node sceneNode) return null;
+        return sceneNode;
     }
 }

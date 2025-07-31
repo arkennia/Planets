@@ -1,12 +1,12 @@
 [gd_scene load_steps=6 format=3 uid="uid://gqyfs0rbresq"]
 
 [ext_resource type="Theme" uid="uid://d4be054boylrp" path="res://resources/ui/ui_Theme.tres" id="1_nt7q6"]
-[ext_resource type="Script" uid="uid://w1fwvmcuvw7t" path="res://scripts/ui/MainUi.cs" id="2_yev5y"]
+[ext_resource type="Script" uid="uid://bvl66aebx3lir" path="res://scripts/ui/GameUi.cs" id="2_yev5y"]
 [ext_resource type="PackedScene" uid="uid://gf6gneyha1om" path="res://scenes/game_menu.tscn" id="3_yev5y"]
 [ext_resource type="Texture2D" uid="uid://ca4a670yhh6dd" path="res://resources/textures/circle_crosshair.png" id="4_gdt2y"]
 [ext_resource type="PackedScene" uid="uid://c05al84sqc3w4" path="res://scenes/settings_menu.tscn" id="5_wm3ai"]
 
-[node name="UI" type="Control"]
+[node name="UI" type="Control" node_paths=PackedStringArray("CoordLabel")]
 layout_direction = 1
 layout_mode = 3
 anchors_preset = 15
@@ -17,6 +17,7 @@ grow_vertical = 2
 theme = ExtResource("1_nt7q6")
 script = ExtResource("2_yev5y")
 GameMenu = ExtResource("3_yev5y")
+CoordLabel = NodePath("HBoxContainer/Coords")
 
 [node name="Crosshair" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -46,3 +47,22 @@ offset_left = -100.0
 offset_top = -100.0
 offset_right = 100.0
 offset_bottom = 100.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme = ExtResource("1_nt7q6")
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_nt7q6")
+text = "Coordinates: "
+
+[node name="Coords" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(83, 23)
+layout_mode = 2

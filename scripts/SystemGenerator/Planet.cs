@@ -19,7 +19,7 @@ public partial class Planet : Resource, ICelestialBody
     /// The buffer space for the area3D which acts as a way to trigger gravity acting on a body that enters it.
     /// </summary>
     [Export]
-    public int Area3DExtraSpace { get; set; } = 3000;
+    public int Area3DExtraSpace { get; set; } = 500;
 
     /// <summary>
     /// The acceleration due to gravity.

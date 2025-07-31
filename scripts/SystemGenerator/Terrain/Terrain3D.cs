@@ -9,6 +9,12 @@ namespace Planets.SystemGenerator.Terrain;
 [GlobalClass]
 public abstract partial class Terrain3D : MeshInstance3D
 {
+
+    public class SpawnPoint
+    {
+        public Node3D Node { get; set; }
+        public Vector3 Normal { get; set; }
+    }
     /// <summary>
     /// The <c>TerrainColor</c> object to use for coloring the Terrain.
     /// </summary>
@@ -28,6 +34,19 @@ public abstract partial class Terrain3D : MeshInstance3D
     public ulong Seed { get; set; } = 69000;
 
     /// <summary>
+    /// The origin to use to calculate surface coordinates.
+    /// </summary>
+    public Vector3 CoordinateOrigin { get; protected set; }
+
+    /// <summary>
+    /// Randomly generated spawn points.
+    /// </summary>
+    public SpawnPoint[] SpawnPoints => _spawnPoints;
+
+    public const int NUM_SPAWN_POINTS = 10;
+    protected SpawnPoint[] _spawnPoints = new SpawnPoint[NUM_SPAWN_POINTS];
+
+    /// <summary>
     /// Generates the terrain.
     /// </summary>
     /// <remarks>
@@ -36,5 +55,27 @@ public abstract partial class Terrain3D : MeshInstance3D
     /// <param name="generateLods">Optional, generate LODs.</param>
     /// <param name="shaderMaterial">The shader material to use.</param>
     public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial = null);
+
+    protected void _GenerateSpawnPoints(MeshDataTool mdt, int vCount)
+    {
+        RandomNumberGenerator rng = new();
+        for (int i = 0; i < NUM_SPAWN_POINTS; i++)
+        {
+            int vIdx = rng.RandiRange(0, vCount - 1);
+            Vector3 vertex = mdt.GetVertex(vIdx);
+            Vector3 normal = mdt.GetVertexNormal(vIdx);
+            vertex += normal * 0.09f;
+            Node3D node = new()
+            {
+                Position = vertex,
+            };
+            _spawnPoints[i] = new()
+            {
+                Node = node,
+                Normal = normal
+            };
+            AddChild(_spawnPoints[i].Node);
+        }
+    }
 
 }

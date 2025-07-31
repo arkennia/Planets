@@ -33,12 +33,26 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
     }
 
+    public Terrain3D.SpawnPoint GetSpawnPoint()
+    {
+        RandomNumberGenerator rng = new();
+        int idx = rng.RandiRange(0, Terrain3D.NUM_SPAWN_POINTS - 1);
+        return PlanetTerrain.SpawnPoints[idx];
+    }
+
     public void Save(string path = "res://scenes/planets")
     {
         Name = new StringName($"{Planet.Guid}");
         PackedScene ps = new();
         ps.Pack(this);
         ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.scn", ResourceSaver.SaverFlags.Compress);
+    }
+
+    public Vector2 CalculatePosition(Vector3 coord)
+    {
+        float x = coord.X - PlanetTerrain.CoordinateOrigin.X;
+        float y = coord.Y - PlanetTerrain.CoordinateOrigin.Y;
+        return new Vector2(x, y);
     }
 
     public void Generate()
@@ -73,7 +87,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
         SphereShape3D areaColliderShape = new()
         {
-            Radius = (float)_mesh.GetMeta("Radius") + Planet.Area3DExtraSpace
+            Radius = (float)_mesh.GetMeta("Radius") + Planet.Area3DExtraSpace,
         };
         CollisionShape3D areaCollider = new()
         {
@@ -114,6 +128,24 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
         PlanetTerrain = terrain;
 
-        Scale *= (float)Planet.Scale;
+        Scale *= Planet.Scale;
+
+        PlanetArea.BodyEntered += body =>
+        {
+            if (body is Player p)
+            {
+                p.Gravity = Planet.Gravity;
+                p.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
+                p.Planet = this;
+            }
+        };
+
+        PlanetArea.BodyExited += body =>
+        {
+            if (body is Player p)
+            {
+                p.MotionMode = CharacterBody3D.MotionModeEnum.Floating;
+            }
+        };
     }
 }
