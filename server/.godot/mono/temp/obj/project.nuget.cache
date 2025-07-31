@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "PovH49+FCBY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\jmanl\\Documents\\Godot\\planets\\server\\PlanetsServer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\jmanl\\.nuget\\packages\\godot.sourcegenerators\\4.5.0-beta.4\\godot.sourcegenerators.4.5.0-beta.4.nupkg.sha512",
+    "C:\\Users\\jmanl\\.nuget\\packages\\godotsharp\\4.5.0-beta.4\\godotsharp.4.5.0-beta.4.nupkg.sha512",
+    "C:\\Users\\jmanl\\.nuget\\packages\\godotsharpeditor\\4.5.0-beta.4\\godotsharpeditor.4.5.0-beta.4.nupkg.sha512",
+    "C:\\Users\\jmanl\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.16\\microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
+    "C:\\Users\\jmanl\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.16\\microsoft.windowsdesktop.app.ref.8.0.16.nupkg.sha512",
+    "C:\\Users\\jmanl\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.16\\microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

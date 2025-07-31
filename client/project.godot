@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Planets"
-run/main_scene="uid://c6fqvvg6jvls2"
+run/main_scene="uid://db3hwgud2i8fs"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
