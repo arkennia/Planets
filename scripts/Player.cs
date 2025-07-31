@@ -28,8 +28,7 @@ public partial class Player : CharacterBody3D
     [Export]
     public float MouseSensitivty { get; set; } = 0.005f;
     public float Gravity { get; set; }
-    public Node3D Planet { get; set; }
-
+    public PlanetNode Planet { get; set; }
 
     private Vector3 _targetVelocity = Vector3.Zero;
 
@@ -120,6 +119,7 @@ public partial class Player : CharacterBody3D
         {
             if (direction != Vector3.Zero)
             {
+                _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
                 // Translate the input direction(s) to actual world direction while on a planet.
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                 Vector3 newX = newZ.Cross(_up).Normalized();
@@ -204,6 +204,11 @@ public partial class Player : CharacterBody3D
     {
         _movementDisabled = false;
         Input.MouseMode = Input.MouseModeEnum.Captured;
+    }
+
+    private void _UpdateCoordsUI(Vector2 p)
+    {
+        UiManager.Instance.Ui.UpdateCoords(p);
     }
 
     private void _ChangeMotionMode(PlanetNode node, Vector3 up)

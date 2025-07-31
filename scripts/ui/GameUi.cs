@@ -10,12 +10,16 @@ public partial class GameUi : Control
 {
     [Export]
     public PackedScene GameMenu { get; set; }
+    [Export]
+    public Label CoordLabel { get; set; }
 
     [Signal]
     public delegate void GameMenuOpenedEventHandler();
 
     [Signal]
     public delegate void GameMenuClosedEventHandler();
+
+
 
     private bool _gameMenuOpen = false;
 
@@ -36,6 +40,11 @@ public partial class GameUi : Control
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
+    }
+
+    public void UpdateCoords(Vector2 p)
+    {
+        CoordLabel.Text = $"({p.X:F}, {p.Y:F})";
     }
 
     private void HandleGameMenu()

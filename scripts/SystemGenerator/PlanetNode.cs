@@ -48,6 +48,13 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.scn", ResourceSaver.SaverFlags.Compress);
     }
 
+    public Vector2 CalculatePosition(Vector3 coord)
+    {
+        float x = coord.X - PlanetTerrain.CoordinateOrigin.X;
+        float y = coord.Y - PlanetTerrain.CoordinateOrigin.Y;
+        return new Vector2(x, y);
+    }
+
     public void Generate()
     {
         SimplexTerrain3D terrain = new()
