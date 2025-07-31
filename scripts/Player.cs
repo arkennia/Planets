@@ -23,7 +23,7 @@ public partial class Player : CharacterBody3D
     /// Upward momentary speed when jumping.
     /// </summary>
     [Export]
-    public int JumpSpeed { get; set; } = 5;
+    public int JumpSpeed { get; set; } = 8;
 
     [Export]
     public float MouseSensitivty { get; set; } = 0.005f;
