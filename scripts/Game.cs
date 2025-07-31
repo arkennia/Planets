@@ -64,7 +64,8 @@ public partial class Game : Node
     {
         Terrain3D.SpawnPoint spawn = _planetNode.GetSpawnPoint();
         GD.Print($"Global Position:{Player.GlobalPosition}");
-        GD.Print($"Spawn: {spawn}");
+        GD.Print($"Spawn Local: {spawn.Node.Position}");
+        // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
         // Player.GlobalPosition = spawn;
         Player.Spawn(spawn, _planetNode);
         GD.Print($"New Global Position:{Player.GlobalPosition}");

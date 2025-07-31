@@ -59,7 +59,7 @@ public abstract partial class Terrain3D : MeshInstance3D
             int vIdx = rng.RandiRange(0, vCount - 1);
             Vector3 vertex = mdt.GetVertex(vIdx);
             Vector3 normal = mdt.GetVertexNormal(vIdx);
-            // vertex += normal * -20f;
+            vertex += normal * 0.09f;
             Node3D node = new()
             {
                 Position = vertex,
