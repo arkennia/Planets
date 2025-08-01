@@ -8,7 +8,7 @@ public partial class Networking : Node
     private Dictionary<long, Dictionary<string, string>> _players = [];
     private Dictionary<string, string> _playerInfo = new()
     {
-        {"Name", "PlayerName"}
+        // {"Name", "PlayerName"}
     };
 
     [Signal]

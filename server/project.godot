@@ -15,6 +15,11 @@ run/main_scene="uid://bndk1f006q4w3"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+ServerManager="*res://scripts/ServerManager.cs"
+Networking="*res://scripts/Networking.cs"
+
 [dotnet]
 
 project/assembly_name="PlanetsServer"

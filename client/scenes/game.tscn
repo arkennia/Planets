@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://wpa6nw1cmvpr" path="res://scenes/debug_ui.tscn" id="1_uwrxv"]
 [ext_resource type="Script" uid="uid://b8ovwpsgexm14" path="res://scripts/Game.cs" id="1_yqjtg"]
 [ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="2_lnu2h"]
-[ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scenes/player_node.tscn" id="3_lbhrr"]
+[ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scripts/common/player_node.tscn" id="3_lbhrr"]
 
 [node name="Game" type="Node" node_paths=PackedStringArray("Player")]
 script = ExtResource("1_yqjtg")

@@ -30,6 +30,8 @@ public partial class Networking : Node
         {"Name", "PlayerName"}
     };
 
+    Dictionary<long, Player> _playerObjects = [];
+
     private int _numConnections = 0;
 
     public override void _EnterTree()
@@ -66,6 +68,9 @@ public partial class Networking : Node
     {
         int newPlayerId = Multiplayer.GetRemoteSenderId();
         _players[newPlayerId] = newPlayerInfo;
+        Player p = new Player(newPlayerId);
+        _playerObjects[newPlayerId] = p;
+        GD.Print(_playerObjects.ToString());
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
 
