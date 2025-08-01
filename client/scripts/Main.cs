@@ -8,7 +8,7 @@ public partial class Main : Node
 
     public override void _EnterTree()
     {
-        GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), "/root/Main/Client0");
+        GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), "/root/Main/Networking");
     }
 
 

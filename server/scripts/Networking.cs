@@ -4,7 +4,7 @@ using Array = Godot.Collections.Array;
 
 namespace Planets.Server;
 
-public sealed partial class Server : Node
+public partial class Networking : Node
 {
     [Export]
     public int Port { get; set; } = 7000;
@@ -50,21 +50,18 @@ public sealed partial class Server : Node
         // Multiplayer.ConnectionFailed += OnConnectionFail;
         // Multiplayer.ServerDisconnected += OnServerDisconnected;
     }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void PlayerLoaded()
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void PlayerLoaded(long id)
     {
-        if (Multiplayer.IsServer())
+        _numConnections += 1;
+        GD.Print("Peer loaded: " + id);
+        if (_numConnections == _players.Count)
         {
-            _numConnections += 1;
-            if (_numConnections == _players.Count)
-            {
-                // GetNode<Game>("/root/Game").StartGame();
-                _numConnections = 0;
-            }
+            _numConnections = 0;
         }
+
     }
-    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void RegisterPlayer(Dictionary<string, string> newPlayerInfo)
     {
         int newPlayerId = Multiplayer.GetRemoteSenderId();
@@ -75,13 +72,14 @@ public sealed partial class Server : Node
     private void OnPlayerConnected(long id)
     {
         GD.Print("Player connected at ID: " + id);
-        Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
-        if (e != Error.Ok)
-            GD.Print(e.ToString());
+        // Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
+        // if (e != Error.Ok)
+        //     GD.Print(e.ToString());
     }
 
     private void OnPlayerDisconnected(long id)
     {
+        GD.Print("Disconnect: " + id);
         _players.Remove(id);
         EmitSignal(SignalName.PlayerDisconnected, id);
     }

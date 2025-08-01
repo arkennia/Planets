@@ -21,12 +21,17 @@ public partial class Game : Node
     private PlanetNode _planetNode;
 
     // Called when the node enters the scene tree for the first time.
+
+    public Game()
+    {
+
+    }
+
     public override void _Ready()
     {
         _Load();
         _SetSpawnPoint();
     }
-
 
     private void _Load()
     {

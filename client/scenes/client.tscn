@@ -1,14 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=5 format=3 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Client.cs" id="1_4tr0r"]
+[ext_resource type="Script" uid="uid://b81pjpnbh6ggb" path="res://scripts/Main.cs" id="1_r26j7"]
 [ext_resource type="PackedScene" uid="uid://csuicy0jgwwvd" path="res://scenes/loading_screen.tscn" id="2_r26j7"]
 [ext_resource type="PackedScene" uid="uid://gqyfs0rbresq" path="res://scenes/game_ui.tscn" id="3_t0ykn"]
 
 [node name="Main" type="Node"]
+script = ExtResource("1_r26j7")
+
+[node name="Main" type="Node" parent="."]
 script = ExtResource("1_4tr0r")
 LoadingScreenScene = ExtResource("2_r26j7")
 GameUiScene = ExtResource("3_t0ykn")
 Game = "res://scenes/game.tscn"
 
-[node name="GameUi" parent="." instance_placeholder="res://scenes/game_ui.tscn"]
+[node name="GameUi" parent="Main" instance_placeholder="res://scenes/game_ui.tscn"]
 unique_name_in_owner = true

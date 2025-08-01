@@ -27,21 +27,18 @@ public partial class Client : Node
 
     private Node _gameNode;
 
-    private Dictionary<string, string> _playerInfo = new()
-    {
-        {"Name", "PlayerName"}
-    };
 
-    private Dictionary<long, Dictionary<string, string>> _players = [];
 
-    [Signal]
-    public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
-    [Signal]
-    public delegate void PlayerDisconnectedEventHandler(int peerId);
-    [Signal]
-    public delegate void ServerDisconnectedEventHandler();
+    // private Dictionary<long, Dictionary<string, string>> _players = [];
 
-    private int _numConnections = 0;
+    // [Signal]
+    // public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
+    // [Signal]
+    // public delegate void PlayerDisconnectedEventHandler(int peerId);
+    // [Signal]
+    // public delegate void ServerDisconnectedEventHandler();
+
+    // private int _numConnections = 0;
     public override void _Ready()
     {
         GD.Print(GetPath());
@@ -50,17 +47,12 @@ public partial class Client : Node
             AddChild(node);
             _loadingScreen = node;
         }
-        GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
-        ENetMultiplayerPeer peer = new();
-        peer.CreateClient("127.0.0.1", 7000);
-        Multiplayer.MultiplayerPeer = peer;
-        // Multiplayer.PeerConnected += OnPlayerConnected;
-        Multiplayer.PeerDisconnected += OnPlayerDisconnected;
-        Multiplayer.ConnectedToServer += OnConnectOk;
-        Multiplayer.ConnectionFailed += OnConnectionFail;
-        Multiplayer.ServerDisconnected += OnServerDisconnected;
-        if (_gameNode is null)
-            _LoadGame();
+        Multiplayer.ConnectedToServer += () =>
+        {
+            if (_gameNode is null)
+                _LoadGame();
+            // Networking.Instance.RpcId(MultiplayerPeer.TargetPeerServer, Networking.MethodName.PlayerLoaded, Multiplayer.GetUniqueId());
+        };
     }
 
     public override void _Process(double _)
@@ -88,59 +80,6 @@ public partial class Client : Node
         }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void PlayerLoaded()
-    {
-        if (Multiplayer.IsServer())
-        {
-            _numConnections += 1;
-            if (_numConnections == _players.Count)
-            {
-                // GetNode<Game>("/root/Game").StartGame();
-                _numConnections = 0;
-            }
-        }
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void RegisterPlayer(Dictionary<string, string> newPlayerInfo)
-    {
-        int newPlayerId = Multiplayer.GetRemoteSenderId();
-        _players[newPlayerId] = newPlayerInfo;
-        EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
-    }
-
-    private void OnPlayerConnected(long id)
-    {
-        GD.Print("Player connected at ID: " + id);
-        Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
-        if (e != Error.Ok)
-            GD.Print(e.ToString());
-    }
-    private void OnPlayerDisconnected(long id)
-    {
-        _players.Remove(id);
-        EmitSignal(SignalName.PlayerDisconnected, id);
-    }
-
-    private void OnConnectOk()
-    {
-        int peerId = Multiplayer.GetUniqueId();
-        _players[peerId] = _playerInfo;
-        EmitSignal(SignalName.PlayerConnected, peerId, _playerInfo);
-    }
-
-    private void OnConnectionFail()
-    {
-        Multiplayer.MultiplayerPeer = null;
-    }
-
-    private void OnServerDisconnected()
-    {
-        Multiplayer.MultiplayerPeer = null;
-        _players.Clear();
-        EmitSignal(SignalName.ServerDisconnected);
-    }
 
     private void _LoadGameUi()
     {
