@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PlanetsServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8b78fb01ab2a268baf0e3374dd22df5de967657")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee392dd7d69d2e73c2afdc7fc9a2f20576435c30")]
 [assembly: System.Reflection.AssemblyProductAttribute("PlanetsServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PlanetsServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
