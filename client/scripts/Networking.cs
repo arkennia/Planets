@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Godot.Collections;
 using Planets.SystemGenerator;
+using Planets.SystemGenerator.Terrain;
 
 public partial class Networking : Node
 {
@@ -70,6 +71,8 @@ public partial class Networking : Node
         {
             GD.Print(heights[0..10]);
             GD.Print("Seed: " + seed);
+            PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
+            GetTree().Root.GetNode<Node>("/root/Main/Main/Game/World").AddChild(planet);
         }
     }
 

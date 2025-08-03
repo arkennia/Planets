@@ -33,31 +33,11 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public const string SAVE_PATH = "res://scenes/planets";
 
-
-    public partial class Data : RefCounted
-    {
-        public Array<Vector3> mesh;
-        public float[] heights;
-        public Array<Color> vertexColors;
-        public Array<Vector3> normals;
-    }
-
     private Mesh _mesh = ResourceLoader.Load<Mesh>("res://scripts/common/meshes/planets/Icosphere.res");
 
     public override void _Ready()
     {
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
-    }
-
-    public Data GetData()
-    {
-        Data d = new();
-        Array array = _mesh.SurfaceGetArrays(0);
-        d.mesh = array[(int)Mesh.ArrayType.Vertex].As<Array<Vector3>>();
-        d.heights = PlanetTerrain.Heights;
-        d.vertexColors = array[(int)Mesh.ArrayType.Color].As<Array<Color>>();
-        d.normals = array[(int)Mesh.ArrayType.Normal].As<Array<Vector3>>();
-        return d;
     }
     public Terrain3D.SpawnPoint GetSpawnPoint()
     {
@@ -85,22 +65,43 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
 
 
-    public void Generate()
+    public void Generate(bool withHeights = false, int seed = 0, Array<float> heights = null)
     {
-        SimplexTerrain3D terrain = new()
+        Terrain3D terrain = null;
+        if (!withHeights)
         {
-            Colors = Planet.Colors,
-            Mesh = _mesh.Duplicate() as Mesh, //ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
-            HeightmapSize = new NoiseImageSize(128),
-            // Noise1ImageSize = new NoiseImageSize(128),
-            // Noise2ImageSize = new NoiseImageSize(128),
-            // Noise3ImageSize = new NoiseImageSize(128),
-            MoistureImageSize = new NoiseImageSize(128),
-            WaterLevel = 0.3f,
-            UseSeamless = false
-        };
-        AddChild(terrain);
-        terrain.Generate(false, Planet.ShaderMaterial);
+            terrain = new SimplexTerrain3D()
+            {
+                Colors = Planet.Colors,
+                Mesh = _mesh.Duplicate() as Mesh, //ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
+                HeightmapSize = new NoiseImageSize(128),
+                // Noise1ImageSize = new NoiseImageSize(128),
+                // Noise2ImageSize = new NoiseImageSize(128),
+                // Noise3ImageSize = new NoiseImageSize(128),
+                MoistureImageSize = new NoiseImageSize(128),
+                WaterLevel = 0.3f,
+                UseSeamless = false
+            };
+            AddChild(terrain);
+            terrain.Generate(false, Planet.ShaderMaterial);
+        }
+        else
+        {
+            terrain = new SimplexTerrain3D()
+            {
+                Colors = Planet.Colors,
+                Mesh = _mesh.Duplicate() as Mesh, //ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
+                HeightmapSize = new NoiseImageSize(128),
+                // Noise1ImageSize = new NoiseImageSize(128),
+                // Noise2ImageSize = new NoiseImageSize(128),
+                // Noise3ImageSize = new NoiseImageSize(128),
+                MoistureImageSize = new NoiseImageSize(128),
+                WaterLevel = 0.3f,
+                UseSeamless = false,
+            };
+            AddChild(terrain);
+            terrain.FromHeights(false, seed, heights, Planet.ShaderMaterial);
+        }
 
         StaticBody3D sB = new()
         {

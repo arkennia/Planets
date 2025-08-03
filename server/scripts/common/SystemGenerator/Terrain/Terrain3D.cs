@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using Godot.Collections;
 
 namespace Planets.SystemGenerator.Terrain;
 
@@ -60,6 +62,8 @@ public abstract partial class Terrain3D : MeshInstance3D
     /// <param name="generateLods">Optional, generate LODs.</param>
     /// <param name="shaderMaterial">The shader material to use.</param>
     public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial = null);
+
+    public abstract void FromHeights(bool generateLods, int seed, Array<float> heights, ShaderMaterial shaderMaterial = null);
 
     protected void _GenerateSpawnPoints(MeshDataTool mdt, int vCount)
     {

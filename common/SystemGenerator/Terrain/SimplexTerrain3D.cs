@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
@@ -87,6 +88,36 @@ public partial class SimplexTerrain3D : Terrain3D
         //     _Generate();
 
     }
+
+    public override void FromHeights(bool generateLods, int seed, Array<float> heights, ShaderMaterial shaderMaterial = null)
+    {
+        if (Noise1 is null)
+            _CreateNoise();
+        Seed = (ulong)seed;
+        Heights = [.. heights];
+        _generateLods = generateLods;
+        _material = shaderMaterial;
+        // _generateCalled = true;
+        Images = new NoiseImages();
+        _GenerateWithHeights();
+    }
+
+    private void _GenerateWithHeights()
+    {
+        _mesh = new ArrayMesh();
+        _mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, Mesh.SurfaceGetArrays(0));
+        GD.Print("Mesh loaded.");
+        if (_generateLods) _mesh = _GenerateLoDs(_mesh);
+        Mesh = _GenerateNoiseWithHeights(_mesh.Duplicate() as ArrayMesh);
+        _material.SetShaderParameter("Moisture", Images.Moisture);
+        _material.SetShaderParameter("Heights", Heights);
+        GD.Print("Noise generated");
+        // Mesh = m;
+        SetSurfaceOverrideMaterial(0, _material);
+        // _material.SetShaderParameter("heightMapDim", HeightmapSize.Depth);
+        _generateCalled = false;
+    }
+
 
     private void _Generate()
     {
@@ -344,6 +375,72 @@ public partial class SimplexTerrain3D : Terrain3D
             h = (float)Mathf.Pow(h * 1.3f, 2.0);
             Vector3 vertN = mdt.GetVertexNormal(i);
             Heights[i] = h;
+            if (h > MountainLevel)
+                vert += vertN * h * 13f;
+            else vert += vertN * h * 10f;
+            mdt.SetVertex(i, vert);
+            mdt.SetVertexNormal(i, Vector3.Zero);
+            mdt.SetVertexColor(i, _GetColor(h, m));
+        });
+
+
+        Parallel.For(0, mdt.GetFaceCount(), i =>
+        {
+            int ia = mdt.GetFaceVertex(i, 0);
+            int ib = mdt.GetFaceVertex(i, 1);
+            int ic = mdt.GetFaceVertex(i, 2);
+
+            Vector3 e1 = mdt.GetVertex(ia) - mdt.GetVertex(ib);
+            Vector3 e2 = mdt.GetVertex(ic) - mdt.GetVertex(ib);
+            Vector3 normal = e1.Cross(e2);
+
+            mdt.SetVertexNormal(ia, (mdt.GetVertexNormal(ia) + normal).Normalized());
+            mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
+            mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
+        });
+
+
+        _GenerateSpawnPoints(mdt, vCount);
+        arrayMesh.ClearSurfaces();
+        mdt.CommitToSurface(arrayMesh);
+        return arrayMesh;
+    }
+
+    private ArrayMesh _GenerateNoiseWithHeights(ArrayMesh arrayMesh)
+    {
+
+        MeshDataTool mdt = new();
+        mdt.CreateFromSurface(arrayMesh, 0);
+        int vCount = mdt.GetVertexCount();
+
+        Images.Moisture = new ImageTexture3D();
+        Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
+            MoistureImageSize.Depth, false,
+            Moisture.GetImage3D(MoistureImageSize.Width, MoistureImageSize.Height, MoistureImageSize.Depth));
+
+
+#if DEBUG
+        GD.Print($"Num faces: {mdt.GetFaceCount()}");
+        GD.Print($"Num Vertices: {vCount}");
+#endif
+        _material.SetShaderParameter("VertexCount", vCount);
+        // Heights = new float[vCount];
+        CoordinateOrigin = mdt.GetVertex(0);
+        Parallel.For(0, vCount, i =>
+        {
+            Vector3 vert = mdt.GetVertex(i);
+
+            // float height = Heights[i];
+            // float n1 = _SampleNoise(Noise1, vert);
+            // float n2 = _SampleNoise(Noise2, vert * 2f);
+            // float n3 = _SampleNoise(Noise3, vert * 4f);
+            float m = _SampleNoise(Moisture, vert);
+            // float h = n1 * 1f + n2 * 0.33f + n3 * 0.1f;
+            // h /= 1f + 0.33f + 0.1f;
+            // h = (float)Mathf.Pow(h * 1.3f, 2.0);
+            Vector3 vertN = mdt.GetVertexNormal(i);
+            // Heights[i] = h;
+            float h = Heights[i];
             if (h > MountainLevel)
                 vert += vertN * h * 13f;
             else vert += vertN * h * 10f;

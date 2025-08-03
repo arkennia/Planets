@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using Godot.Collections;
 using Planets.SystemGenerator.Terrain;
 
 
@@ -21,14 +23,17 @@ public partial class PlanetGenerator : EditorScript
         p.Save();
     }
 
-    public static PlanetNode GeneratePlanet(string name = "Earth", int scale = 1000)
+    public static PlanetNode GeneratePlanet(string name = "Earth", int scale = 1000, int seed = 0, Array<float> heights = null)
     {
         Planet planet = new(name, scale);
         PlanetNode mI = new()
         {
             Planet = planet
         };
-        mI.Generate();
+        if (heights is not null)
+            mI.Generate(true, seed, heights);
+        else
+            mI.Generate();
         return mI;
     }
 }
