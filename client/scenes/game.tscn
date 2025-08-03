@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://wpa6nw1cmvpr" path="res://scenes/debug_ui.tscn" id="1_uwrxv"]
 [ext_resource type="Script" uid="uid://b8ovwpsgexm14" path="res://scripts/Game.cs" id="1_yqjtg"]
-[ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://meshes/planets/Icosphere.res" id="2_lnu2h"]
+[ext_resource type="ArrayMesh" uid="uid://bqsqy10qwo6xa" path="res://scripts/common/meshes/planets/Icosphere.res" id="2_lnu2h"]
 [ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scripts/common/player_node.tscn" id="3_lbhrr"]
 
 [node name="Game" type="Node" node_paths=PackedStringArray("Player")]
@@ -19,10 +19,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 378.86688)
 light_angular_distance = 0.5
 directional_shadow_mode = 0
 
-[node name="Player" parent="." instance=ExtResource("3_lbhrr")]
-unique_name_in_owner = true
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
-
 [node name="DebugUI" parent="." instance=ExtResource("1_uwrxv")]
 unique_name_in_owner = true
 anchors_preset = -1
+
+[node name="Player" parent="." instance=ExtResource("3_lbhrr")]
+unique_name_in_owner = true
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

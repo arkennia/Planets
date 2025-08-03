@@ -49,11 +49,6 @@ public partial class SimplexTerrain3D : Terrain3D
     [Export]
     public NoiseImageSize MoistureImageSize { get; set; } = new();
 
-    /// <summary>
-    /// The heights by vertex index.
-    /// </summary>
-    public float[] Heights { get; private set; }
-
     // The noise declarations and the noise images.
     private FastNoiseLite Noise1 { get; set; }
     private FastNoiseLite Noise2 { get; set; }
@@ -70,21 +65,27 @@ public partial class SimplexTerrain3D : Terrain3D
     /// </summary>
     public override void _Ready()
     {
-        if (_generateCalled && !Generated)
+        if (Multiplayer.IsServer())
         {
-            // _Generate();
-            Generated = true;
+            if (_generateCalled && !Generated)
+            {
+                _Generate();
+                Generated = true;
+            }
         }
     }
     public override void Generate(bool generateLods, ShaderMaterial shaderMaterial = null)
     {
+
         if (Noise1 is null)
             _CreateNoise();
         _generateLods = generateLods;
         _material = shaderMaterial;
         _generateCalled = true;
         Images = new NoiseImages();
-        _Generate();
+        // if (!Generated)
+        //     _Generate();
+
     }
 
     private void _Generate()
@@ -311,9 +312,11 @@ public partial class SimplexTerrain3D : Terrain3D
 
     private ArrayMesh _GenerateNoise(ArrayMesh arrayMesh)
     {
+
         MeshDataTool mdt = new();
         mdt.CreateFromSurface(arrayMesh, 0);
         int vCount = mdt.GetVertexCount();
+
         Images.Moisture = new ImageTexture3D();
         Images.Moisture.Create(Image.Format.L8, MoistureImageSize.Width, MoistureImageSize.Height,
             MoistureImageSize.Depth, false,
@@ -349,6 +352,7 @@ public partial class SimplexTerrain3D : Terrain3D
             mdt.SetVertexColor(i, _GetColor(h, m));
         });
 
+
         Parallel.For(0, mdt.GetFaceCount(), i =>
         {
             int ia = mdt.GetFaceVertex(i, 0);
@@ -363,12 +367,13 @@ public partial class SimplexTerrain3D : Terrain3D
             mdt.SetVertexNormal(ib, (mdt.GetVertexNormal(ib) + normal).Normalized());
             mdt.SetVertexNormal(ic, (mdt.GetVertexNormal(ic) + normal).Normalized());
         });
+
+
         _GenerateSpawnPoints(mdt, vCount);
         arrayMesh.ClearSurfaces();
         mdt.CommitToSurface(arrayMesh);
         return arrayMesh;
     }
-
     /* private float[] _GetVertexHeights(int vertexCount, MeshDataTool mdt)
     {
         float[] heights = new float[vertexCount];

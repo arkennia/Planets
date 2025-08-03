@@ -1,4 +1,6 @@
+using System.Runtime.Serialization;
 using Godot;
+using Godot.Collections;
 using Planets.SystemGenerator.Terrain;
 
 namespace Planets.SystemGenerator;
@@ -26,13 +28,37 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public ICelestialBody CelestialBody => Planet;
 
-    private Mesh _mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res");
+    public string SaveLocation { get; set; }
+
+
+    public const string SAVE_PATH = "res://scenes/planets";
+
+
+    public partial class Data : RefCounted
+    {
+        public Array<Vector3> mesh;
+        public float[] heights;
+        public Array<Color> vertexColors;
+        public Array<Vector3> normals;
+    }
+
+    private Mesh _mesh = ResourceLoader.Load<Mesh>("res://scripts/common/meshes/planets/Icosphere.res");
 
     public override void _Ready()
     {
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
     }
 
+    public Data GetData()
+    {
+        Data d = new();
+        Array array = _mesh.SurfaceGetArrays(0);
+        d.mesh = array[(int)Mesh.ArrayType.Vertex].As<Array<Vector3>>();
+        d.heights = PlanetTerrain.Heights;
+        d.vertexColors = array[(int)Mesh.ArrayType.Color].As<Array<Color>>();
+        d.normals = array[(int)Mesh.ArrayType.Normal].As<Array<Vector3>>();
+        return d;
+    }
     public Terrain3D.SpawnPoint GetSpawnPoint()
     {
         RandomNumberGenerator rng = new();
@@ -40,12 +66,14 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         return PlanetTerrain.SpawnPoints[idx];
     }
 
-    public void Save(string path = "res://scenes/planets")
+    public void Save()
     {
         Name = new StringName($"{Planet.Guid}");
         PackedScene ps = new();
         ps.Pack(this);
-        ResourceSaver.Save(ps, $"{path}/{CelestialBody.Guid}.scn", ResourceSaver.SaverFlags.Compress);
+        string fullPath = $"{SAVE_PATH}/{CelestialBody.Guid}.scn";
+        SaveLocation = fullPath;
+        ResourceSaver.Save(ps, fullPath, ResourceSaver.SaverFlags.Compress);
     }
 
     public Vector2 CalculatePosition(Vector3 coord)
@@ -55,12 +83,14 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         return new Vector2(x, y);
     }
 
+
+
     public void Generate()
     {
         SimplexTerrain3D terrain = new()
         {
             Colors = Planet.Colors,
-            Mesh = ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
+            Mesh = _mesh.Duplicate() as Mesh, //ResourceLoader.Load<Mesh>("res://meshes/planets/Icosphere.res"),
             HeightmapSize = new NoiseImageSize(128),
             // Noise1ImageSize = new NoiseImageSize(128),
             // Noise2ImageSize = new NoiseImageSize(128),
@@ -69,6 +99,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             WaterLevel = 0.3f,
             UseSeamless = false
         };
+        AddChild(terrain);
         terrain.Generate(false, Planet.ShaderMaterial);
 
         StaticBody3D sB = new()
@@ -109,7 +140,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         };
         collider.Scale *= 1.001f;
 
-        AddChild(terrain);
+
         AddChild(area);
         area.Owner = this;
         area.AddChild(areaCollider);
@@ -148,4 +179,15 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             }
         };
     }
+
+    void ICelestialBodyNode<Planet>.Save()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    void ICelestialBodyNode<Planet>.Generate()
+    {
+        throw new System.NotImplementedException();
+    }
+
 }

@@ -34,6 +34,11 @@ public abstract partial class Terrain3D : MeshInstance3D
     public ulong Seed { get; set; } = 69000;
 
     /// <summary>
+    /// The heights by vertex index.
+    /// </summary>
+    public float[] Heights { get; protected set; }
+
+    /// <summary>
     /// The origin to use to calculate surface coordinates.
     /// </summary>
     public Vector3 CoordinateOrigin { get; protected set; }

@@ -1,5 +1,8 @@
+using System.Linq;
 using Godot;
 using Godot.Collections;
+using Planets.SystemGenerator;
+using Planets.SystemGenerator.Terrain;
 using Array = Godot.Collections.Array;
 
 namespace Planets.Server;
@@ -12,6 +15,8 @@ public partial class Networking : Node
     public string ServerIp { get; set; } = "127.0.0.1"; // IPv4 localhost
     [Export]
     public int MaxConnections { get; set; } = 20;
+
+    public static Networking Instance;
 
     // These signals can be connected to by a UI lobby scene or the game scene.
     [Signal]
@@ -30,18 +35,24 @@ public partial class Networking : Node
         {"Name", "PlayerName"}
     };
 
-    Dictionary<long, Player> _playerObjects = [];
+    private Dictionary<long, Player> _playerObjects = [];
 
     private int _numConnections = 0;
 
     public override void _EnterTree()
     {
-        GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), "/root/Main");
+        // GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), "/root/Main");
+        GD.Print("Server ID: " + Multiplayer.GetUniqueId());
+        if (Multiplayer is SceneMultiplayer mp)
+        {
+            mp.AllowObjectDecoding = true;
+        }
     }
 
 
     public override void _Ready()
     {
+        Instance ??= this;
         GD.Print("Server Multiplayer instance ID: " + Multiplayer.GetInstanceId());
         ENetMultiplayerPeer peer = new();
         peer.CreateServer(Port, MaxConnections);
@@ -74,9 +85,38 @@ public partial class Networking : Node
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetPlanets(long id, int seed, Array<float> heights)
+    {
+        // PackedScene scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn");
+        GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
+        RpcId(id, MethodName.GetPlanets, 1, ServerManager.Planets[0].PlanetTerrain.Seed, new Array<float>(ServerManager.Planets[0].PlanetTerrain.Heights));
+    }
+
+    // [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    // public void SyncPlanets(Array<PlanetNode> nodes)
+    // {
+    //     if (Multiplayer.IsServer())
+    //     {
+    //         Error e = RpcId(MultiplayerPeer.TargetPeerBroadcast, MethodName.SyncPlanets, ServerManager.Instance.planets);
+    //         if (e != Error.Ok)
+    //         {
+    //             GD.Print($"Error sending data: {e}");
+    //         }
+    //     }
+    //     else
+    //     {
+    //         foreach (PlanetNode n in nodes)
+    //         {
+    //             GetNode("%World").AddChild(n);
+    //         }
+    //     }
+    // }
+
     private void OnPlayerConnected(long id)
     {
         GD.Print("Player connected at ID: " + id);
+        //RpcId(MultiplayerPeer.TargetPeerServer, MethodName.SyncPlanets, null);
         // Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
         // if (e != Error.Ok)
         //     GD.Print(e.ToString());
@@ -86,6 +126,7 @@ public partial class Networking : Node
     {
         GD.Print("Disconnect: " + id);
         _players.Remove(id);
+        _playerObjects.Remove(id);
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 

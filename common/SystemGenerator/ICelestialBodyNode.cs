@@ -7,12 +7,13 @@ namespace Planets.SystemGenerator;
 public interface ICelestialBodyNode<T> where T : ICelestialBody
 {
     ICelestialBody CelestialBody { get; }
+    string SaveLocation { get; set; }
 
     /// <summary>
     /// Saves this node to a file.
     /// </summary>
     /// <param name="path">The path to save to.</param>
-    public void Save(string path);
+    public void Save();
 
     /// <summary>
     /// Generate the celestial body.

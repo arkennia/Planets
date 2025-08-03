@@ -1,0 +1,31 @@
+[gd_resource type="VisualShader" load_steps=2 format=3 uid="uid://djumulcexgovg"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_ww7uj"]
+input_name = "color"
+
+[resource]
+resource_local_to_scene = true
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_disabled, diffuse_lambert, specular_schlick_ggx, ensure_correct_normals;
+
+
+
+
+void fragment() {
+// Input:2
+	vec4 n_out2p0 = COLOR;
+
+
+// Output:0
+	ALBEDO = vec3(n_out2p0.xyz);
+
+
+}
+"
+modes/cull = 2
+flags/ensure_correct_normals = true
+nodes/vertex/0/position = Vector2(1000, 80)
+nodes/fragment/0/position = Vector2(1060, -540)
+nodes/fragment/2/node = SubResource("VisualShaderNodeInput_ww7uj")
+nodes/fragment/2/position = Vector2(283.83612, -608.614)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0)

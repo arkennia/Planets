@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cnewervka0qnb"
+path="res://.godot/imported/get_vertex_heights.glsl-2e659a157ce0130aca5b1f57db5a3e10.res"
+
+[deps]
+
+source_file="res://scripts/common/shaders/get_vertex_heights.glsl"
+dest_files=["res://.godot/imported/get_vertex_heights.glsl-2e659a157ce0130aca5b1f57db5a3e10.res"]
+
+[params]
+

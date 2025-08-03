@@ -1,3 +1,14 @@
-[gd_scene format=3 uid="uid://bndk1f006q4w3"]
+[gd_scene load_steps=2 format=3 uid="uid://bndk1f006q4w3"]
+
+[ext_resource type="Script" uid="uid://cvw4r0bd5j5iv" path="res://scripts/Game.cs" id="1_m3u1i"]
 
 [node name="Main" type="Node"]
+
+[node name="Main" type="Node" parent="."]
+
+[node name="Game" type="Node" parent="Main"]
+unique_name_in_owner = true
+script = ExtResource("1_m3u1i")
+
+[node name="World" type="Node3D" parent="Main/Game"]
+unique_name_in_owner = true

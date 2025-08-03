@@ -42,7 +42,7 @@ public partial class Planet : Resource, ICelestialBody
 
     [Export]
     public ShaderMaterial ShaderMaterial { get; set; } =
-        ResourceLoader.Load<ShaderMaterial>("res://materials/shader_materials/planet_material.tres")
+        ResourceLoader.Load<ShaderMaterial>("res://scripts/common/materials/shader_materials/planet_material.tres")
             .Duplicate() as ShaderMaterial;
 
     [Export]

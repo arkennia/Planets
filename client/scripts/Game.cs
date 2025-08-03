@@ -18,7 +18,12 @@ public partial class Game : Node
     [Export]
     public Mesh Mesh { get; set; }
 
+    // [Export]
+    // public MultiplayerSpawner PlanetSpawner { get; set; }
+
     private PlanetNode _planetNode;
+
+    private int numSpawned = 0;
 
     // Called when the node enters the scene tree for the first time.
 
@@ -30,39 +35,58 @@ public partial class Game : Node
     public override void _Ready()
     {
         _Load();
-        _SetSpawnPoint();
+        // GD.Print(PlanetSpawner.GetPath());
+        // PlanetSpawner.SpawnPath = "/root/Main/Main/Game/World";
+        // PlanetSpawner.Spawned += (node) =>
+        // {
+        //     GD.Print("Spawned node: " + node.ToString());
+        //     _planetNode = node as PlanetNode;
+        //     numSpawned++;
+        // };
+        // _SetSpawnPoint();
+
     }
 
     private void _Load()
     {
-        if (!Generated)
-        {
-            PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale);
-            GD.Print("Planet generation complete.");
-            Node3D worldNode = GetNode<Node3D>("%World");
-            worldNode.AddChild(p);
-            GD.Print("Planet added to scene.");
-            p.Save();
-            GD.Print("Planet saved.");
-            _planetNode = p;
-            _planetNode.Position = new Vector3(0, 0, -13800);
-            // p.Scale *= 500f;
-        }
-        else
-        {
-            Error sceneLoader =
-                ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn",
-                    useSubThreads: true);
-            if (sceneLoader != Error.Ok)
-                GD.PrintErr(sceneLoader);
-            PackedScene scene =
-                ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
-                    PackedScene;
-            if (scene?.Instantiate() is not Node3D sceneNode) return;
-            sceneNode.Position = new Vector3(0, 0, -500);
-            GetNode("%World").AddChild(sceneNode);
-            GD.Print("Planet loaded");
-        }
+        // while (_planetNode == null)
+        // {
+
+        // }
+        // GD.Print("Num spawnable scenes: " + PlanetSpawner.GetSpawnableSceneCount());
+        // while (numSpawned < PlanetSpawner.GetSpawnableSceneCount())
+        // {
+
+        // }
+        // GD.Print("Network Spawning finished");
+        // if (!Generated)
+        // {
+        //     PlanetNode p = PlanetGenerator.GeneratePlanet(scale: Scale);
+        //     GD.Print("Planet generation complete.");
+        //     Node3D worldNode = GetNode<Node3D>("%World");
+        //     worldNode.AddChild(p);
+        //     GD.Print("Planet added to scene.");
+        //     p.Save();
+        //     GD.Print("Planet saved.");
+        //     _planetNode = p;
+        //     _planetNode.Position = new Vector3(0, 0, -13800);
+        //     // p.Scale *= 500f;
+        // }
+        // else
+        // {
+        //     Error sceneLoader =
+        //         ResourceLoader.LoadThreadedRequest("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn",
+        //             useSubThreads: true);
+        //     if (sceneLoader != Error.Ok)
+        //         GD.PrintErr(sceneLoader);
+        //     PackedScene scene =
+        //         ResourceLoader.LoadThreadedGet("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn") as
+        //             PackedScene;
+        //     if (scene?.Instantiate() is not Node3D sceneNode) return;
+        //     sceneNode.Position = new Vector3(0, 0, -500);
+        //     GetNode("%World").AddChild(sceneNode);
+        //     GD.Print("Planet loaded");
+        // }
     }
 
     private void _SetSpawnPoint()
@@ -73,6 +97,5 @@ public partial class Game : Node
         // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
         // Player.GlobalPosition = spawn;
         Player.Spawn(spawn, _planetNode);
-
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using Godot;
 using Godot.Collections;
+using Planets.SystemGenerator;
 
 public partial class Networking : Node
 {
@@ -25,6 +27,10 @@ public partial class Networking : Node
     public override void _Ready()
     {
         Instance ??= this;
+        if (Multiplayer is SceneMultiplayer mp)
+        {
+            mp.AllowObjectDecoding = true;
+        }
         GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
         ENetMultiplayerPeer peer = new();
         peer.CreateClient("127.0.0.1", 7000);
@@ -54,6 +60,19 @@ public partial class Networking : Node
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetPlanets(long id, int seed, Array<float> heights)
+    {
+        GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
+        if (Multiplayer.GetRemoteSenderId() != 1) return;
+        // GD.Print("Data Received: " + planetBytes.Length + " ");
+        if (heights != null)
+        {
+            GD.Print(heights[0..10]);
+            GD.Print("Seed: " + seed);
+        }
+    }
+
     private void OnPlayerConnected(long id)
     {
         GD.Print("Player connected at ID: " + id);
@@ -71,7 +90,9 @@ public partial class Networking : Node
     {
         Connected = true;
         int peerId = Multiplayer.GetUniqueId();
+        GD.Print("My ID: " + peerId);
         _players[peerId] = _playerInfo;
+        RpcId(1, MethodName.GetPlanets, peerId, 0, new());
         EmitSignal(SignalName.PlayerConnected, peerId, _playerInfo);
     }
 
