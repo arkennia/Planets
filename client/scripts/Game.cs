@@ -34,7 +34,7 @@ public partial class Game : Node
 
     public override void _Ready()
     {
-        _Load();
+        // Networking.Instance.PlanetLoaded += OnPlanetLoaded;
         // GD.Print(PlanetSpawner.GetPath());
         // PlanetSpawner.SpawnPath = "/root/Main/Main/Game/World";
         // PlanetSpawner.Spawned += (node) =>
@@ -43,16 +43,12 @@ public partial class Game : Node
         //     _planetNode = node as PlanetNode;
         //     numSpawned++;
         // };
-        // _SetSpawnPoint();
-
+        _planetNode = Networking.Instance.planets[0];
+        _SetSpawnPoint();
     }
 
     private void _Load()
     {
-        // while (_planetNode == null)
-        // {
-
-        // }
         // GD.Print("Num spawnable scenes: " + PlanetSpawner.GetSpawnableSceneCount());
         // while (numSpawned < PlanetSpawner.GetSpawnableSceneCount())
         // {
@@ -97,5 +93,12 @@ public partial class Game : Node
         // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
         // Player.GlobalPosition = spawn;
         Player.Spawn(spawn, _planetNode);
+    }
+
+    public void OnPlanetLoaded(PlanetNode planet)
+    {
+        _planetNode = planet;
+        _Load();
+        _SetSpawnPoint();
     }
 }

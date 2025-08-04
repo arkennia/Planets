@@ -23,61 +23,58 @@ public partial class Client : Node
 
     private bool _loading;
 
+    private bool _syncing = true;
+
     private Control _loadingScreen;
 
     private Node _gameNode;
 
+    public override void _EnterTree()
+    {
+    }
 
 
-    // private Dictionary<long, Dictionary<string, string>> _players = [];
-
-    // [Signal]
-    // public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
-    // [Signal]
-    // public delegate void PlayerDisconnectedEventHandler(int peerId);
-    // [Signal]
-    // public delegate void ServerDisconnectedEventHandler();
-
-    // private int _numConnections = 0;
     public override void _Ready()
     {
-        GD.Print(GetPath());
+        // GD.Print(GetPath());
         if (LoadingScreenScene?.Instantiate() is Control node)
         {
             AddChild(node);
             _loadingScreen = node;
         }
-        Multiplayer.ConnectedToServer += () =>
+
+        while (_syncing)
         {
-            if (_gameNode is null)
-                _LoadGame();
-            // Networking.Instance.RpcId(MultiplayerPeer.TargetPeerServer, Networking.MethodName.PlayerLoaded, Multiplayer.GetUniqueId());
-        };
+            _syncing = Networking.Instance.IsSyncing;
+        }
+        OnSyncingFinished();
+        // Multiplayer.ConnectedToServer += () =>
+        // {
+        // };
     }
 
     public override void _Process(double _)
     {
-        if (_loading)
-        {
-            Array progress = [];
-            if (ResourceLoader.LoadThreadedGetStatus(Game, progress) == ResourceLoader.ThreadLoadStatus.Loaded)
-            {
-                GD.Print($"Progress: {progress}");
-                if (_GetLoadedPackedScene(Game) is not Node sceneNode)
-                {
-                    GD.PrintErr($"Failed to load scene {Game}.");
-                }
-                else
-                {
-                    AddChild(sceneNode);
-                    RemoveChild(_loadingScreen);
-                    GD.Print("Game Scene loaded");
-                    _gameNode = sceneNode;
-                    _LoadGameUi();
-                }
-                _loading = false;
-            }
-        }
+        // if (_loading)
+        // {
+        //     Array progress = [];
+        //     if (ResourceLoader.LoadThreadedGetStatus(Game, progress) == ResourceLoader.ThreadLoadStatus.Loaded)
+        //     {
+        //         GD.Print($"Progress: {progress}");
+        //         if (_GetLoadedPackedScene(Game) is not Node sceneNode)
+        //         {
+        //             GD.PrintErr($"Failed to load scene {Game}.");
+        //         }
+        //         else
+        //         {
+        //             AddChild(sceneNode);
+        //             GD.Print("Game Scene loaded");
+        //             _gameNode = sceneNode;
+        //         }
+        //         _loading = false;
+        //     }
+        // }
+
     }
 
 
@@ -88,26 +85,36 @@ public partial class Client : Node
         UiManager.Instance.Ui = Ui;
     }
 
-    private void _LoadGame()
+    // private void _LoadGame()
+    // {
+    //     _BeginLoadPackedScene(Game);
+    //     _loading = true;
+    // }
+
+    private void OnSyncingFinished()
     {
-        _BeginLoadPackedScene(Game);
-        _loading = true;
+        GD.Print("Client syncing finished.");
+        RemoveChild(_loadingScreen);
+        _syncing = Networking.Instance.IsSyncing;
+        _LoadGameUi();
+        _syncing = false;
     }
 
-    private static void _BeginLoadPackedScene(string path)
-    {
-        Error sceneLoader =
-                ResourceLoader.LoadThreadedRequest(path);
-        if (sceneLoader != Error.Ok)
-            GD.PrintErr(sceneLoader);
-    }
+    // private static void _BeginLoadPackedScene(string path)
+    // {
+    //     Error sceneLoader =
+    //             ResourceLoader.LoadThreadedRequest(path);
+    //     if (sceneLoader != Error.Ok)
+    //         GD.PrintErr(sceneLoader);
+    // }
 
-    private static Node _GetLoadedPackedScene(string path)
-    {
-        PackedScene scene =
-                ResourceLoader.LoadThreadedGet(path) as
-                    PackedScene;
-        if (scene?.Instantiate() is not Node sceneNode) return null;
-        return sceneNode;
-    }
+    // private static Node _GetLoadedPackedScene(string path)
+    // {
+    //     PackedScene scene =
+    //             ResourceLoader.LoadThreadedGet(path) as
+    //                 PackedScene;
+    //     if (scene?.Instantiate() is not Node sceneNode) return null;
+    //     return sceneNode;
+    // }
+
 }

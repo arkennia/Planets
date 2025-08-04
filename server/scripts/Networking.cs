@@ -90,9 +90,12 @@ public partial class Networking : Node
     {
         // PackedScene scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn");
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
-        RpcId(id, MethodName.GetPlanets, 1,
-            ServerManager.Planets[0].PlanetTerrain.Seed,
-            new Array<float>(ServerManager.Planets[0].PlanetTerrain.Heights));
+        for (int i = 0; i < ServerManager.Planets.Count; i++)
+            RpcId(id, MethodName.GetPlanets, 1,
+                ServerManager.Planets[0].PlanetTerrain.Seed,
+                new Array<float>(ServerManager.Planets[0].PlanetTerrain.Heights));
+        RpcId(id, MethodName.GetPlanets, 1, 0, new Array<float>());
+
     }
 
     // [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

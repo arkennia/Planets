@@ -10,4 +10,7 @@
         <Content Include="materials\shader_materials\get_vertex_heights.glsl" />
         <Content Include="materials\shader_materials\get_vertex_heights_2d.glsl" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Stateless" Version="2.3.1.1" />
+    </ItemGroup>
 </Project>

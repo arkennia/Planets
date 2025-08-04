@@ -14,20 +14,33 @@ public partial class Networking : Node
         // {"Name", "PlayerName"}
     };
 
+    public bool IsSyncing { get; private set; }
+    public Array<PlanetNode> planets;
+
     [Signal]
     public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
     [Signal]
     public delegate void PlayerDisconnectedEventHandler(int peerId);
     [Signal]
     public delegate void ServerDisconnectedEventHandler();
+    [Signal]
+    public delegate void PlanetLoadedEventHandler(PlanetNode planet);
+    [Signal]
+    public delegate void SyncingFinishedEventHandler();
 
     private int _numConnections = 0;
 
+    // private bool _isSyncing = false;
+
+    private Networking()
+    {
+
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        Instance ??= this;
+        // Instance ??= this;
         if (Multiplayer is SceneMultiplayer mp)
         {
             mp.AllowObjectDecoding = true;
@@ -35,6 +48,8 @@ public partial class Networking : Node
         GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
         ENetMultiplayerPeer peer = new();
         peer.CreateClient("127.0.0.1", 7000);
+        PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
+        SyncingFinished += () => IsSyncing = false;
         Multiplayer.MultiplayerPeer = peer;
         Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
@@ -67,12 +82,19 @@ public partial class Networking : Node
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         if (Multiplayer.GetRemoteSenderId() != 1) return;
         // GD.Print("Data Received: " + planetBytes.Length + " ");
-        if (heights != null)
+        if (heights.Count > 0)
         {
+            IsSyncing = true;
             GD.Print(heights[0..10]);
             GD.Print("Seed: " + seed);
             PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
-            GetTree().Root.GetNode<Node>("/root/Main/Main/Game/World").AddChild(planet);
+            GetTree().Root.GetNode<Node>("/root/Main/Game/World").AddChild(planet);
+            planets.Add(planet);
+            EmitSignal(SignalName.PlanetLoaded, planet);
+        }
+        else
+        {
+            EmitSignal(SignalName.SyncingFinished);
         }
     }
 

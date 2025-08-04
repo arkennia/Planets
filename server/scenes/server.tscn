@@ -4,11 +4,11 @@
 
 [node name="Main" type="Node"]
 
-[node name="Main" type="Node" parent="."]
-
-[node name="Game" type="Node" parent="Main"]
+[node name="Game" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("1_m3u1i")
 
-[node name="World" type="Node3D" parent="Main/Game"]
+[node name="World" type="Node3D" parent="Game"]
 unique_name_in_owner = true
+
+[node name="Main" type="Node" parent="."]

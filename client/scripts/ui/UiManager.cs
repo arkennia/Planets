@@ -18,7 +18,7 @@ public partial class UiManager : Node
     public override void _Ready()
     {
         Instance ??= this;
-        MainNode ??= GetNode<Client>("/root/Main/Main");
+        MainNode ??= GetNode<Client>("/root/Main");
         Ui ??= MainNode.Ui;
     }
 
