@@ -27,6 +27,8 @@ public partial class Client : Node
 
     private Node _gameNode;
 
+    private Control _mainMenu;
+
     public override void _EnterTree()
     {
     }
@@ -40,6 +42,21 @@ public partial class Client : Node
         // Multiplayer.ConnectedToServer += () =>
         // {
         // };
+        ShowMainMenu();
+    }
+
+    public void ShowMainMenu()
+    {
+        if (MainMenuScene?.Instantiate() is Control node)
+        {
+            AddChild(node);
+            _mainMenu = node;
+        }
+    }
+
+    public void RemoveMainMenu()
+    {
+        RemoveChild(_mainMenu);
     }
 
     public void ShowLoadingScreen()
@@ -81,7 +98,7 @@ public partial class Client : Node
     }
 
 
-    private void _LoadGameUi()
+    public void LoadGameUi()
     {
         Ui = GameUiScene.Instantiate<GameUi>();
         AddChild(Ui);
@@ -98,7 +115,7 @@ public partial class Client : Node
     {
         // GD.Print("Client syncing finished.");
 
-        _LoadGameUi();
+        // _LoadGameUi();
     }
 
     // private static void _BeginLoadPackedScene(string path)

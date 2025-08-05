@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Client.cs" id="1_4tr0r"]
 [ext_resource type="PackedScene" uid="uid://csuicy0jgwwvd" path="res://scenes/loading_screen.tscn" id="2_r26j7"]
+[ext_resource type="PackedScene" uid="uid://3mbd8q2efj0s" path="res://scenes/main_menu.tscn" id="3_dipmf"]
 [ext_resource type="PackedScene" uid="uid://gqyfs0rbresq" path="res://scenes/game_ui.tscn" id="3_t0ykn"]
 [ext_resource type="Script" uid="uid://b8ovwpsgexm14" path="res://scripts/Game.cs" id="4_da3od"]
 [ext_resource type="PackedScene" uid="uid://wpa6nw1cmvpr" path="res://scenes/debug_ui.tscn" id="5_dipmf"]
-[ext_resource type="PackedScene" uid="uid://da4k4iimbemic" path="res://scripts/common/player_node.tscn" id="6_5q6u5"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rsb3r"]
 
@@ -46,16 +46,17 @@ metadata/Radius = 60
 [node name="Main" type="Node"]
 script = ExtResource("1_4tr0r")
 LoadingScreenScene = ExtResource("2_r26j7")
+MainMenuScene = ExtResource("3_dipmf")
 GameUiScene = ExtResource("3_t0ykn")
 Game = "res://scenes/game.tscn"
 
 [node name="GameUi" parent="." instance_placeholder="res://scenes/game_ui.tscn"]
 unique_name_in_owner = true
 
-[node name="Game" type="Node" parent="." node_paths=PackedStringArray("Player")]
+[node name="Game" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("4_da3od")
 Scale = 250
-Player = NodePath("Player")
 Mesh = SubResource("ArrayMesh_umycy")
 
 [node name="World" type="Node3D" parent="Game"]
@@ -70,6 +71,6 @@ directional_shadow_mode = 0
 unique_name_in_owner = true
 anchors_preset = -1
 
-[node name="Player" parent="Game" instance=ExtResource("6_5q6u5")]
+[node name="Player" parent="Game" instance_placeholder="res://scripts/common/player_node.tscn"]
 unique_name_in_owner = true
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)

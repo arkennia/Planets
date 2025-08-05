@@ -54,6 +54,8 @@ public partial class Player : CharacterBody3D
         MotionMode = MotionModeEnum.Floating;
         _ = InitUiSignals();
         FloorSnapLength = 0.5f;
+        ProcessMode = ProcessModeEnum.Disabled;
+        SetPhysicsProcess(false);
     }
 
     /// <summary>
@@ -69,6 +71,8 @@ public partial class Player : CharacterBody3D
         _up = UpDirection = dir;
         _ChangeMotionMode(planet, sp.Normal);
         float angle = GlobalPosition.AngleTo(_up);
+        ProcessMode = ProcessModeEnum.Pausable;
+        SetPhysicsProcess(true);
     }
 
     private async Task InitUiSignals()

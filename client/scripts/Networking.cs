@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using Planets;
@@ -8,13 +9,13 @@ using Planets.SystemGenerator.Terrain;
 public partial class Networking : Node
 {
     public static bool Connected { get; private set; } = false;
-    public static Networking Instance { get; private set; } = new();
+    public static Networking Instance { get; private set; }
     private Dictionary<long, Dictionary<string, string>> _players = [];
     private Dictionary<string, string> _playerInfo = new()
     {
         // {"Name", "PlayerName"}
     };
-    public Array<PlanetNode> planets;
+    public Array<PlanetNode> planets = [];
 
     private int _numPlanets = 0;
 
@@ -35,26 +36,25 @@ public partial class Networking : Node
 
     private Networking()
     {
-
     }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        // Instance ??= this;
-    }
-
-    public Error ConnectToServer()
-    {
+        Instance ??= this;
         if (Multiplayer is SceneMultiplayer mp)
         {
             mp.AllowObjectDecoding = true;
         }
         GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
+    }
+
+    public Error ConnectToServer()
+    {
         ENetMultiplayerPeer peer = new();
         Error e = peer.CreateClient("127.0.0.1", 7000);
         PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
-        SyncingFinished += () => GameManager.Instance.WorldLoaded();
+        // SyncingFinished += GameManager.Instance.WorldLoaded;
         Multiplayer.MultiplayerPeer = peer;
         Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
@@ -62,6 +62,16 @@ public partial class Networking : Node
         Multiplayer.ConnectionFailed += OnConnectionFail;
         Multiplayer.ServerDisconnected += OnServerDisconnected;
         return e;
+    }
+
+    public void BeginPlanetSync()
+    {
+        Error e = RpcId(1, MethodName.NumPlanets, -1);
+        if (e != Error.Ok)
+            GD.Print($"Error getting number of planets: {e}");
+        e = RpcId(1, MethodName.GetPlanets, 0, 0, new Array<float>());
+        if (e != Error.Ok)
+            GD.Print($"Error getting planets: {e}");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -82,7 +92,7 @@ public partial class Networking : Node
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void GetPlanets(long id, int seed, Array<float> heights)
     {
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
@@ -100,11 +110,12 @@ public partial class Networking : Node
         else
         {
             EmitSignal(SignalName.SyncingFinished);
-            GD.Print($"_numPlanets: {_numPlanets} \n Number of Planets received:  {planets.Count}");
+            GD.Print($"Number of Planets received:  {planets.Count}");
+            GameManager.Instance.WorldLoaded();
         }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void NumPlanets(int numPlanets)
     {
         if (Multiplayer.GetRemoteSenderId() != 1) return;
@@ -117,6 +128,10 @@ public partial class Networking : Node
         Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
         if (e != Error.Ok)
             GD.Print(e.ToString());
+        if (Multiplayer.GetRemoteSenderId() == 1)
+        {
+            BeginPlanetSync();
+        }
     }
     private void OnPlayerDisconnected(long id)
     {

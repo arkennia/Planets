@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using Stateless;
@@ -20,6 +21,7 @@ public partial class GameManager : Node
 
     public enum Triggers
     {
+        Start,
         Connect,
         Connected,
         ConnectionFailed,
@@ -30,7 +32,8 @@ public partial class GameManager : Node
         Resume,
         Exit,
     }
-    public static GameManager Instance { get; private set; } = new();
+    public static GameManager Instance { get; private set; }
+
     public State CurrentState => _machine.State;
 
     private readonly StateMachine<State, Triggers> _machine;
@@ -38,11 +41,50 @@ public partial class GameManager : Node
 
     private GameManager()
     {
+        Instance ??= this;
         _machine = new StateMachine<State, Triggers>(State.Starting);
+
+        // _machine.Configure(State.Starting)
+        //     .Permit(Triggers.Connect, State.Connecting)
+        //     .OnEntry(_OnStartingEntry)
+        //     .OnExit(_OnStartingExit);
+
+        // _machine.Configure(State.Connecting)
+        //     .PermitReentry(Triggers.ConnectionFailed)
+        //     .Permit(Triggers.Connected, State.LoadingWorld)
+        //     .OnEntry(_OnConnectingEntry)
+        //     .OnExit(_OnConnectingExit);
+
+        // _machine.Configure(State.LoadingWorld)
+        //     .Permit(Triggers.WorldLoaded, State.PlayerSetup)
+        //     .OnEntry(_OnLoadingWorldEntry)
+        //     .OnExit(_OnLoadingWorldExit);
+
+        // _machine.Configure(State.PlayerSetup)
+        //     .Permit(Triggers.PlayerSetupComplete, State.Gameplay);
+
+        // _machine.Configure(State.Gameplay)
+        //     .Permit(Triggers.Pause, State.Paused)
+        //     .PermitReentry(Triggers.Resume);
+
+        // _machine.Configure(State.Paused)
+        //     .Permit(Triggers.Resume, State.Gameplay)
+        //     .Permit(Triggers.Exit, State.Exiting);
+
+        // _machine.Configure(State.Exiting)
+        //     .OnEntry(_OnExitingEntry);
+
+        // GD.Print("Current state in constructor: " + _machine.State);
+
+    }
+
+    public override void _Ready()
+    {
 
         _machine.Configure(State.Starting)
             .Permit(Triggers.Connect, State.Connecting)
-            .OnEntry(_OnStartingEntry);
+            .OnEntry(_OnStartingEntry)
+            .OnExit(_OnStartingExit);
 
         _machine.Configure(State.Connecting)
             .PermitReentry(Triggers.ConnectionFailed)
@@ -56,7 +98,8 @@ public partial class GameManager : Node
             .OnExit(_OnLoadingWorldExit);
 
         _machine.Configure(State.PlayerSetup)
-            .Permit(Triggers.PlayerSetupComplete, State.Gameplay);
+            .Permit(Triggers.PlayerSetupComplete, State.Gameplay)
+            .OnEntry(_OnPlayerSetupEntry);
 
         _machine.Configure(State.Gameplay)
             .Permit(Triggers.Pause, State.Paused)
@@ -69,7 +112,9 @@ public partial class GameManager : Node
         _machine.Configure(State.Exiting)
             .OnEntry(_OnExitingEntry);
 
+        GD.Print("Current state in constructor: " + _machine.State);
     }
+
 
     public void ConnectToServer() => _machine.Fire(Triggers.Connect);
     public void ConnectionFailed() => _machine.Fire(Triggers.ConnectionFailed);
@@ -83,15 +128,24 @@ public partial class GameManager : Node
 
     private void _OnStartingEntry()
     {
-
+        GD.Print("Start State entered.");
+    }
+    private void _OnStartingExit()
+    {
+        if (GetTree().CurrentScene is Client c)
+        {
+            c.RemoveMainMenu();
+        }
     }
 
     private void _OnConnectingEntry()
     {
-        Error e = Networking.Instance.ConnectToServer();
+        GD.Print("Connecting State entered.");
+        Error e = Networking.Instance.CallDeferred(Networking.MethodName.ConnectToServer).As<Error>();
         if (e == Error.Ok)
         {
             ConnectedToServer();
+            GD.Print("Connected to server!");
         }
         else
         {
@@ -107,22 +161,32 @@ public partial class GameManager : Node
 
     private void _OnLoadingWorldEntry()
     {
-        if (GetTree().Root.GetNode("/Main") is Client c)
+        if (GetTree().CurrentScene is Client c)
         {
             c.ShowLoadingScreen();
         }
-        RpcId(1, Networking.MethodName.NumPlanets, -1);
-        RpcId(1, Networking.MethodName.GetPlanets, 0, 0, new Array<float>());
+        // Networking.Instance.CallDeferred(Networking.MethodName.BeginPlanetSync);
     }
 
     private void _OnLoadingWorldExit()
     {
-
+        if (GetTree().CurrentScene is Client c)
+        {
+            c.RemoveLoadingScreen();
+            c.LoadGameUi();
+        }
     }
 
     private void _OnPlayerSetupEntry()
     {
-
+        if (GetTree().CurrentScene.GetNode<Game>("%Game") is Game g)
+        {
+            g.SetupPlayer();
+        }
+        else
+        {
+            GD.Print("Failed to call SetupPlayer");
+        }
     }
 
     private void _OnPlayerSetupExit()
