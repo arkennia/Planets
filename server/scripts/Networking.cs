@@ -16,7 +16,7 @@ public partial class Networking : Node
     [Export]
     public int MaxConnections { get; set; } = 20;
 
-    public static Networking Instance;
+    public static Networking Instance { get; private set; }
 
     // These signals can be connected to by a UI lobby scene or the game scene.
     [Signal]

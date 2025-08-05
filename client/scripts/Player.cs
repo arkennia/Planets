@@ -70,7 +70,7 @@ public partial class Player : CharacterBody3D
         Vector3 dir = sp.Normal; //-(planet.GlobalPosition - GlobalPosition).Normalized();
         _up = UpDirection = dir;
         _ChangeMotionMode(planet, sp.Normal);
-        float angle = GlobalPosition.AngleTo(_up);
+        // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
         SetPhysicsProcess(true);
     }
