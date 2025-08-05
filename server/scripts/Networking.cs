@@ -98,6 +98,12 @@ public partial class Networking : Node
 
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void NumPlanets(int numPlanets)
+    {
+        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Planets.Count);
+    }
+
     // [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     // public void SyncPlanets(Array<PlanetNode> nodes)
     // {

@@ -23,8 +23,6 @@ public partial class Client : Node
 
     private bool _loading;
 
-    private bool _syncing = true;
-
     private Control _loadingScreen;
 
     private Node _gameNode;
@@ -37,20 +35,25 @@ public partial class Client : Node
     public override void _Ready()
     {
         // GD.Print(GetPath());
+
+        // OnSyncingFinished();
+        // Multiplayer.ConnectedToServer += () =>
+        // {
+        // };
+    }
+
+    public void ShowLoadingScreen()
+    {
         if (LoadingScreenScene?.Instantiate() is Control node)
         {
             AddChild(node);
             _loadingScreen = node;
         }
+    }
 
-        while (_syncing)
-        {
-            _syncing = Networking.Instance.IsSyncing;
-        }
-        OnSyncingFinished();
-        // Multiplayer.ConnectedToServer += () =>
-        // {
-        // };
+    public void RemoveLoadingScreen()
+    {
+        RemoveChild(_loadingScreen);
     }
 
     public override void _Process(double _)
@@ -93,11 +96,9 @@ public partial class Client : Node
 
     private void OnSyncingFinished()
     {
-        GD.Print("Client syncing finished.");
-        RemoveChild(_loadingScreen);
-        _syncing = Networking.Instance.IsSyncing;
+        // GD.Print("Client syncing finished.");
+
         _LoadGameUi();
-        _syncing = false;
     }
 
     // private static void _BeginLoadPackedScene(string path)

@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Godot.Collections;
+using Planets;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
 
@@ -13,9 +14,9 @@ public partial class Networking : Node
     {
         // {"Name", "PlayerName"}
     };
-
-    public bool IsSyncing { get; private set; }
     public Array<PlanetNode> planets;
+
+    private int _numPlanets = 0;
 
     [Signal]
     public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
@@ -41,21 +42,26 @@ public partial class Networking : Node
     public override void _Ready()
     {
         // Instance ??= this;
+    }
+
+    public Error ConnectToServer()
+    {
         if (Multiplayer is SceneMultiplayer mp)
         {
             mp.AllowObjectDecoding = true;
         }
         GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
         ENetMultiplayerPeer peer = new();
-        peer.CreateClient("127.0.0.1", 7000);
+        Error e = peer.CreateClient("127.0.0.1", 7000);
         PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
-        SyncingFinished += () => IsSyncing = false;
+        SyncingFinished += () => GameManager.Instance.WorldLoaded();
         Multiplayer.MultiplayerPeer = peer;
         Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
         Multiplayer.ConnectedToServer += OnConnectOk;
         Multiplayer.ConnectionFailed += OnConnectionFail;
         Multiplayer.ServerDisconnected += OnServerDisconnected;
+        return e;
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -84,7 +90,6 @@ public partial class Networking : Node
         // GD.Print("Data Received: " + planetBytes.Length + " ");
         if (heights.Count > 0)
         {
-            IsSyncing = true;
             GD.Print(heights[0..10]);
             GD.Print("Seed: " + seed);
             PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
@@ -95,7 +100,15 @@ public partial class Networking : Node
         else
         {
             EmitSignal(SignalName.SyncingFinished);
+            GD.Print($"_numPlanets: {_numPlanets} \n Number of Planets received:  {planets.Count}");
         }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void NumPlanets(int numPlanets)
+    {
+        if (Multiplayer.GetRemoteSenderId() != 1) return;
+        _numPlanets = numPlanets;
     }
 
     private void OnPlayerConnected(long id)
