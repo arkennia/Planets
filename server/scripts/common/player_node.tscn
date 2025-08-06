@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://da4k4iimbemic"]
 
-[ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/Player.cs" id="1_72p8a"]
+[ext_resource type="Script" uid="uid://dw2gv7u46s7wp" path="res://scripts/common/Player.cs" id="1_72p8a"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4m5hh"]
 margin = 0.08
