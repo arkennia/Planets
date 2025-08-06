@@ -56,11 +56,11 @@ public partial class Planet : Resource, ICelestialBody
         // if (Guid == Guid.Empty) Guid = Guid.NewGuid();
     }
 
-    public Planet(string name = "Earth", int scale = 500)
+    public Planet(string name = "Earth", int scale = 500, Guid? guid = null)
     {
         Name = name;
         Scale = scale;
-        Guid = Guid.Empty;
+        Guid = (Guid)(guid is null ? Guid.NewGuid() : guid);
     }
 
     public void Save(string path = "res://resources")

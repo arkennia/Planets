@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
@@ -100,6 +101,7 @@ public partial class Networking : Node
         // GD.Print("Data Received: " + planetBytes.Length + " ");
         if (heights.Count > 0)
         {
+            // Guid uid = Guid.Parse(id);
             GD.Print(heights[0..10]);
             GD.Print("Seed: " + seed);
             PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);

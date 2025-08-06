@@ -10,7 +10,7 @@ public partial class Game : Node
     {
         PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 250);
         // ServerManager.Instance.planets.Add(p);
-        p.Save();
+        // p.Save();
         ServerManager.AddPlanet(p);
         GetTree().Root.GetNode("/root/Main/Game/World").AddChild(p);
         // PackedScene packedScene = ResourceLoader.Load<PackedScene>(p.SaveLocation);

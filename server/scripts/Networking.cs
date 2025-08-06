@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -92,9 +93,11 @@ public partial class Networking : Node
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Planets.Count);
         for (int i = 0; i < ServerManager.Planets.Count; i++)
+        {
             RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1,
-                ServerManager.Planets[0].PlanetTerrain.Seed,
-                new Array<float>(ServerManager.Planets[0].PlanetTerrain.Heights));
+                ServerManager.Planets[i].PlanetTerrain.Seed,
+                new Array<float>(ServerManager.Planets[i].PlanetTerrain.Heights));
+        }
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1, 0, new Array<float>());
 
     }
