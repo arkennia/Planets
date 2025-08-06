@@ -83,6 +83,7 @@ public partial class Networking : Node
         _players[newPlayerId] = newPlayerInfo;
         Player p = new Player(newPlayerId);
         _playerObjects[newPlayerId] = p;
+        GetTree().CurrentScene.GetNode<Node>("Main/Game").AddChild(p);
         GD.Print(_playerObjects.ToString());
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
