@@ -1,6 +1,8 @@
 using System;
 using Godot;
 
+namespace Planets;
+
 public partial class PlayerData : Resource
 {
     public Vector3 Position { get; set; }
@@ -13,8 +15,8 @@ public partial class PlayerData : Resource
 
     public float MouseSensitivty { get; set; } = 0.005f;
 
-    public Guid? SpawnPlanet { get; set; } = null;
+    // public Guid? SpawnPlanet { get; set; } = null;
 
-    public Guid? CurrentPlanet { get; set; } = null;
+    // public Guid? CurrentPlanet { get; set; } = null;
 
 }

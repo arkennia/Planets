@@ -30,6 +30,8 @@ public partial class Player : CharacterBody3D
     public float Gravity { get; set; }
     public PlanetNode Planet { get; set; }
 
+    public PlayerData PlayerData { get; set; }
+
     private Vector3 _targetVelocity = Vector3.Zero;
 
     private Vector2 _rotation = new();
@@ -52,7 +54,7 @@ public partial class Player : CharacterBody3D
         _camera = GetNode<Camera3D>("./Pivot/MainCamera");
         _pivot = GetNode<Node3D>("Pivot");
         MotionMode = MotionModeEnum.Floating;
-        _ = InitUiSignals();
+        // _ = InitUiSignals();
         FloorSnapLength = 0.5f;
         ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
@@ -75,13 +77,13 @@ public partial class Player : CharacterBody3D
         SetPhysicsProcess(true);
     }
 
-    private async Task InitUiSignals()
-    {
-        await ToSignal(GetTree().Root.GetNode<Node>("/root/Main"), Node.SignalName.Ready);
-        UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
-        UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
-        GD.Print("Signals connected to UI.");
-    }
+    // private async Task InitUiSignals()
+    // {
+    //     await ToSignal(GetTree().Root.GetNode<Node>("/root/Main"), Node.SignalName.Ready);
+    //     UiManager.Instance.Ui.GameMenuOpened += DisableMovement;
+    //     UiManager.Instance.Ui.GameMenuClosed += EnableMovement;
+    //     GD.Print("Signals connected to UI.");
+    // }
 
 
     public override void _Input(InputEvent @event)
@@ -195,7 +197,6 @@ public partial class Player : CharacterBody3D
 
         _up = UpDirection = (Vector3)result["normal"];
         ApplyFloorSnap();
-
     }
 
     public void DisableMovement()
