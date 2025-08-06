@@ -43,17 +43,18 @@ public partial class Networking : Node
     public override void _EnterTree()
     {
         // GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), "/root/Main");
-        GD.Print("Server ID: " + Multiplayer.GetUniqueId());
-        if (Multiplayer is SceneMultiplayer mp)
-        {
-            mp.AllowObjectDecoding = true;
-        }
+
     }
 
 
     public override void _Ready()
     {
         Instance ??= this;
+        // GD.Print("Server ID: " + Multiplayer.GetUniqueId());
+        if (Multiplayer is SceneMultiplayer mp)
+        {
+            mp.AllowObjectDecoding = true;
+        }
         GD.Print("Server Multiplayer instance ID: " + Multiplayer.GetInstanceId());
         ENetMultiplayerPeer peer = new();
         peer.CreateServer(Port, MaxConnections);
@@ -87,14 +88,16 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void GetPlanets(long id, int seed, Array<float> heights)
+    private void GetPlanets(byte[] guid, int seed, Array<float> heights)
     {
         // PackedScene scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn");
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Planets.Count);
         for (int i = 0; i < ServerManager.Planets.Count; i++)
         {
-            RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1,
+            GD.Print("Sent GUID: " + ServerManager.Planets[i].Planet.Guid.ToString());
+            RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
+                ServerManager.Planets[i].Planet.Guid.ToByteArray(),
                 ServerManager.Planets[i].PlanetTerrain.Seed,
                 new Array<float>(ServerManager.Planets[i].PlanetTerrain.Heights));
         }
@@ -110,25 +113,13 @@ public partial class Networking : Node
         GD.Print($"NumPlanets called. Value sent: {ServerManager.Planets.Count}");
     }
 
-    // [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    // public void SyncPlanets(Array<PlanetNode> nodes)
-    // {
-    //     if (Multiplayer.IsServer())
-    //     {
-    //         Error e = RpcId(MultiplayerPeer.TargetPeerBroadcast, MethodName.SyncPlanets, ServerManager.Instance.planets);
-    //         if (e != Error.Ok)
-    //         {
-    //             GD.Print($"Error sending data: {e}");
-    //         }
-    //     }
-    //     else
-    //     {
-    //         foreach (PlanetNode n in nodes)
-    //         {
-    //             GetNode("%World").AddChild(n);
-    //         }
-    //     }
-    // }
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendPlayerData()
+    {
+        int id = Multiplayer.GetRemoteSenderId();
+        RpcId(id, MethodName.SendPlayerData, _playerObjects[id].PlayerData);
+        GD.Print($"Sending player data {_playerObjects[id].PlayerData} to {id}");
+    }
 
     private void OnPlayerConnected(long id)
     {

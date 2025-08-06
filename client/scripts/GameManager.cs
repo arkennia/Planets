@@ -182,6 +182,7 @@ public partial class GameManager : Node
         if (GetTree().CurrentScene.GetNode<Game>("%Game") is Game g)
         {
             g.SetupPlayer();
+            Networking.Instance.BeginPlayerDataSync();
         }
         else
         {

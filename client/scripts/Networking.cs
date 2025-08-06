@@ -75,6 +75,12 @@ public partial class Networking : Node
             GD.Print($"Error getting planets: {e}");
     }
 
+    public void BeginPlayerDataSync()
+    {
+        Error e = RpcId(1, MethodName.SendPlayerData, null);
+        GD.Print("Requesting player data. Code: " + e.ToString());
+    }
+
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
@@ -93,8 +99,8 @@ public partial class Networking : Node
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void GetPlanets(long id, int seed, Array<float> heights)
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetPlanets(byte[] id, int seed, Array<float> heights)
     {
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         if (Multiplayer.GetRemoteSenderId() != 1) return;
@@ -104,6 +110,8 @@ public partial class Networking : Node
             // Guid uid = Guid.Parse(id);
             GD.Print(heights[0..10]);
             GD.Print("Seed: " + seed);
+            Guid guid = new Guid(id);
+            GD.Print("Received GUID: " + guid.ToString());
             PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
             GetTree().Root.GetNode<Node>("/root/Main/Game/World").AddChild(planet);
             planets.Add(planet);
@@ -117,11 +125,18 @@ public partial class Networking : Node
         }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void NumPlanets(int numPlanets)
     {
         if (Multiplayer.GetRemoteSenderId() != 1) return;
         _numPlanets = numPlanets;
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendPlayerData(PlayerData data)
+    {
+        GetTree().CurrentScene.GetNode<Player>("Game/Player").PlayerData = data;
+        GD.Print("PlayerData: " + data.ToString());
     }
 
     private void OnPlayerConnected(long id)
