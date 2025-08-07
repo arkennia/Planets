@@ -1,43 +1,70 @@
 using System;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using Planets.SystemGenerator;
+using Planets.SystemGenerator.Terrain;
 
 namespace Planets.Server;
 
 public partial class ServerManager : Node
 {
-    public static Array<PlanetNode> Planets { get => _planets; }
-    private static Array<PlanetNode> _planets = [];
+    public static Dictionary<string, PlanetNode> Planets { get => _planets; }
+    private readonly static Dictionary<string, PlanetNode> _planets = [];
 
-    // public static MultiplayerSpawner PlanetSpawner { get; private set; }
+    public static Dictionary<long, Player> ConnectedPlayers { get => _playerObjects; }
+    private static Dictionary<long, Player> _playerObjects = [];
 
     public static ServerManager Instance { get => _instance; }
 
     private static readonly ServerManager _instance = new();
 
-    // public const string PLANET_SPAWNER_PATH = "/root/Main/Main/Game/PlanetSpawner";
-    // public const string PLANET_SPAWNER_SPAWN_PATH = "/root/Main/Main/Game/World";
-    // Called when the node enters the scene tree for the first time.
     private ServerManager()
+    {
+
+    }
+
+    public override void _Ready()
     {
 
     }
 
     public static void AddPlanet(PlanetNode planet)
     {
-        _planets.Add(planet);
+        _planets.Add(planet.Planet.Guid.ToString(), planet);
         //PlanetSpawner.AddSpawnableScene(planet.SaveLocation);
         // GD.Print(PlanetSpawner.GetSpawnableScene(0));
     }
 
-    public override void _Ready()
+    public static void AddPlayer(long id, Player p)
     {
-        // PlanetSpawner = GetTree().Root.GetNode<MultiplayerSpawner>(PLANET_SPAWNER_PATH);
-        // PlanetSpawner.SpawnPath = GetNode(PLANET_SPAWNER_SPAWN_PATH).GetPath();
-        //Instance ??= this;
+        if (!_playerObjects.ContainsKey(id))
+        {
+            _playerObjects.Add(id, p);
+            if (p.PlayerData.SpawnPlanet == string.Empty)
+            {
+                SetPlayerSpawn(p, _planets.Values.ToArray()[0]);
+            }
+        }
     }
 
+    public static void RemovePlayer(long id)
+    {
+        _playerObjects.Remove(id);
+    }
+
+    public static void SetPlayerSpawn(Player player, PlanetNode planet)
+    {
+        Terrain3D.SpawnPoint spawn = planet.GetSpawnPoint();
+        GD.Print($"Spawn Local Position: {spawn.Node.Position}");
+        GD.Print($"Spawn Global Position:{spawn.Node.GlobalPosition}");
+        // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
+        // Player.GlobalPosition = spawn;
+        // Player.Spawn(spawn, planet);
+        player.PlayerData.SpawnPlanet = planet.Planet.Guid.ToString();
+        player.PlayerData.SpawnPosition = spawn.Node.GlobalPosition;
+        player.PlayerData.Up = spawn.Normal;
+    }
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {

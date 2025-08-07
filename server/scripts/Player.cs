@@ -1,10 +1,12 @@
 using System;
 using Godot;
+using Planets.Server;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
 
 namespace Planets;
 
+[GlobalClass]
 public partial class Player : CharacterBody3D
 {
     public readonly long MultiplayerId = 0;
@@ -22,7 +24,7 @@ public partial class Player : CharacterBody3D
     private Vector3 _targetVelocity = Vector3.Zero;
     private Vector2 _rotation = new();
     private bool _movementDisabled = false;
-    private Camera3D _camera;
+    private Node3D _camera;
     private Node3D _pivot;
 
     public Player()
@@ -37,21 +39,41 @@ public partial class Player : CharacterBody3D
 
     public override void _Ready()
     {
-        _camera = GetNode<Camera3D>("./Pivot/MainCamera");
+        AddChild(new Node3D()
+        {
+            Name = "Pivot"
+        });
         _pivot = GetNode<Node3D>("Pivot");
+        _pivot.AddChild(new Node3D()
+        {
+            Name = "MainCamera"
+        });
+        _camera = GetNode<Node3D>("./Pivot/MainCamera");
         MotionMode = MotionModeEnum.Floating;
         FloorSnapLength = 0.5f;
         ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
     }
 
-    public void Spawn(Terrain3D.SpawnPoint sp, PlanetNode planet)
+    public override void _PhysicsProcess(double delta)
+    {
+        RotatePlayer((float)delta);
+        MoveAndSlide();
+        PlayerMovement movement = new()
+        {
+            CurrentGlobalPosition = GlobalPosition,
+        };
+        Networking.Instance.SendMovement(MultiplayerId, movement);
+    }
+
+    public void Spawn()
     {
         DisableMovement();
-        GlobalPosition = sp.Node.GlobalPosition;
-        Vector3 dir = sp.Normal; //-(planet.GlobalPosition - GlobalPosition).Normalized();
-        _up = UpDirection = dir;
-        _ChangeMotionMode(planet, sp.Normal);
+        GlobalPosition = PlayerData.SpawnPosition;
+        //-(planet.GlobalPosition - GlobalPosition).Normalized();
+        _up = UpDirection = PlayerData.Up;
+        PlanetNode p = ServerManager.Planets[PlayerData.SpawnPlanet];
+        _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
         SetPhysicsProcess(true);

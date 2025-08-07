@@ -9,6 +9,7 @@ using Planets.SystemGenerator.Terrain;
 
 public partial class Networking : Node
 {
+    public static Player Player { get; set; }
     public static bool Connected { get; private set; } = false;
     public static Networking Instance { get; private set; }
     private Dictionary<long, Dictionary<string, string>> _players = [];
@@ -137,6 +138,23 @@ public partial class Networking : Node
     {
         GetTree().CurrentScene.GetNode<Player>("Game/Player").PlayerData = data;
         GD.Print("PlayerData: " + data.ToString());
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void RequestMovement(PlayerMovement movement)
+    {
+
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SendMovement(PlayerMovement movement)
+    {
+        float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
+        if (distance >= 0.5f)
+        {
+            Player.GlobalPosition = movement.CurrentGlobalPosition;
+        }
+        GD.Print($"Distance from Server to Client: {distance}");
     }
 
     private void OnPlayerConnected(long id)

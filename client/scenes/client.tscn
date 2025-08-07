@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://db3hwgud2i8fs"]
+[gd_scene load_steps=11 format=4 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Client.cs" id="1_4tr0r"]
 [ext_resource type="PackedScene" uid="uid://csuicy0jgwwvd" path="res://scenes/loading_screen.tscn" id="2_r26j7"]
@@ -43,6 +43,8 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_im5ka")
 metadata/Radius = 60
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_da3od"]
+
 [node name="Main" type="Node"]
 script = ExtResource("1_4tr0r")
 LoadingScreenScene = ExtResource("2_r26j7")
@@ -74,3 +76,7 @@ anchors_preset = -1
 [node name="Player" parent="Game" instance_placeholder="res://scripts/common/player_node.tscn"]
 unique_name_in_owner = true
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+script = null
+
+[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game"]
+replication_config = SubResource("SceneReplicationConfig_da3od")

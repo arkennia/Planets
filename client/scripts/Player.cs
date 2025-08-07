@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
@@ -197,6 +198,13 @@ public partial class Player : CharacterBody3D
 
         _up = UpDirection = (Vector3)result["normal"];
         ApplyFloorSnap();
+        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, new PlayerMovement()
+        {
+            CurrentGlobalPosition = GlobalPosition,
+            Rotation = Rotation,
+            Velocity = _targetVelocity,
+            Up = _up,
+        });
     }
 
     public void DisableMovement()

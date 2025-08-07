@@ -36,7 +36,7 @@ public partial class Networking : Node
         {"Name", "PlayerName"}
     };
 
-    private Dictionary<long, Player> _playerObjects = [];
+    // private Dictionary<long, Player> _playerObjects = ServerManager.ConnectedPlayers;
 
     private int _numConnections = 0;
 
@@ -82,25 +82,35 @@ public partial class Networking : Node
         int newPlayerId = Multiplayer.GetRemoteSenderId();
         _players[newPlayerId] = newPlayerInfo;
         Player p = new Player(newPlayerId);
-        _playerObjects[newPlayerId] = p;
-        GetTree().CurrentScene.GetNode<Node>("Main/Game").AddChild(p);
-        GD.Print(_playerObjects.ToString());
+        ServerManager.AddPlayer(newPlayerId, p);
+        GetTree().CurrentScene.GetNode<Node>("Game").AddChild(p);
+        GD.Print(ServerManager.ConnectedPlayers.ToString());
         EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
+        // #if DEBUG
+        //         GetTree().CurrentScene.PrintTreePretty();
+        // #endif
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void GetPlanets(byte[] guid, int seed, Array<float> heights)
     {
-        // PackedScene scene = ResourceLoader.Load<PackedScene>("res://scenes/planets/00000000-0000-0000-0000-000000000000.scn");
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Planets.Count);
-        for (int i = 0; i < ServerManager.Planets.Count; i++)
+        // for (int i = 0; i < ServerManager.Planets.Count; i++)
+        // {
+        //     GD.Print("Sent GUID: " + ServerManager.Planets[i].Planet.Guid.ToString());
+        //     RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
+        //         ServerManager.Planets[i].Planet.Guid.ToByteArray(),
+        //         ServerManager.Planets[i].PlanetTerrain.Seed,
+        //         new Array<float>(ServerManager.Planets[i].PlanetTerrain.Heights));
+        // }
+        foreach (PlanetNode p in ServerManager.Planets.Values)
         {
-            GD.Print("Sent GUID: " + ServerManager.Planets[i].Planet.Guid.ToString());
+            GD.Print("Sent GUID: " + p.Planet.Guid.ToString());
             RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
-                ServerManager.Planets[i].Planet.Guid.ToByteArray(),
-                ServerManager.Planets[i].PlanetTerrain.Seed,
-                new Array<float>(ServerManager.Planets[i].PlanetTerrain.Heights));
+                p.Planet.Guid.ToByteArray(),
+                p.PlanetTerrain.Seed,
+                new Array<float>(p.PlanetTerrain.Heights));
         }
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1, 0, new Array<float>());
 
@@ -118,8 +128,24 @@ public partial class Networking : Node
     private void SendPlayerData()
     {
         int id = Multiplayer.GetRemoteSenderId();
-        RpcId(id, MethodName.SendPlayerData, _playerObjects[id].PlayerData);
-        GD.Print($"Sending player data {_playerObjects[id].PlayerData} to {id}");
+        RpcId(id, MethodName.SendPlayerData, ServerManager.ConnectedPlayers[id].PlayerData);
+        GD.Print($"Sending player data {ServerManager.ConnectedPlayers[id].PlayerData} to {id}");
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void RequestMovement(PlayerMovement movement)
+    {
+        Player p = ServerManager.ConnectedPlayers[Multiplayer.GetRemoteSenderId()];
+        p.Velocity = movement.Velocity;
+        p.Rotation = movement.Rotation;
+        p.UpDirection = movement.Up;
+        p.GlobalPosition = movement.CurrentGlobalPosition;
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SendMovement(long id, PlayerMovement movement)
+    {
+        RpcId(id, MethodName.SendMovement, movement);
     }
 
     private void OnPlayerConnected(long id)
@@ -135,7 +161,7 @@ public partial class Networking : Node
     {
         GD.Print("Disconnect: " + id);
         _players.Remove(id);
-        _playerObjects.Remove(id);
+        ServerManager.RemovePlayer(id);
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 

@@ -51,6 +51,7 @@ public partial class Game : Node
         _planetNode = Networking.Instance.planets[0];
         Player = GetNode<InstancePlaceholder>("%Player").CreateInstance(true) as Player;
         _SetSpawnPoint();
+        Networking.Player = Player;
         GameManager.Instance.PlayerSetupComplete();
 
     }
