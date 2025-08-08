@@ -1,8 +1,10 @@
 using System;
 using Godot;
+using Google.Protobuf;
 using Planets.Server;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
+using Planets.Util;
 
 namespace Planets;
 
@@ -51,19 +53,22 @@ public partial class Player : CharacterBody3D
         _camera = GetNode<Node3D>("./Pivot/MainCamera");
         MotionMode = MotionModeEnum.Floating;
         FloorSnapLength = 0.5f;
-        ProcessMode = ProcessModeEnum.Disabled;
-        SetPhysicsProcess(false);
+        Spawn();
+        // ProcessMode = ProcessModeEnum.Disabled;
+        // SetPhysicsProcess(false);
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        RotatePlayer((float)delta);
+        RotatePlayer(0.0f);
         MoveAndSlide();
-        PlayerMovement movement = new()
+        PlayerMovementProto protomovement = new()
         {
-            CurrentGlobalPosition = GlobalPosition,
+            CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
         };
-        Networking.Instance.SendMovement(MultiplayerId, movement);
+        byte[] bytes = protomovement.ToByteArray();
+        // GD.Print($"Sending: {bytes}");
+        Networking.Instance.RpcId(1, Networking.MethodName.SendMovement, MultiplayerId, bytes);
     }
 
     public void Spawn()
@@ -113,7 +118,7 @@ public partial class Player : CharacterBody3D
         }
     }
 
-    private void RotatePlayer(float delta)
+    public void RotatePlayer(float delta)
     {
         Transform3D target = new();
         target.Origin = GlobalPosition;

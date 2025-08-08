@@ -1,10 +1,8 @@
-using System;
-using System.Linq;
 using Godot;
 using Godot.Collections;
+using Google.Protobuf;
 using Planets.SystemGenerator;
-using Planets.SystemGenerator.Terrain;
-using Array = Godot.Collections.Array;
+using Planets.Util;
 
 namespace Planets.Server;
 
@@ -65,6 +63,7 @@ public partial class Networking : Node
         // Multiplayer.ConnectionFailed += OnConnectionFail;
         // Multiplayer.ServerDisconnected += OnServerDisconnected;
     }
+
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void PlayerLoaded(long id)
     {
@@ -133,8 +132,9 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestMovement(PlayerMovement movement)
+    public void RequestMovement(byte[] movementBytes)
     {
+        PlayerMovement movement = new(PlayerMovementProto.Parser.ParseFrom(movementBytes));
         Player p = ServerManager.ConnectedPlayers[Multiplayer.GetRemoteSenderId()];
         p.Velocity = movement.Velocity;
         p.Rotation = movement.Rotation;
@@ -142,10 +142,11 @@ public partial class Networking : Node
         p.GlobalPosition = movement.CurrentGlobalPosition;
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void SendMovement(long id, PlayerMovement movement)
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SendMovement(long id, byte[] movementBytes)
     {
-        RpcId(id, MethodName.SendMovement, movement);
+        if (movementBytes.Length != 0)
+            RpcId(id, MethodName.SendMovement, movementBytes);
     }
 
     private void OnPlayerConnected(long id)

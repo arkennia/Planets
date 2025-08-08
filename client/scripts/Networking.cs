@@ -141,14 +141,16 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestMovement(PlayerMovement movement)
+    public void RequestMovement(byte[] movementBytes)
     {
 
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void SendMovement(PlayerMovement movement)
+    public void SendMovement(byte[] movementBytes)
     {
+        GD.Print(movementBytes[0..10]);
+        PlayerMovement movement = new(PlayerMovementProto.Parser.ParseFrom(movementBytes));
         float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
         if (distance >= 0.5f)
         {

@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
+using Google.Protobuf;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
 using Planets.UI;
+using Planets.Util;
 
 namespace Planets;
 
@@ -198,13 +200,14 @@ public partial class Player : CharacterBody3D
 
         _up = UpDirection = (Vector3)result["normal"];
         ApplyFloorSnap();
-        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, new PlayerMovement()
+        PlayerMovementProto movement = new()
         {
-            CurrentGlobalPosition = GlobalPosition,
-            Rotation = Rotation,
-            Velocity = _targetVelocity,
-            Up = _up,
-        });
+            CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
+            Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
+            Velocity = ProtoUtils.GodotToProtoVector3(_targetVelocity),
+            Up = ProtoUtils.GodotToProtoVector3(_up),
+        };
+        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
     }
 
     public void DisableMovement()
