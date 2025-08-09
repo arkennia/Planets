@@ -139,7 +139,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         {
             Shape = colliderShape,
         };
-        collider.Scale *= 1.001f;
+        collider.Scale *= 1.00f;
 
 
         AddChild(area);

@@ -132,21 +132,31 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestMovement(byte[] movementBytes)
+    private void RequestMovement(byte[] movementBytes)
     {
         PlayerMovement movement = new(PlayerMovementProto.Parser.ParseFrom(movementBytes));
         Player p = ServerManager.ConnectedPlayers[Multiplayer.GetRemoteSenderId()];
         p.Velocity = movement.Velocity;
         p.Rotation = movement.Rotation;
-        p.UpDirection = movement.Up;
+        // p.UpDirection = movement.Up;
         p.GlobalPosition = movement.CurrentGlobalPosition;
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void SendMovement(long id, byte[] movementBytes)
+    private void SendMovement(long id, byte[] movementBytes)
     {
-        if (movementBytes.Length != 0)
-            RpcId(id, MethodName.SendMovement, movementBytes);
+        RpcId(id, MethodName.SendMovement, movementBytes);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RequestSpawn()
+    {
+        long id = Multiplayer.GetRemoteSenderId();
+        GD.Print($"Spawn requested by: {id}");
+        if (ServerManager.ConnectedPlayers.TryGetValue(id, out Player value))
+        {
+            value.Spawn();
+        }
     }
 
     private void OnPlayerConnected(long id)

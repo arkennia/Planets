@@ -41,6 +41,9 @@ public partial class Player : CharacterBody3D
 
     public override void _Ready()
     {
+        SetCollisionLayerValue(1, true);
+        SetCollisionMaskValue(1, false);
+        SetCollisionMaskValue(2, true);
         AddChild(new Node3D()
         {
             Name = "Pivot"
@@ -53,21 +56,53 @@ public partial class Player : CharacterBody3D
         _camera = GetNode<Node3D>("./Pivot/MainCamera");
         MotionMode = MotionModeEnum.Floating;
         FloorSnapLength = 0.5f;
-        Spawn();
-        // ProcessMode = ProcessModeEnum.Disabled;
-        // SetPhysicsProcess(false);
+        ProcessMode = ProcessModeEnum.Disabled;
+        SetPhysicsProcess(false);
+        GD.Print($"Current Scale: {Scale}");
+        Scale *= 0.1f;
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        RotatePlayer(0.0f);
+        // _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
+
+        RotatePlayer((float)delta);
+        if (IsOnFloor())
+            GD.Print("Is on floor!");
         MoveAndSlide();
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            KinematicCollision3D collision = GetSlideCollision(i);
+            Node collider = (Node)collision.GetCollider();
+            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
+            _ChangeMotionMode(cParent, _up);
+            GD.Print("Collided with: " + collider.Name);
+        }
+        if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
+        {
+            Vector3 dest = -_up * 100f;
+            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            query.Exclude = [GetRid()];
+            query.CollisionMask = CollisionMask;
+            query.HitFromInside = true;
+            Godot.Collections.Dictionary result = spaceState.IntersectRay(query);
+            if (result.Count > 0)
+            {
+                _up = UpDirection = (Vector3)result["normal"];
+                ApplyFloorSnap();
+            }
+        }
         PlayerMovementProto protomovement = new()
         {
             CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
+            Velocity = new(),
+            Rotation = new(),
+            Up = new()
+
         };
+        // GD.Print(protomovement.CurrentGlobalPosition);
         byte[] bytes = protomovement.ToByteArray();
-        // GD.Print($"Sending: {bytes}");
         Networking.Instance.RpcId(1, Networking.MethodName.SendMovement, MultiplayerId, bytes);
     }
 

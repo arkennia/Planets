@@ -50,6 +50,7 @@ public partial class ServerManager : Node
 
     public static void RemovePlayer(long id)
     {
+        _playerObjects[id].QueueFree();
         _playerObjects.Remove(id);
     }
 

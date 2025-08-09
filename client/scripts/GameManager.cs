@@ -99,7 +99,8 @@ public partial class GameManager : Node
 
         _machine.Configure(State.PlayerSetup)
             .Permit(Triggers.PlayerSetupComplete, State.Gameplay)
-            .OnEntry(_OnPlayerSetupEntry);
+            .OnEntry(_OnPlayerSetupEntry)
+            .OnExit(_OnPlayerSetupExit);
 
         _machine.Configure(State.Gameplay)
             .Permit(Triggers.Pause, State.Paused)
@@ -192,10 +193,11 @@ public partial class GameManager : Node
 
     private void _OnPlayerSetupExit()
     {
-        if (GetTree().Root.GetNode("/Main") is Client c)
-        {
-            c.RemoveLoadingScreen();
-        }
+        // if (GetTree().Root.GetNode("/Main") is Client c)
+        // {
+        //     c.RemoveLoadingScreen();
+        // }
+        Networking.Instance.RequestPlayerSpawn();
     }
 
     private void _OnExitingEntry()

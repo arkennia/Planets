@@ -178,33 +178,36 @@ public partial class Player : CharacterBody3D
         }
         // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
 
-        if (_isInAir || MotionMode != MotionModeEnum.Grounded) return;
-        Vector3 dest = -_up * 100f;
-        PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
-        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
-        query.Exclude = [GetRid()];
-        query.CollisionMask = CollisionMask;
-        query.HitFromInside = true;
-        Dictionary result = spaceState.IntersectRay(query);
-        Control debugUI = GetNodeOrNull<Control>("%DebugUI");
-        if (debugUI != null)
+        if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
         {
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
-                Position.ToString("F");
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
-            GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
+            Vector3 dest = -_up * 100f;
+            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            query.Exclude = [GetRid()];
+            query.CollisionMask = CollisionMask;
+            query.HitFromInside = true;
+            Dictionary result = spaceState.IntersectRay(query);
+            Control debugUI = GetNodeOrNull<Control>("%DebugUI");
+            if (debugUI != null)
+            {
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
+                    Position.ToString("F");
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
+            }
+
+            if (result.Count > 0)
+            {
+                _up = UpDirection = (Vector3)result["normal"];
+                ApplyFloorSnap();
+            }
         }
-
-        if (result.Count == 0) return;
-
-        _up = UpDirection = (Vector3)result["normal"];
-        ApplyFloorSnap();
         PlayerMovementProto movement = new()
         {
             CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
             Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
-            Velocity = ProtoUtils.GodotToProtoVector3(_targetVelocity),
+            Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
             Up = ProtoUtils.GodotToProtoVector3(_up),
         };
         Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());

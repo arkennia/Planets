@@ -82,6 +82,12 @@ public partial class Networking : Node
         GD.Print("Requesting player data. Code: " + e.ToString());
     }
 
+    public void RequestPlayerSpawn()
+    {
+        Error e = RpcId(1, MethodName.RequestSpawn);
+        GD.Print("Requesting player spawn. Code: " + e.ToString());
+    }
+
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
@@ -141,22 +147,27 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestMovement(byte[] movementBytes)
+    private void RequestMovement(byte[] movementBytes)
     {
 
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void SendMovement(byte[] movementBytes)
+    private void SendMovement(byte[] movementBytes)
     {
-        GD.Print(movementBytes[0..10]);
+        // GD.Print(movementBytes[0..10]);
         PlayerMovement movement = new(PlayerMovementProto.Parser.ParseFrom(movementBytes));
         float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
         if (distance >= 0.5f)
         {
             Player.GlobalPosition = movement.CurrentGlobalPosition;
         }
-        GD.Print($"Distance from Server to Client: {distance}");
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RequestSpawn()
+    {
+
     }
 
     private void OnPlayerConnected(long id)
