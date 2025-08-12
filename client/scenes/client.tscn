@@ -71,7 +71,6 @@ directional_shadow_mode = 0
 
 [node name="DebugUI" parent="Game" instance=ExtResource("5_dipmf")]
 unique_name_in_owner = true
-visible = true
 anchors_preset = -1
 
 [node name="Player" parent="Game" instance_placeholder="res://scripts/common/player_node.tscn"]

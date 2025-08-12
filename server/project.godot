@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 ServerManager="*res://scripts/ServerManager.cs"
 Networking="*res://scripts/Networking.cs"
 
+[debug]
+
+file_logging/enable_file_logging=true
+
 [dotnet]
 
 project/assembly_name="PlanetsServer"

@@ -19,7 +19,7 @@ public partial class Networking : Node
 
     // These signals can be connected to by a UI lobby scene or the game scene.
     [Signal]
-    public delegate void PlayerConnectedEventHandler(int peerId, Dictionary<string, string> playerInfo);
+    public delegate void PlayerConnectedEventHandler(int peerId);
     [Signal]
     public delegate void PlayerDisconnectedEventHandler(int peerId);
     [Signal]
@@ -27,12 +27,8 @@ public partial class Networking : Node
 
     // This will contain player info for every player,
     // with the keys being each player's unique IDs.
-    private Dictionary<long, Dictionary<string, string>> _players = [];
+    // private Dictionary<long, Dictionary<string, string>> _players = [];
 
-    private Dictionary<string, string> _playerInfo = new()
-    {
-        {"Name", "PlayerName"}
-    };
 
     // private Dictionary<long, Player> _playerObjects = ServerManager.ConnectedPlayers;
 
@@ -69,22 +65,22 @@ public partial class Networking : Node
     {
         _numConnections += 1;
         GD.Print("Peer loaded: " + id);
-        if (_numConnections == _players.Count)
+        if (_numConnections == ServerManager.ConnectedPlayers.Count)
         {
             _numConnections = 0;
         }
 
     }
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void RegisterPlayer(Dictionary<string, string> newPlayerInfo)
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RegisterPlayer(long id)
     {
-        int newPlayerId = Multiplayer.GetRemoteSenderId();
-        _players[newPlayerId] = newPlayerInfo;
-        Player p = new Player(newPlayerId);
-        ServerManager.AddPlayer(newPlayerId, p);
+        // int newPlayerId = Multiplayer.GetRemoteSenderId();
+        // _players[newPlayerId] = newPlayerInfo;
+        Player p = new(id);
+        ServerManager.AddPlayer(id, p);
         GetTree().CurrentScene.GetNode<Node>("Game").AddChild(p);
-        GD.Print(ServerManager.ConnectedPlayers.ToString());
-        EmitSignal(SignalName.PlayerConnected, newPlayerId, newPlayerInfo);
+        GD.Print("Currently connected players: " + ServerManager.ConnectedPlayers.ToString());
+        EmitSignal(SignalName.PlayerConnected, id);
         // #if DEBUG
         //         GetTree().CurrentScene.PrintTreePretty();
         // #endif
@@ -142,10 +138,11 @@ public partial class Networking : Node
         p.GlobalPosition = movement.CurrentGlobalPosition;
     }
 
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendMovement(long id, byte[] movementBytes)
     {
-        RpcId(id, MethodName.SendMovement, movementBytes);
+        //RpcId(id, MethodName.SendMovement, id, movementBytes);
+        //Rpc(MethodName.SendMovement, id, movementBytes);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -166,12 +163,13 @@ public partial class Networking : Node
         // Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
         // if (e != Error.Ok)
         //     GD.Print(e.ToString());
+        RpcId(1, MethodName.RegisterPlayer, id);
     }
 
     private void OnPlayerDisconnected(long id)
     {
         GD.Print("Disconnect: " + id);
-        _players.Remove(id);
+        // _players.Remove(id);
         ServerManager.RemovePlayer(id);
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
@@ -179,7 +177,7 @@ public partial class Networking : Node
     private void OnConnectOk()
     {
         int peerId = Multiplayer.GetUniqueId();
-        _players[peerId] = _playerInfo;
-        EmitSignal(SignalName.PlayerConnected, peerId, _playerInfo);
+        // _players[peerId] = _playerInfo;
+        EmitSignal(SignalName.PlayerConnected, peerId);
     }
 }

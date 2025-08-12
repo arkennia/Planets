@@ -29,6 +29,11 @@ public partial class Player : CharacterBody3D
     private Node3D _camera;
     private Node3D _pivot;
 
+    private bool _spawned = false;
+
+    [Signal]
+    private delegate void SpawnedEventHandler();
+
     public Player()
     {
 
@@ -37,6 +42,8 @@ public partial class Player : CharacterBody3D
     public Player(long id)
     {
         MultiplayerId = id;
+        bool onSpawn() => _spawned = true;
+        Connect(SignalName.Spawned, Callable.From(onSpawn), (uint)ConnectFlags.OneShot);
     }
 
     public override void _Ready()
@@ -62,11 +69,36 @@ public partial class Player : CharacterBody3D
         Scale *= 0.1f;
     }
 
+    public override void _Process(double delta)
+    {
+        if (_spawned)
+        {
+            ProcessMode = ProcessModeEnum.Pausable;
+            SetPhysicsProcess(true);
+            _spawned = false;
+        }
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         // _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
 
         RotatePlayer((float)delta);
+        if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
+        {
+            Vector3 dest = -_up * 100f;
+            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            query.Exclude = [GetRid()];
+            query.CollisionMask = CollisionMask;
+            // query.HitFromInside = true;
+            Godot.Collections.Dictionary result = spaceState.IntersectRay(query);
+            if (result.Count > 0)
+            {
+                _up = UpDirection = (Vector3)result["normal"];
+                ApplyFloorSnap();
+            }
+        }
         if (IsOnFloor())
             GD.Print("Is on floor!");
         MoveAndSlide();
@@ -78,21 +110,7 @@ public partial class Player : CharacterBody3D
             _ChangeMotionMode(cParent, _up);
             GD.Print("Collided with: " + collider.Name);
         }
-        if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
-        {
-            Vector3 dest = -_up * 100f;
-            PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
-            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
-            query.Exclude = [GetRid()];
-            query.CollisionMask = CollisionMask;
-            query.HitFromInside = true;
-            Godot.Collections.Dictionary result = spaceState.IntersectRay(query);
-            if (result.Count > 0)
-            {
-                _up = UpDirection = (Vector3)result["normal"];
-                ApplyFloorSnap();
-            }
-        }
+
         PlayerMovementProto protomovement = new()
         {
             CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
@@ -103,7 +121,7 @@ public partial class Player : CharacterBody3D
         };
         // GD.Print(protomovement.CurrentGlobalPosition);
         byte[] bytes = protomovement.ToByteArray();
-        Networking.Instance.RpcId(1, Networking.MethodName.SendMovement, MultiplayerId, bytes);
+        Networking.Instance.Rpc(Networking.MethodName.SendMovement, MultiplayerId, bytes);
     }
 
     public void Spawn()
@@ -115,8 +133,9 @@ public partial class Player : CharacterBody3D
         PlanetNode p = ServerManager.Planets[PlayerData.SpawnPlanet];
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
-        ProcessMode = ProcessModeEnum.Pausable;
-        SetPhysicsProcess(true);
+        // ProcessMode = ProcessModeEnum.Pausable;
+        // SetPhysicsProcess(true);
+        EmitSignal(SignalName.Spawned);
     }
 
     public void DisableMovement()
