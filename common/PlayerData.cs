@@ -20,7 +20,7 @@ public class PlayerData
 
     public string SpawnPlanet { get; set; } = string.Empty;
 
-    public string CurrentPlanet { get; set; }
+    public string CurrentPlanet { get; set; } = string.Empty;
     public PlayerData(PlayerDataProto data)
     {
         Position = ProtoUtils.ProtoToGodotVector3(data.Position);

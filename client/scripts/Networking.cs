@@ -120,7 +120,7 @@ public partial class Networking : Node
             GD.Print("Seed: " + seed);
             Guid guid = new Guid(id);
             GD.Print("Received GUID: " + guid.ToString());
-            PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
+            PlanetNode planet = PlanetGenerator.GeneratePlanet(scale: 250, heights: heights, seed: seed, guid: guid);
             GetTree().Root.GetNode<Node>("/root/Main/Game/World").AddChild(planet);
             Planets[planet.Planet.Guid.ToString()] = planet;
             EmitSignal(SignalName.PlanetLoaded, planet);

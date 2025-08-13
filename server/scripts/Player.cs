@@ -65,7 +65,6 @@ public partial class Player : CharacterBody3D
         FloorSnapLength = 0.5f;
         ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
-        GD.Print($"Current Scale: {Scale}");
         Scale *= 0.1f;
     }
 
@@ -99,8 +98,6 @@ public partial class Player : CharacterBody3D
                 ApplyFloorSnap();
             }
         }
-        if (IsOnFloor())
-            GD.Print("Is on floor!");
         MoveAndSlide();
         for (int i = 0; i < GetSlideCollisionCount(); i++)
         {
