@@ -119,7 +119,7 @@ public partial class Player : CharacterBody3D
             Up = new()
 
         };
-        // GD.Print(protomovement.CurrentGlobalPosition);
+
         byte[] bytes = protomovement.ToByteArray();
         Networking.Instance.Rpc(Networking.MethodName.SendMovement, MultiplayerId, bytes);
     }

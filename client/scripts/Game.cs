@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Planets;
@@ -48,9 +49,9 @@ public partial class Game : Node
     public void SetupPlayer()
     {
         GD.Print("Setting up player");
-        _planetNode = Networking.Instance.planets[0];
+        _planetNode = Networking.Planets.Values.First();
         Player = GetNode<InstancePlaceholder>("%Player").CreateInstance(true) as Player;
-        _SetSpawnPoint();
+        //_SetSpawnPoint();
         Networking.Player = Player;
         GameManager.Instance.PlayerSetupComplete();
 
@@ -101,7 +102,7 @@ public partial class Game : Node
         GD.Print($"Spawn Global Position:{spawn.Node.GlobalPosition}");
         // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
         // Player.GlobalPosition = spawn;
-        Player.Spawn(spawn, _planetNode);
+        Player.Spawn();
     }
 
     public void OnPlanetLoaded(PlanetNode planet)

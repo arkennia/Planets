@@ -180,6 +180,7 @@ public partial class GameManager : Node
 
     private void _OnPlayerSetupEntry()
     {
+        GD.Print("Beginning player setup.");
         if (GetTree().CurrentScene.GetNode<Game>("%Game") is Game g)
         {
             g.SetupPlayer();

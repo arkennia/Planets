@@ -68,13 +68,13 @@ public partial class Player : CharacterBody3D
     /// </summary>
     /// <remarks><paramref name="coords"/> is in Global coordinates.
     /// <param name="coords">The spawn location.</param>
-    public void Spawn(Terrain3D.SpawnPoint sp, PlanetNode planet)
+    public void Spawn(/* Terrain3D.SpawnPoint sp, PlanetNode planet */)
     {
         DisableMovement();
-        GlobalPosition = sp.Node.GlobalPosition;
-        Vector3 dir = sp.Normal; //-(planet.GlobalPosition - GlobalPosition).Normalized();
-        _up = UpDirection = dir;
-        _ChangeMotionMode(planet, sp.Normal);
+        GlobalPosition = PlayerData.SpawnPosition;
+        _up = UpDirection = PlayerData.Up;
+        PlanetNode p = Networking.Planets[PlayerData.SpawnPlanet];
+        _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
         SetPhysicsProcess(true);

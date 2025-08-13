@@ -123,7 +123,19 @@ public partial class Networking : Node
     private void SendPlayerData()
     {
         int id = Multiplayer.GetRemoteSenderId();
-        RpcId(id, MethodName.SendPlayerData, ServerManager.ConnectedPlayers[id].PlayerData);
+        PlayerData data = ServerManager.ConnectedPlayers[id].PlayerData;
+        PlayerDataProto proto = new()
+        {
+            Position = ProtoUtils.GodotToProtoVector3(data.Position),
+            SpawnPosition = ProtoUtils.GodotToProtoVector3(data.SpawnPosition),
+            Up = ProtoUtils.GodotToProtoVector3(data.Up),
+            Speed = data.Speed,
+            JumpSpeed = data.JumpSpeed,
+            MouseSensitivity = data.MouseSensitivty,
+            SpawnPlanet = data.SpawnPlanet,
+            CurrentPlanet = data.CurrentPlanet
+        };
+        RpcId(id, MethodName.SendPlayerData, proto.ToByteArray());
         GD.Print($"Sending player data {ServerManager.ConnectedPlayers[id].PlayerData} to {id}");
     }
 
@@ -154,6 +166,7 @@ public partial class Networking : Node
         {
             value.Spawn();
         }
+        RpcId(id, MethodName.RequestSpawn);
     }
 
     private void OnPlayerConnected(long id)

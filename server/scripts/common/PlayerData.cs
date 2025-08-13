@@ -1,9 +1,10 @@
-using System;
+
 using Godot;
+using Planets.Util;
 
 namespace Planets;
 
-public partial class PlayerData : Resource
+public class PlayerData
 {
     public Vector3 Position { get; set; }
 
@@ -20,5 +21,21 @@ public partial class PlayerData : Resource
     public string SpawnPlanet { get; set; } = string.Empty;
 
     public string CurrentPlanet { get; set; }
+    public PlayerData(PlayerDataProto data)
+    {
+        Position = ProtoUtils.ProtoToGodotVector3(data.Position);
+        SpawnPosition = ProtoUtils.ProtoToGodotVector3(data.SpawnPosition);
+        Up = ProtoUtils.ProtoToGodotVector3(data.Up);
+        Speed = data.Speed;
+        JumpSpeed = data.JumpSpeed;
+        MouseSensitivty = data.MouseSensitivity;
+        SpawnPlanet = data.SpawnPlanet;
+        CurrentPlanet = data.CurrentPlanet;
+    }
+
+    public PlayerData()
+    {
+
+    }
 
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -17,7 +18,7 @@ public partial class Networking : Node
     // {
     //     // {"Name", "PlayerName"}
     // };
-    public Array<PlanetNode> planets = [];
+    public static Dictionary<string, PlanetNode> Planets = [];
 
     private int _numPlanets = 0;
 
@@ -121,13 +122,13 @@ public partial class Networking : Node
             GD.Print("Received GUID: " + guid.ToString());
             PlanetNode planet = PlanetGenerator.GeneratePlanet(heights: heights, seed: seed);
             GetTree().Root.GetNode<Node>("/root/Main/Game/World").AddChild(planet);
-            planets.Add(planet);
+            Planets[planet.Planet.Guid.ToString()] = planet;
             EmitSignal(SignalName.PlanetLoaded, planet);
         }
         else
         {
             EmitSignal(SignalName.SyncingFinished);
-            GD.Print($"Number of Planets received:  {planets.Count}");
+            GD.Print($"Number of Planets received:  {Planets.Count}");
             GameManager.Instance.WorldLoaded();
         }
     }
@@ -140,10 +141,11 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void SendPlayerData(PlayerData data)
+    private void SendPlayerData(byte[] playerData)
     {
-        GetTree().CurrentScene.GetNode<Player>("Game/Player").PlayerData = data;
-        GD.Print("PlayerData: " + data.ToString());
+        GetTree().CurrentScene.GetNode<Player>("Game/Player").PlayerData
+            = new(PlayerDataProto.Parser.ParseFrom(playerData));
+        GD.Print("PlayerData received");
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -152,25 +154,32 @@ public partial class Networking : Node
 
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendMovement(long id, byte[] movementBytes)
     {
-        // GD.Print(movementBytes[0..10]);
         if (Multiplayer.GetRemoteSenderId() == MultiplayerPeer.TargetPeerServer)
         {
             PlayerMovement movement = new(PlayerMovementProto.Parser.ParseFrom(movementBytes));
-            float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
-            if (distance >= 0.5f)
+            if (id == Multiplayer.GetUniqueId())
             {
+                //float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
                 Player.GlobalPosition = movement.CurrentGlobalPosition;
+            }
+            else if (_players.TryGetValue(id, out Player p))
+            {
+                p.GlobalPosition = movement.CurrentGlobalPosition;
+            }
+            else
+            {
+                GD.PushError($"Error: SendMovement : {id} not found in connected players.\n{System.Environment.StackTrace}");
             }
         }
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void RequestSpawn()
     {
-
+        Player.Spawn();
     }
 
     // private void OnPlayerConnected(long id)
