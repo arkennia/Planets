@@ -1,7 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
+using Planets.SystemGenerator;
 using Stateless;
 
 namespace Planets;
@@ -33,6 +32,8 @@ public partial class GameManager : Node
         Exit,
     }
     public static GameManager Instance { get; private set; }
+    public static Dictionary<string, PlanetNode> Planets => _planets;
+    private readonly static Dictionary<string, PlanetNode> _planets = [];
 
     public State CurrentState => _machine.State;
 
@@ -43,39 +44,6 @@ public partial class GameManager : Node
     {
         Instance ??= this;
         _machine = new StateMachine<State, Triggers>(State.Starting);
-
-        // _machine.Configure(State.Starting)
-        //     .Permit(Triggers.Connect, State.Connecting)
-        //     .OnEntry(_OnStartingEntry)
-        //     .OnExit(_OnStartingExit);
-
-        // _machine.Configure(State.Connecting)
-        //     .PermitReentry(Triggers.ConnectionFailed)
-        //     .Permit(Triggers.Connected, State.LoadingWorld)
-        //     .OnEntry(_OnConnectingEntry)
-        //     .OnExit(_OnConnectingExit);
-
-        // _machine.Configure(State.LoadingWorld)
-        //     .Permit(Triggers.WorldLoaded, State.PlayerSetup)
-        //     .OnEntry(_OnLoadingWorldEntry)
-        //     .OnExit(_OnLoadingWorldExit);
-
-        // _machine.Configure(State.PlayerSetup)
-        //     .Permit(Triggers.PlayerSetupComplete, State.Gameplay);
-
-        // _machine.Configure(State.Gameplay)
-        //     .Permit(Triggers.Pause, State.Paused)
-        //     .PermitReentry(Triggers.Resume);
-
-        // _machine.Configure(State.Paused)
-        //     .Permit(Triggers.Resume, State.Gameplay)
-        //     .Permit(Triggers.Exit, State.Exiting);
-
-        // _machine.Configure(State.Exiting)
-        //     .OnEntry(_OnExitingEntry);
-
-        // GD.Print("Current state in constructor: " + _machine.State);
-
     }
 
     public override void _Ready()
@@ -116,6 +84,20 @@ public partial class GameManager : Node
         GD.Print("Current state in constructor: " + _machine.State);
     }
 
+    public static void AddPlanet(PlanetNode p)
+    {
+        string guid = p.Planet.Guid.ToString();
+        if (!_planets.TryGetValue(guid, out PlanetNode value))
+        {
+            _planets[guid] = p;
+        }
+    }
+
+    public static void RemovePlanet(PlanetNode p)
+    {
+        string guid = p.Planet.Guid.ToString();
+        _planets.Remove(guid);
+    }
 
     public void ConnectToServer() => _machine.Fire(Triggers.Connect);
     public void ConnectionFailed() => _machine.Fire(Triggers.ConnectionFailed);

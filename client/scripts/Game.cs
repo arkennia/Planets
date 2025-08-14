@@ -49,7 +49,7 @@ public partial class Game : Node
     public void SetupPlayer()
     {
         GD.Print("Setting up player");
-        _planetNode = Networking.Planets.Values.First();
+        _planetNode = GameManager.Planets.Values.First();
         Player = GetNode<InstancePlaceholder>("%Player").CreateInstance(true) as Player;
         //_SetSpawnPoint();
         Networking.Player = Player;

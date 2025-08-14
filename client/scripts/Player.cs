@@ -11,6 +11,7 @@ using Planets.Util;
 
 namespace Planets;
 
+[GlobalClass]
 /// <summary>
 /// Player inherits CharacterBody3D and is the controller for the player character.
 /// </summary>
@@ -73,7 +74,7 @@ public partial class Player : CharacterBody3D
         DisableMovement();
         GlobalPosition = PlayerData.SpawnPosition;
         _up = UpDirection = PlayerData.Up;
-        PlanetNode p = Networking.Planets[PlayerData.SpawnPlanet];
+        PlanetNode p = GameManager.Planets[PlayerData.SpawnPlanet];
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;

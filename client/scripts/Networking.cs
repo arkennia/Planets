@@ -18,7 +18,6 @@ public partial class Networking : Node
     // {
     //     // {"Name", "PlayerName"}
     // };
-    public static Dictionary<string, PlanetNode> Planets = [];
 
     private int _numPlanets = 0;
 
@@ -122,13 +121,14 @@ public partial class Networking : Node
             GD.Print("Received GUID: " + guid.ToString());
             PlanetNode planet = PlanetGenerator.GeneratePlanet(scale: 250, heights: heights, seed: seed, guid: guid);
             GetTree().Root.GetNode<Node>("/root/Main/Game/World").AddChild(planet);
-            Planets[planet.Planet.Guid.ToString()] = planet;
+            // Planets[planet.Planet.Guid.ToString()] = planet;
+            GameManager.AddPlanet(planet);
             EmitSignal(SignalName.PlanetLoaded, planet);
         }
         else
         {
             EmitSignal(SignalName.SyncingFinished);
-            GD.Print($"Number of Planets received:  {Planets.Count}");
+            GD.Print($"Number of Planets received:  {GameManager.Planets.Count}");
             GameManager.Instance.WorldLoaded();
         }
     }
@@ -182,17 +182,6 @@ public partial class Networking : Node
         Player.Spawn();
     }
 
-    // private void OnPlayerConnected(long id)
-    // {
-    //     GD.Print("Player connected at ID: " + id);
-    //     Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
-    //     if (e != Error.Ok)
-    //         GD.Print(e.ToString());
-    //     if (Multiplayer.GetRemoteSenderId() == 1)
-    //     {
-    //         BeginPlanetSync();
-    //     }
-    // }
     private void OnPlayerDisconnected(long id)
     {
         _players.Remove(id);
