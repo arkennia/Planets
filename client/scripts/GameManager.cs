@@ -96,6 +96,7 @@ public partial class GameManager : Node
     public static void RemovePlanet(PlanetNode p)
     {
         string guid = p.Planet.Guid.ToString();
+        _planets[guid].QueueFree();
         _planets.Remove(guid);
     }
 

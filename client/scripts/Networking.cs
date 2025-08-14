@@ -102,7 +102,7 @@ public partial class Networking : Node
     private void RegisterPlayer(long id)
     {
         int newPlayerId = Multiplayer.GetRemoteSenderId();
-        _players[newPlayerId] = new();
+        _players[newPlayerId] = new PlayerPeer(id);
         EmitSignal(SignalName.PlayerConnected, newPlayerId);
     }
 
@@ -167,7 +167,11 @@ public partial class Networking : Node
             }
             else if (_players.TryGetValue(id, out Player p))
             {
-                p.GlobalPosition = movement.CurrentGlobalPosition;
+                // p.GlobalPosition = movement.CurrentGlobalPosition;
+                p.Velocity = movement.Velocity;
+                p.Rotation = movement.Rotation;
+                // p.UpDirection = movement.Up;
+                // p.GlobalPosition = movement.CurrentGlobalPosition;
             }
             else
             {

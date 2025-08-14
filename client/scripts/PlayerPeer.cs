@@ -113,7 +113,7 @@ public partial class PlayerPeer : Player
         // Networking.Instance.Rpc(Networking.MethodName.SendMovement, MultiplayerId, bytes);
     }
 
-    public void Spawn()
+    public new void Spawn()
     {
         DisableMovement();
         GlobalPosition = PlayerData.SpawnPosition;
@@ -127,17 +127,31 @@ public partial class PlayerPeer : Player
         EmitSignal(SignalName.Spawned);
     }
 
-    public void DisableMovement()
+    public void RotatePlayer(float delta)
     {
-        _movementDisabled = true;
-        Input.MouseMode = Input.MouseModeEnum.Visible;
+        Transform3D target = new();
+        target.Origin = GlobalPosition;
+        Vector3 left = _up.Cross(GlobalBasis.Z).Normalized();
+        Vector3 z = GlobalTransform.Basis.Z;
+        target.Basis = new Basis(left, _up, z).Orthonormalized();
+        Quaternion currentRotation = GlobalBasis.GetRotationQuaternion().Normalized();
+        Quaternion targetRotation = target.Basis.GetRotationQuaternion().Normalized();
+
+        Quaternion r = currentRotation.Slerp(targetRotation, 1f).Normalized();
+        GlobalBasis = new Basis(r);
     }
 
-    public void EnableMovement()
-    {
-        _movementDisabled = false;
-        Input.MouseMode = Input.MouseModeEnum.Captured;
-    }
+    // public void DisableMovement()
+    // {
+    //     _movementDisabled = true;
+    //     Input.MouseMode = Input.MouseModeEnum.Visible;
+    // }
+
+    // public void EnableMovement()
+    // {
+    //     _movementDisabled = false;
+    //     Input.MouseMode = Input.MouseModeEnum.Captured;
+    // }
 
     private void _ChangeMotionMode(PlanetNode node, Vector3 up)
     {
@@ -159,19 +173,5 @@ public partial class PlayerPeer : Player
             _isInAir = false;
             // GD.Print($"Is in air: {_isInAir}");
         }
-    }
-
-    public void RotatePlayer(float delta)
-    {
-        Transform3D target = new();
-        target.Origin = GlobalPosition;
-        Vector3 left = _up.Cross(GlobalBasis.Z).Normalized();
-        Vector3 z = GlobalTransform.Basis.Z;
-        target.Basis = new Basis(left, _up, z).Orthonormalized();
-        Quaternion currentRotation = GlobalBasis.GetRotationQuaternion().Normalized();
-        Quaternion targetRotation = target.Basis.GetRotationQuaternion().Normalized();
-
-        Quaternion r = currentRotation.Slerp(targetRotation, 1f).Normalized();
-        GlobalBasis = new Basis(r);
     }
 }
