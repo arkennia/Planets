@@ -124,12 +124,13 @@ public partial class Player : CharacterBody3D
     public override void _PhysicsProcess(double delta)
     {
         Vector3 direction = GetDirection();
+        bool jumpedLocal = _jumped;
         _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
+        _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
         if (MotionMode == MotionModeEnum.Grounded)
         {
             if (direction != Vector3.Zero)
             {
-                _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
                 // Translate the input direction(s) to actual world direction while on a planet.
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                 Vector3 newX = newZ.Cross(_up).Normalized();
@@ -173,7 +174,11 @@ public partial class Player : CharacterBody3D
             Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
             Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
             Up = ProtoUtils.GodotToProtoVector3(_up),
+            MovementDirection = ProtoUtils.GodotToProtoVector3(direction),
+            IsJumping = jumpedLocal,
+            IsInAir = _isInAir
         };
+        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
         MoveAndSlide();
 
         for (int i = 0; i < GetSlideCollisionCount(); i++)
@@ -210,8 +215,6 @@ public partial class Player : CharacterBody3D
                 ApplyFloorSnap();
             }
         }
-        movement.Up = ProtoUtils.GodotToProtoVector3(_up);
-        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
     }
 
     public void DisableMovement()

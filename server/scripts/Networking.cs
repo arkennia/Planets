@@ -92,11 +92,6 @@ public partial class Networking : Node
                 // RpcId(id, MethodName.SendPeerData, player.PlayerData.ToProto().ToByteArray());
             }
         }
-        // RpcId(MultiplayerPeer.TargetPeerBroadcast, MethodName.RegisterPlayer, id);
-        //EmitSignal(SignalName.PlayerConnected, id);
-        // #if DEBUG
-        //         GetTree().CurrentScene.PrintTreePretty();
-        // #endif
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

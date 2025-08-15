@@ -187,8 +187,8 @@ public partial class Networking : Node
             }
             else if (_players.TryGetValue(id, out PlayerPeer p))
             {
-                // p.GlobalPosition = movement.CurrentGlobalPosition;
-                p.Velocity = movement.Velocity;
+                p.GlobalPosition = movement.CurrentGlobalPosition;
+                //p.Velocity = movement.Velocity;
                 p.Rotation = movement.Rotation;
                 // p.UpDirection = movement.Up;
                 // p.GlobalPosition = movement.CurrentGlobalPosition;

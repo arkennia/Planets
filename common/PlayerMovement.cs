@@ -3,7 +3,7 @@ using Planets.Util;
 
 namespace Planets;
 
-public class PlayerMovement(PlayerMovementProto movement)
+public struct PlayerMovement(PlayerMovementProto movement)
 {
     public Vector3 CurrentGlobalPosition = ProtoUtils.ProtoToGodotVector3(movement.CurrentGlobalPosition);
 

@@ -75,7 +75,7 @@ public partial class Player : CharacterBody3D
         _camera = GetNode<Node3D>("./Pivot/MainCamera");
         MotionMode = MotionModeEnum.Floating;
         FloorSnapLength = 0.5f;
-        ProcessMode = ProcessModeEnum.Disabled;
+        // ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
         Scale *= 0.1f;
     }
@@ -87,6 +87,7 @@ public partial class Player : CharacterBody3D
             ProcessMode = ProcessModeEnum.Pausable;
             SetPhysicsProcess(true);
             _spawned = false;
+            GD.Print($"Spawned id: {MultiplayerId}");
         }
     }
 
@@ -123,10 +124,10 @@ public partial class Player : CharacterBody3D
         PlayerMovementProto protomovement = new()
         {
             CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
-            Velocity = new(),
+            Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
             Rotation = new(),
-            Up = new()
-
+            Up = new(),
+            MovementDirection = new()
         };
 
         byte[] bytes = protomovement.ToByteArray();
