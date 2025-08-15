@@ -69,7 +69,7 @@ public partial class PlayerPeer : Player
         FloorSnapLength = 0.5f;
         ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
-        Scale *= 0.1f;
+        Scale *= 0.3f;
     }
 
     public override void _Process(double delta)
