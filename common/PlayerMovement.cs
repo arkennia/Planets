@@ -3,7 +3,7 @@ using Planets.Util;
 
 namespace Planets;
 
-public struct PlayerMovement(PlayerMovementProto movement)
+public class PlayerMovement(PlayerMovementProto movement)
 {
     public Vector3 CurrentGlobalPosition = ProtoUtils.ProtoToGodotVector3(movement.CurrentGlobalPosition);
 
@@ -13,4 +13,9 @@ public struct PlayerMovement(PlayerMovementProto movement)
 
     public Vector3 Up = ProtoUtils.ProtoToGodotVector3(movement.Up);
 
+    public Vector3 MovementDirection = ProtoUtils.ProtoToGodotVector3(movement.MovementDirection);
+
+    public bool IsJumping = movement.IsJumping;
+
+    public bool IsInAir = movement.IsInAir;
 }

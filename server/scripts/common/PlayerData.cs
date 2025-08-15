@@ -38,4 +38,19 @@ public class PlayerData
 
     }
 
+    public PlayerDataProto ToProto()
+    {
+        return new PlayerDataProto()
+        {
+            Position = ProtoUtils.GodotToProtoVector3(Position),
+            SpawnPosition = ProtoUtils.GodotToProtoVector3(SpawnPosition),
+            Up = ProtoUtils.GodotToProtoVector3(Up),
+            Speed = Speed,
+            JumpSpeed = JumpSpeed,
+            MouseSensitivity = MouseSensitivty,
+            SpawnPlanet = SpawnPlanet,
+            CurrentPlanet = CurrentPlanet,
+        };
+    }
+
 }

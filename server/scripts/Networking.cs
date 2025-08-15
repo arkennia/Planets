@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using Google.Protobuf;
@@ -80,10 +81,28 @@ public partial class Networking : Node
         ServerManager.AddPlayer(id, p);
         GetTree().CurrentScene.GetNode<Node>("Game").AddChild(p);
         GD.Print("Currently connected players: " + ServerManager.ConnectedPlayers.ToString());
-        EmitSignal(SignalName.PlayerConnected, id);
+        foreach (Player player in ServerManager.ConnectedPlayers.Values)
+        {
+            if (player.MultiplayerId != id)
+            {
+                RpcId(player.MultiplayerId, MethodName.RegisterPlayer, id);
+                // RpcId(player.MultiplayerId, MethodName.SendPeerData, p.PlayerData.ToProto().ToByteArray());
+                GD.Print($"Sending {id} to {player.MultiplayerId}");
+                RpcId(id, MethodName.RegisterPlayer, player.MultiplayerId);
+                // RpcId(id, MethodName.SendPeerData, player.PlayerData.ToProto().ToByteArray());
+            }
+        }
+        // RpcId(MultiplayerPeer.TargetPeerBroadcast, MethodName.RegisterPlayer, id);
+        //EmitSignal(SignalName.PlayerConnected, id);
         // #if DEBUG
         //         GetTree().CurrentScene.PrintTreePretty();
         // #endif
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendPeerData(long id, byte[] bytes)
+    {
+        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.SendPeerData, id, ServerManager.ConnectedPlayers[id].PlayerData.ToProto().ToByteArray());
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

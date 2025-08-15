@@ -13,7 +13,7 @@ public partial class Networking : Node
     public static Player Player { get; set; }
     public static bool Connected { get; private set; } = false;
     public static Networking Instance { get; private set; }
-    private Dictionary<long, Player> _players = [];
+    private Dictionary<long, PlayerPeer> _players = [];
     // private Dictionary<string, string> _playerInfo = new()
     // {
     //     // {"Name", "PlayerName"}
@@ -58,7 +58,7 @@ public partial class Networking : Node
         PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
         // SyncingFinished += GameManager.Instance.WorldLoaded;
         Multiplayer.MultiplayerPeer = peer;
-        // Multiplayer.PeerConnected += OnPlayerConnected;
+        Multiplayer.PeerConnected += OnPlayerConnected;
         Multiplayer.PeerDisconnected += OnPlayerDisconnected;
         Multiplayer.ConnectedToServer += OnConnectOk;
         Multiplayer.ConnectionFailed += OnConnectionFail;
@@ -101,9 +101,24 @@ public partial class Networking : Node
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void RegisterPlayer(long id)
     {
-        int newPlayerId = Multiplayer.GetRemoteSenderId();
-        _players[newPlayerId] = new PlayerPeer(id);
-        EmitSignal(SignalName.PlayerConnected, newPlayerId);
+        if (id != Multiplayer.GetUniqueId())
+        {
+            PlayerPeer p = new(id);
+            _players[id] = p;
+            GD.Print($"Connected Players: {_players}");
+            RpcId(1, MethodName.SendPeerData, id, new byte[1]);
+            EmitSignal(SignalName.PlayerConnected, id);
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendPeerData(long id, byte[] peerBytes)
+    {
+        GD.Print("SendPeerData called.");
+        _players[id].PlayerData = new(PlayerDataProto.Parser.ParseFrom(peerBytes));
+        GetTree().CurrentScene.GetNode<Node>("Game").AddChild(_players[id]);
+        _players[id].Spawn();
+        GD.Print($"Peer data received for {id}. Added to tree and calling spawn.");
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -143,9 +158,14 @@ public partial class Networking : Node
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendPlayerData(byte[] playerData)
     {
+
         GetTree().CurrentScene.GetNode<Player>("Game/Player").PlayerData
             = new(PlayerDataProto.Parser.ParseFrom(playerData));
         GD.Print("PlayerData received");
+
+
+
+
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -165,7 +185,7 @@ public partial class Networking : Node
                 //float distance = Mathf.Abs(movement.CurrentGlobalPosition.DistanceTo(Player.GlobalPosition));
                 Player.GlobalPosition = movement.CurrentGlobalPosition;
             }
-            else if (_players.TryGetValue(id, out Player p))
+            else if (_players.TryGetValue(id, out PlayerPeer p))
             {
                 // p.GlobalPosition = movement.CurrentGlobalPosition;
                 p.Velocity = movement.Velocity;
@@ -192,12 +212,17 @@ public partial class Networking : Node
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 
+    private void OnPlayerConnected(long id)
+    {
+        //EmitSignal(SignalName.PlayerConnected);
+    }
+
     private void OnConnectOk()
     {
         Connected = true;
         int peerId = Multiplayer.GetUniqueId();
         GD.Print("My ID: " + peerId);
-        _players[peerId] = Player;
+        //_players[peerId] = Player;
         RpcId(1, MethodName.GetPlanets, peerId, 0, new());
         EmitSignal(SignalName.PlayerConnected, peerId);
     }

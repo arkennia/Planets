@@ -10,4 +10,7 @@ message PlayerMovementProto {
     ProtoVector3 Velocity = 2;
     ProtoVector3 Rotation = 3;
     ProtoVector3 Up = 4;
+    ProtoVector3 MovementDirection = 5;
+    bool IsJumping = 6;
+    bool IsInAir = 7;
 }

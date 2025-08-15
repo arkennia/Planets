@@ -167,7 +167,13 @@ public partial class Player : CharacterBody3D
 
             }
         }
-
+        PlayerMovementProto movement = new()
+        {
+            CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
+            Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
+            Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
+            Up = ProtoUtils.GodotToProtoVector3(_up),
+        };
         MoveAndSlide();
 
         for (int i = 0; i < GetSlideCollisionCount(); i++)
@@ -204,13 +210,7 @@ public partial class Player : CharacterBody3D
                 ApplyFloorSnap();
             }
         }
-        PlayerMovementProto movement = new()
-        {
-            CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
-            Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
-            Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
-            Up = ProtoUtils.GodotToProtoVector3(_up),
-        };
+        movement.Up = ProtoUtils.GodotToProtoVector3(_up);
         Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
     }
 

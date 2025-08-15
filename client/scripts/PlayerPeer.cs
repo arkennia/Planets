@@ -50,7 +50,19 @@ public partial class PlayerPeer : Player
         _pivot = GetNode<Node3D>("Pivot");
         _pivot.AddChild(new Node3D()
         {
-            Name = "MainCamera"
+            Name = "MainCamera",
+            Transform = new Transform3D(3.333333f, 0, 0, 0, 3.333333f,
+            0, 0, 0, 3.333333f,
+            0, 1.5389407f, -0.34487972f),
+        });
+        AddChild(new MeshInstance3D()
+        {
+            Mesh = new CapsuleMesh() { Radius = 0.35f, Height = 1.9f },
+        });
+        AddChild(new CollisionShape3D()
+        {
+            Shape = new CapsuleShape3D() { Margin = 0.08f, Radius = 0.411f, Height = 2.0f },
+            Transform = new Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.90819395f, 0),
         });
         _camera = GetNode<Node3D>("./Pivot/MainCamera");
         MotionMode = MotionModeEnum.Floating;

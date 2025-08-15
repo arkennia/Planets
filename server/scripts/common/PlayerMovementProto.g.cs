@@ -25,16 +25,17 @@ namespace Planets {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChlQbGF5ZXJNb3ZlbWVudFByb3RvLnByb3RvEgdQbGFuZXRzGhJQcm90b1Zl",
-            "Y3RvcjMucHJvdG8iwAEKE1BsYXllck1vdmVtZW50UHJvdG8SNAoVQ3VycmVu",
+            "Y3RvcjMucHJvdG8ilgIKE1BsYXllck1vdmVtZW50UHJvdG8SNAoVQ3VycmVu",
             "dEdsb2JhbFBvc2l0aW9uGAEgASgLMhUuUGxhbmV0cy5Qcm90b1ZlY3RvcjMS",
             "JwoIVmVsb2NpdHkYAiABKAsyFS5QbGFuZXRzLlByb3RvVmVjdG9yMxInCghS",
             "b3RhdGlvbhgDIAEoCzIVLlBsYW5ldHMuUHJvdG9WZWN0b3IzEiEKAlVwGAQg",
-            "ASgLMhUuUGxhbmV0cy5Qcm90b1ZlY3RvcjNCCqoCB1BsYW5ldHNiBnByb3Rv",
-            "Mw=="));
+            "ASgLMhUuUGxhbmV0cy5Qcm90b1ZlY3RvcjMSMAoRTW92ZW1lbnREaXJlY3Rp",
+            "b24YBSABKAsyFS5QbGFuZXRzLlByb3RvVmVjdG9yMxIRCglJc0p1bXBpbmcY",
+            "BiABKAgSDwoHSXNJbkFpchgHIAEoCEIKqgIHUGxhbmV0c2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Planets.ProtoVector3Reflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Planets.PlayerMovementProto), global::Planets.PlayerMovementProto.Parser, new[]{ "CurrentGlobalPosition", "Velocity", "Rotation", "Up" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Planets.PlayerMovementProto), global::Planets.PlayerMovementProto.Parser, new[]{ "CurrentGlobalPosition", "Velocity", "Rotation", "Up", "MovementDirection", "IsJumping", "IsInAir" }, null, null, null, null)
           }));
     }
     #endregion
@@ -80,6 +81,9 @@ namespace Planets {
       velocity_ = other.velocity_ != null ? other.velocity_.Clone() : null;
       rotation_ = other.rotation_ != null ? other.rotation_.Clone() : null;
       up_ = other.up_ != null ? other.up_.Clone() : null;
+      movementDirection_ = other.movementDirection_ != null ? other.movementDirection_.Clone() : null;
+      isJumping_ = other.isJumping_;
+      isInAir_ = other.isInAir_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -137,6 +141,42 @@ namespace Planets {
       }
     }
 
+    /// <summary>Field number for the "MovementDirection" field.</summary>
+    public const int MovementDirectionFieldNumber = 5;
+    private global::Planets.ProtoVector3 movementDirection_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Planets.ProtoVector3 MovementDirection {
+      get { return movementDirection_; }
+      set {
+        movementDirection_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "IsJumping" field.</summary>
+    public const int IsJumpingFieldNumber = 6;
+    private bool isJumping_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsJumping {
+      get { return isJumping_; }
+      set {
+        isJumping_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "IsInAir" field.</summary>
+    public const int IsInAirFieldNumber = 7;
+    private bool isInAir_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsInAir {
+      get { return isInAir_; }
+      set {
+        isInAir_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -156,6 +196,9 @@ namespace Planets {
       if (!object.Equals(Velocity, other.Velocity)) return false;
       if (!object.Equals(Rotation, other.Rotation)) return false;
       if (!object.Equals(Up, other.Up)) return false;
+      if (!object.Equals(MovementDirection, other.MovementDirection)) return false;
+      if (IsJumping != other.IsJumping) return false;
+      if (IsInAir != other.IsInAir) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -167,6 +210,9 @@ namespace Planets {
       if (velocity_ != null) hash ^= Velocity.GetHashCode();
       if (rotation_ != null) hash ^= Rotation.GetHashCode();
       if (up_ != null) hash ^= Up.GetHashCode();
+      if (movementDirection_ != null) hash ^= MovementDirection.GetHashCode();
+      if (IsJumping != false) hash ^= IsJumping.GetHashCode();
+      if (IsInAir != false) hash ^= IsInAir.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -201,6 +247,18 @@ namespace Planets {
         output.WriteRawTag(34);
         output.WriteMessage(Up);
       }
+      if (movementDirection_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(MovementDirection);
+      }
+      if (IsJumping != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(IsJumping);
+      }
+      if (IsInAir != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(IsInAir);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -227,6 +285,18 @@ namespace Planets {
         output.WriteRawTag(34);
         output.WriteMessage(Up);
       }
+      if (movementDirection_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(MovementDirection);
+      }
+      if (IsJumping != false) {
+        output.WriteRawTag(48);
+        output.WriteBool(IsJumping);
+      }
+      if (IsInAir != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(IsInAir);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -248,6 +318,15 @@ namespace Planets {
       }
       if (up_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Up);
+      }
+      if (movementDirection_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(MovementDirection);
+      }
+      if (IsJumping != false) {
+        size += 1 + 1;
+      }
+      if (IsInAir != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -284,6 +363,18 @@ namespace Planets {
           Up = new global::Planets.ProtoVector3();
         }
         Up.MergeFrom(other.Up);
+      }
+      if (other.movementDirection_ != null) {
+        if (movementDirection_ == null) {
+          MovementDirection = new global::Planets.ProtoVector3();
+        }
+        MovementDirection.MergeFrom(other.MovementDirection);
+      }
+      if (other.IsJumping != false) {
+        IsJumping = other.IsJumping;
+      }
+      if (other.IsInAir != false) {
+        IsInAir = other.IsInAir;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -332,6 +423,21 @@ namespace Planets {
             input.ReadMessage(Up);
             break;
           }
+          case 42: {
+            if (movementDirection_ == null) {
+              MovementDirection = new global::Planets.ProtoVector3();
+            }
+            input.ReadMessage(MovementDirection);
+            break;
+          }
+          case 48: {
+            IsJumping = input.ReadBool();
+            break;
+          }
+          case 56: {
+            IsInAir = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -377,6 +483,21 @@ namespace Planets {
               Up = new global::Planets.ProtoVector3();
             }
             input.ReadMessage(Up);
+            break;
+          }
+          case 42: {
+            if (movementDirection_ == null) {
+              MovementDirection = new global::Planets.ProtoVector3();
+            }
+            input.ReadMessage(MovementDirection);
+            break;
+          }
+          case 48: {
+            IsJumping = input.ReadBool();
+            break;
+          }
+          case 56: {
+            IsInAir = input.ReadBool();
             break;
           }
         }
