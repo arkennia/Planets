@@ -200,6 +200,12 @@ public partial class Networking : Node
         }
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendUUID(byte[] uuidBytes)
+    {
+        // RpcId(1, MethodName.SendUUID, guid.ToByteArray());
+    }
+
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void RequestSpawn()
     {
@@ -224,6 +230,7 @@ public partial class Networking : Node
         GD.Print("My ID: " + peerId);
         //_players[peerId] = Player;
         RpcId(1, MethodName.GetPlanets, peerId, 0, new());
+        RpcId(1, Networking.MethodName.SendUUID, Guid.Parse(FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read).GetLine()).ToByteArray());
         EmitSignal(SignalName.PlayerConnected, peerId);
     }
 

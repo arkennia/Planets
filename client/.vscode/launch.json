@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "C:\\Godot\\Godot_v4.5-beta4_mono_win64.exe",
+            "program": "D:\\Godot_v4.7-stable_mono_win64\\Godot_v4.7-stable_mono_win64.exe",
             "args": ["--debug", "--remote-debug" ,"tcp://127.0.0.1:6007"],
             "symbolOptions": {
                 "searchPaths": ["D:\\GodotProjects\\planets\\.godot\\mono\\temp\\bin\\Debug"],

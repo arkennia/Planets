@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
@@ -31,6 +32,11 @@ public partial class Client : Node
 
     public override void _EnterTree()
     {
+        if (!FileAccess.FileExists("user://uuid")) {
+            FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Write);
+            file.StoreLine(Guid.NewGuid().ToString());
+            file.Close();
+        }
     }
 
 

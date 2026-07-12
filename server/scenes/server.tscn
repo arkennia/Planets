@@ -1,20 +1,20 @@
-[gd_scene load_steps=3 format=3 uid="uid://bndk1f006q4w3"]
+[gd_scene format=3 uid="uid://bndk1f006q4w3"]
 
 [ext_resource type="Script" uid="uid://cvw4r0bd5j5iv" path="res://scripts/Game.cs" id="1_m3u1i"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_m3u1i"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" unique_id=401811689]
 
-[node name="Game" type="Node" parent="."]
+[node name="Game" type="Node" parent="." unique_id=929762653]
 unique_name_in_owner = true
 script = ExtResource("1_m3u1i")
 
-[node name="World" type="Node3D" parent="Game"]
+[node name="World" type="Node3D" parent="Game" unique_id=503144877]
 unique_name_in_owner = true
 
-[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game"]
+[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game" unique_id=1520306179]
 unique_name_in_owner = true
 replication_config = SubResource("SceneReplicationConfig_m3u1i")
 
-[node name="Main" type="Node" parent="."]
+[node name="Main" type="Node" parent="." unique_id=268559056]

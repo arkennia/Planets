@@ -1,11 +1,13 @@
 
+using System;
 using Godot;
 using Planets.Util;
 
 namespace Planets;
 
-public class PlayerData
+public partial class PlayerData : Resource
 {
+    public Guid Uuid { get; set; } = Guid.Empty;
     public Vector3 Position { get; set; }
 
     public Vector3 SpawnPosition { get; set; }
@@ -31,6 +33,7 @@ public class PlayerData
         MouseSensitivty = data.MouseSensitivity;
         SpawnPlanet = data.SpawnPlanet;
         CurrentPlanet = data.CurrentPlanet;
+        Uuid = Guid.TryParse(data.Uuid, out var uuid) ? uuid : Guid.Empty;
     }
 
     public PlayerData()

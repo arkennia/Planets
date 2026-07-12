@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -183,6 +184,19 @@ public partial class Networking : Node
         RpcId(id, MethodName.RequestSpawn);
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SendUUID(byte[] uuidBytes)
+    {
+        long id = Multiplayer.GetRemoteSenderId();
+        Guid uuid = new(uuidBytes);
+        GD.Print($"Received UUID {uuid} from player {id}");
+        if (ServerManager.ConnectedPlayers.TryGetValue(id, out Player value))
+        {
+            value.Uuid = uuid;
+            value.PlayerData.Uuid = uuid;
+        }
+    }
+
     private void OnPlayerConnected(long id)
     {
         GD.Print("Player connected at ID: " + id);
@@ -197,7 +211,8 @@ public partial class Networking : Node
     {
         GD.Print("Disconnect: " + id);
         // _players.Remove(id);
-        ServerManager.RemovePlayer(id);
+        ServerManager.ConnectedPlayers[id].Save();
+        ServerManager.RemovePlayer(id);        
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 

@@ -31,6 +31,8 @@ public partial class Player : CharacterBody3D
 
     [Export]
     public float MouseSensitivty { get; set; } = 0.005f;
+
+    public Guid Uuid { get; set; }
     public float Gravity { get; set; }
     public PlanetNode Planet { get; set; }
 
@@ -52,8 +54,22 @@ public partial class Player : CharacterBody3D
 
     private bool _jumped = false;
 
+    public Player()
+    {
+        // if (!FileAccess.FileExists("user://uuid")) {
+        //     FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Write);
+        //     file.StoreLine(Guid.NewGuid().ToString());
+        //     file.Close();
+        // } else {
+        //     FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read);
+        //     Uuid = Guid.Parse(file.GetLine());
+        //     file.Close();
+        // }
+    }
+
     public override void _Ready()
     {
+        
         Input.MouseMode = Input.MouseModeEnum.Captured;
         _camera = GetNode<Camera3D>("./Pivot/MainCamera");
         _pivot = GetNode<Node3D>("Pivot");

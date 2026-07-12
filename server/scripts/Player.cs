@@ -18,6 +18,11 @@ public partial class Player : CharacterBody3D
     [Export]
     public PlanetNode Planet { get; set; }
 
+    [Export(PropertyHint.Dir)]
+    public string PlayerDataFolder { get; set; } = "res://playerdata";
+
+    public Guid Uuid { get; set; }
+
     public PlayerData PlayerData { get; set; } = new();
 
     private Vector3 _up = Vector3.Up;
@@ -195,4 +200,42 @@ public partial class Player : CharacterBody3D
         Quaternion r = currentRotation.Slerp(targetRotation, 1f).Normalized();
         GlobalBasis = new Basis(r);
     }
+
+    public void Save()
+    {
+        // PlayerData data = new()
+        // {
+        //     Position = GlobalPosition,
+        //     SpawnPosition = PlayerData.SpawnPosition,
+        //     Up = _up,
+        //     Speed = PlayerData.Speed,
+        //     JumpSpeed = PlayerData.JumpSpeed,
+        //     MouseSensitivty = PlayerData.MouseSensitivty,
+        //     SpawnPlanet = PlayerData.SpawnPlanet,
+        //     CurrentPlanet = PlayerData.CurrentPlanet
+        // };
+        PlayerData.Position = GlobalPosition;
+        PlayerData.Up = _up;
+
+        string path = $"{PlayerDataFolder}/{PlayerData.Uuid}.dat";
+        using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
+        file.StoreBuffer(PlayerData.ToProto().ToByteArray());
+        GD.Print($"Saved player data to {path}");
+    }
+
+    public void Load()
+    {
+        string path = $"{PlayerDataFolder}/{PlayerData.Uuid}.dat";
+        if (!FileAccess.FileExists(path))
+        {
+            GD.Print($"Player data file does not exist at {path}");
+            return;
+        }
+        using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+        byte[] bytes = file.GetBuffer((int)file.GetLength());
+        PlayerDataProto proto = PlayerDataProto.Parser.ParseFrom(bytes);
+        PlayerData = new PlayerData(proto);
+        GD.Print($"Loaded player data from {path}");
+    }
 }
+

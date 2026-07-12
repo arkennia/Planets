@@ -25,17 +25,17 @@ namespace Planets {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChVQbGF5ZXJEYXRhUHJvdG8ucHJvdG8SB1BsYW5ldHMaElByb3RvVmVjdG9y",
-            "My5wcm90byLzAQoPUGxheWVyRGF0YVByb3RvEicKCFBvc2l0aW9uGAEgASgL",
+            "My5wcm90byKBAgoPUGxheWVyRGF0YVByb3RvEicKCFBvc2l0aW9uGAEgASgL",
             "MhUuUGxhbmV0cy5Qcm90b1ZlY3RvcjMSLAoNU3Bhd25Qb3NpdGlvbhgCIAEo",
             "CzIVLlBsYW5ldHMuUHJvdG9WZWN0b3IzEiEKAlVwGAMgASgLMhUuUGxhbmV0",
             "cy5Qcm90b1ZlY3RvcjMSDQoFU3BlZWQYBCABKAUSEQoJSnVtcFNwZWVkGAUg",
             "ASgFEhgKEE1vdXNlU2Vuc2l0aXZpdHkYBiABKAISEwoLU3Bhd25QbGFuZXQY",
-            "ByABKAkSFQoNQ3VycmVudFBsYW5ldBgIIAEoCUIKqgIHUGxhbmV0c2IGcHJv",
-            "dG8z"));
+            "ByABKAkSFQoNQ3VycmVudFBsYW5ldBgIIAEoCRIMCgRVdWlkGAkgASgJQgqq",
+            "AgdQbGFuZXRzYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Planets.ProtoVector3Reflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Planets.PlayerDataProto), global::Planets.PlayerDataProto.Parser, new[]{ "Position", "SpawnPosition", "Up", "Speed", "JumpSpeed", "MouseSensitivity", "SpawnPlanet", "CurrentPlanet" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Planets.PlayerDataProto), global::Planets.PlayerDataProto.Parser, new[]{ "Position", "SpawnPosition", "Up", "Speed", "JumpSpeed", "MouseSensitivity", "SpawnPlanet", "CurrentPlanet", "Uuid" }, null, null, null, null)
           }));
     }
     #endregion
@@ -85,6 +85,7 @@ namespace Planets {
       mouseSensitivity_ = other.mouseSensitivity_;
       spawnPlanet_ = other.spawnPlanet_;
       currentPlanet_ = other.currentPlanet_;
+      uuid_ = other.uuid_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -190,6 +191,18 @@ namespace Planets {
       }
     }
 
+    /// <summary>Field number for the "Uuid" field.</summary>
+    public const int UuidFieldNumber = 9;
+    private string uuid_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Uuid {
+      get { return uuid_; }
+      set {
+        uuid_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -213,6 +226,7 @@ namespace Planets {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(MouseSensitivity, other.MouseSensitivity)) return false;
       if (SpawnPlanet != other.SpawnPlanet) return false;
       if (CurrentPlanet != other.CurrentPlanet) return false;
+      if (Uuid != other.Uuid) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -228,6 +242,7 @@ namespace Planets {
       if (MouseSensitivity != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(MouseSensitivity);
       if (SpawnPlanet.Length != 0) hash ^= SpawnPlanet.GetHashCode();
       if (CurrentPlanet.Length != 0) hash ^= CurrentPlanet.GetHashCode();
+      if (Uuid.Length != 0) hash ^= Uuid.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -278,6 +293,10 @@ namespace Planets {
         output.WriteRawTag(66);
         output.WriteString(CurrentPlanet);
       }
+      if (Uuid.Length != 0) {
+        output.WriteRawTag(74);
+        output.WriteString(Uuid);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -320,6 +339,10 @@ namespace Planets {
         output.WriteRawTag(66);
         output.WriteString(CurrentPlanet);
       }
+      if (Uuid.Length != 0) {
+        output.WriteRawTag(74);
+        output.WriteString(Uuid);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -353,6 +376,9 @@ namespace Planets {
       }
       if (CurrentPlanet.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(CurrentPlanet);
+      }
+      if (Uuid.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Uuid);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -398,6 +424,9 @@ namespace Planets {
       }
       if (other.CurrentPlanet.Length != 0) {
         CurrentPlanet = other.CurrentPlanet;
+      }
+      if (other.Uuid.Length != 0) {
+        Uuid = other.Uuid;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -459,6 +488,10 @@ namespace Planets {
             CurrentPlanet = input.ReadString();
             break;
           }
+          case 74: {
+            Uuid = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -517,6 +550,10 @@ namespace Planets {
           }
           case 66: {
             CurrentPlanet = input.ReadString();
+            break;
+          }
+          case 74: {
+            Uuid = input.ReadString();
             break;
           }
         }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=4 uid="uid://db3hwgud2i8fs"]
+[gd_scene format=4 uid="uid://db3hwgud2i8fs"]
 
 [ext_resource type="Script" uid="uid://b7hfypuc7ljnn" path="res://scripts/Client.cs" id="1_4tr0r"]
 [ext_resource type="PackedScene" uid="uid://csuicy0jgwwvd" path="res://scenes/loading_screen.tscn" id="2_r26j7"]
@@ -45,38 +45,38 @@ metadata/Radius = 60
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_da3od"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" unique_id=289716009]
 script = ExtResource("1_4tr0r")
 LoadingScreenScene = ExtResource("2_r26j7")
 MainMenuScene = ExtResource("3_dipmf")
 GameUiScene = ExtResource("3_t0ykn")
 Game = "res://scenes/game.tscn"
 
-[node name="GameUi" parent="." instance_placeholder="res://scenes/game_ui.tscn"]
+[node name="GameUi" parent="." unique_id=1949676864 instance_placeholder="res://scenes/game_ui.tscn"]
 unique_name_in_owner = true
 
-[node name="Game" type="Node" parent="."]
+[node name="Game" type="Node" parent="." unique_id=1868458447]
 unique_name_in_owner = true
 script = ExtResource("4_da3od")
 Scale = 250
 Mesh = SubResource("ArrayMesh_umycy")
 
-[node name="World" type="Node3D" parent="Game"]
+[node name="World" type="Node3D" parent="Game" unique_id=1677098359]
 unique_name_in_owner = true
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Game/World"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Game/World" unique_id=1551061506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.2651, 378.86688)
 light_angular_distance = 0.5
 directional_shadow_mode = 0
 
-[node name="DebugUI" parent="Game" instance=ExtResource("5_dipmf")]
+[node name="DebugUI" parent="Game" unique_id=1853319881 instance=ExtResource("5_dipmf")]
 unique_name_in_owner = true
 anchors_preset = -1
 
-[node name="Player" parent="Game" instance_placeholder="res://scripts/common/player_node.tscn"]
+[node name="Player" parent="Game" unique_id=1174361539 instance_placeholder="res://scripts/common/player_node.tscn"]
 unique_name_in_owner = true
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 script = null
 
-[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game"]
+[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game" unique_id=1192230750]
 replication_config = SubResource("SceneReplicationConfig_da3od")
