@@ -79,7 +79,9 @@ public partial class Networking : Node
         // int newPlayerId = Multiplayer.GetRemoteSenderId();
         // _players[newPlayerId] = newPlayerInfo;
         Player p = new(id);
+        
         ServerManager.AddPlayer(id, p);
+        
         GetTree().CurrentScene.GetNode<Node>("Game").AddChild(p);
         GD.Print("Currently connected players: " + ServerManager.ConnectedPlayers.ToString());
         foreach (Player player in ServerManager.ConnectedPlayers.Values)
@@ -116,7 +118,7 @@ public partial class Networking : Node
         // }
         foreach (PlanetNode p in ServerManager.Planets.Values)
         {
-            GD.Print("Sent GUID: " + p.Planet.Guid.ToString());
+            GD.Print("Sent Planet GUID: " + p.Planet.Guid.ToString());
             RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
                 p.Planet.Guid.ToByteArray(),
                 p.PlanetTerrain.Seed,
@@ -190,11 +192,8 @@ public partial class Networking : Node
         long id = Multiplayer.GetRemoteSenderId();
         Guid uuid = new(uuidBytes);
         GD.Print($"Received UUID {uuid} from player {id}");
-        if (ServerManager.ConnectedPlayers.TryGetValue(id, out Player value))
-        {
-            value.Uuid = uuid;
-            value.PlayerData.Uuid = uuid;
-        }
+        ServerManager.AddClientUUID(id, uuid.ToString());
+        RpcId(1, MethodName.RegisterPlayer, id);
     }
 
     private void OnPlayerConnected(long id)
@@ -204,7 +203,7 @@ public partial class Networking : Node
         // Error e = RpcId(id, MethodName.RegisterPlayer, _playerInfo);
         // if (e != Error.Ok)
         //     GD.Print(e.ToString());
-        RpcId(1, MethodName.RegisterPlayer, id);
+        RpcId(id, MethodName.SendUUID, new byte[1]);
     }
 
     private void OnPlayerDisconnected(long id)

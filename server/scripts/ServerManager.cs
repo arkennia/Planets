@@ -15,6 +15,9 @@ public partial class ServerManager : Node
     public static Dictionary<long, Player> ConnectedPlayers { get => _playerObjects; }
     private static Dictionary<long, Player> _playerObjects = [];
 
+    public static Dictionary<long, string> ClientUuids { get => _clientUuids; }
+    private static Dictionary<long, string> _clientUuids = [];
+
     public static ServerManager Instance { get => _instance; }
 
     private static readonly ServerManager _instance = new();
@@ -41,6 +44,22 @@ public partial class ServerManager : Node
         if (!_playerObjects.ContainsKey(id))
         {
             _playerObjects.Add(id, p);
+            p.Uuid = _clientUuids.ContainsKey(id) ? Guid.Parse(_clientUuids[id]) : Guid.Empty;
+            p.PlayerData.Uuid = p.Uuid;
+            if (FileAccess.FileExists($"{p.PlayerDataFolder}/{p.Uuid}.dat"))
+            {
+                using FileAccess file = FileAccess.Open($"{p.PlayerDataFolder}/{p.Uuid}.dat", FileAccess.ModeFlags.Read);
+                byte[] bytes = file.GetBuffer((int)file.GetLength());
+                PlayerDataProto proto = PlayerDataProto.Parser.ParseFrom(bytes);
+                p.PlayerData = new(proto);
+                GD.Print("Loaded player data for " + id + " with UUID: " + p.PlayerData.Uuid);
+            }
+            else
+            {
+                GD.Print($"No player data found for {id}, creating new player data.");
+                p.PlayerData = new();
+            }
+
             if (p.PlayerData.SpawnPlanet == string.Empty)
             {
                 SetPlayerSpawn(p, _planets.Values.ToArray()[0]);
@@ -52,6 +71,19 @@ public partial class ServerManager : Node
     {
         _playerObjects[id].QueueFree();
         _playerObjects.Remove(id);
+    }
+
+    public static void AddClientUUID(long id, string uuid)
+    {
+        if (!_clientUuids.ContainsKey(id))
+        {
+            _clientUuids.Add(id, uuid);
+        }
+    }
+
+    public static void RemoveClientUUID(long id)
+    {
+        _clientUuids.Remove(id);
     }
 
     public static void SetPlayerSpawn(Player player, PlanetNode planet)
