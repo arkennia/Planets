@@ -13,6 +13,8 @@ public partial class Networking : Node
     public static Player Player { get; set; }
     public static bool Connected { get; private set; } = false;
     public static Networking Instance { get; private set; }
+
+    public static Guid Uuid { get; private set; }
     private Dictionary<long, PlayerPeer> _players = [];
     // private Dictionary<string, string> _playerInfo = new()
     // {
@@ -55,6 +57,10 @@ public partial class Networking : Node
     {
         ENetMultiplayerPeer peer = new();
         Error e = peer.CreateClient("127.0.0.1", 7000);
+
+        using FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read);
+        Uuid = Guid.Parse(file.GetLine());
+
         PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
         // SyncingFinished += GameManager.Instance.WorldLoaded;
         Multiplayer.MultiplayerPeer = peer;
@@ -203,8 +209,7 @@ public partial class Networking : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendUUID(byte[] uuidBytes)
     {
-        using FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Write);
-        RpcId(1, MethodName.SendUUID, Guid.Parse(file.GetLine()).ToByteArray());
+        RpcId(1, MethodName.SendUUID, Uuid.ToByteArray());
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -229,8 +234,9 @@ public partial class Networking : Node
         Connected = true;
         int peerId = Multiplayer.GetUniqueId();
         GD.Print("My ID: " + peerId);
+        GD.Print(OS.GetUserDataDir());
         //_players[peerId] = Player;
-        RpcId(1, MethodName.SendUUID, Guid.Parse(FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read).GetLine()).ToByteArray());
+        RpcId(1, MethodName.SendUUID, Uuid.ToByteArray());
         RpcId(1, MethodName.GetPlanets, peerId, 0, new());
         EmitSignal(SignalName.PlayerConnected, peerId);
     }

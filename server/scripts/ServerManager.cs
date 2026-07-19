@@ -45,7 +45,6 @@ public partial class ServerManager : Node
         {
             _playerObjects.Add(id, p);
             p.Uuid = _clientUuids.ContainsKey(id) ? Guid.Parse(_clientUuids[id]) : Guid.Empty;
-            p.PlayerData.Uuid = p.Uuid;
             if (FileAccess.FileExists($"{p.PlayerDataFolder}/{p.Uuid}.dat"))
             {
                 using FileAccess file = FileAccess.Open($"{p.PlayerDataFolder}/{p.Uuid}.dat", FileAccess.ModeFlags.Read);
@@ -58,6 +57,7 @@ public partial class ServerManager : Node
             {
                 GD.Print($"No player data found for {id}, creating new player data.");
                 p.PlayerData = new();
+                p.PlayerData.Uuid = p.Uuid;
             }
 
             if (p.PlayerData.SpawnPlanet == string.Empty)

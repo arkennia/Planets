@@ -196,6 +196,7 @@ public partial class Player : CharacterBody3D
         };
         Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
         MoveAndSlide();
+        GlobalPosition += new Vector3(0, 1f, 0) * direction;
 
         for (int i = 0; i < GetSlideCollisionCount(); i++)
         {

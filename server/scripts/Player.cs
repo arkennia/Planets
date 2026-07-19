@@ -216,6 +216,7 @@ public partial class Player : CharacterBody3D
         // };
         PlayerData.Position = GlobalPosition;
         PlayerData.Up = _up;
+        PlayerData.Uuid = Uuid;
 
         string path = $"{PlayerDataFolder}/{PlayerData.Uuid}.dat";
         using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
