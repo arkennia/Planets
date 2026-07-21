@@ -51,15 +51,15 @@ public partial class Networking : Node
             mp.AllowObjectDecoding = true;
         }
         GD.Print("Client Multiplayer instance ID: " + Multiplayer.GetInstanceId());
+        using FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read);
+        string uuidString = file.GetLine().Trim();
+        Uuid = Guid.Parse(uuidString);
     }
 
     public Error ConnectToServer()
     {
         ENetMultiplayerPeer peer = new();
         Error e = peer.CreateClient("127.0.0.1", 7000);
-
-        using FileAccess file = FileAccess.Open("user://uuid", FileAccess.ModeFlags.Read);
-        Uuid = Guid.Parse(file.GetLine());
 
         PlanetLoaded += (planet) => GD.Print("Planet loaded! " + planet.ToString());
         // SyncingFinished += GameManager.Instance.WorldLoaded;
@@ -209,6 +209,7 @@ public partial class Networking : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendUUID(byte[] uuidBytes)
     {
+        GD.Print("Sending UUID to server: " + Uuid.ToString());
         RpcId(1, MethodName.SendUUID, Uuid.ToByteArray());
     }
 
@@ -253,5 +254,4 @@ public partial class Networking : Node
         _players.Clear();
         EmitSignal(SignalName.ServerDisconnected);
     }
-
 }

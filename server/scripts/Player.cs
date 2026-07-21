@@ -113,8 +113,9 @@ public partial class Player : CharacterBody3D
             if (result.Count > 0)
             {
                 _up = UpDirection = (Vector3)result["normal"];
-                ApplyFloorSnap();
+                //ApplyFloorSnap();
             }
+            //GlobalPosition += .1f * _up;
         }
         MoveAndSlide();
         for (int i = 0; i < GetSlideCollisionCount(); i++)
