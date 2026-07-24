@@ -13,6 +13,8 @@ public partial class Game : Node
         // p.Save();
         ServerManager.AddPlanet(p);
         GetTree().Root.GetNode("/root/Main/Game/World").AddChild(p);
+        PlanetData planetData = new(p);
+        planetData.SavePlanet(p);
         // PackedScene packedScene = ResourceLoader.Load<PackedScene>(p.SaveLocation);
         // Node3D planetScene = packedScene.Instantiate() as Node3D;
         // GetTree().Root.GetNode("/root/Main/Main/Game/World").AddChild(planetScene);
