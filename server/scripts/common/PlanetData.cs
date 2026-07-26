@@ -1,5 +1,7 @@
 using Godot;
 using Godot.Collections;
+using Google.Protobuf;
+using Planets;
 using Planets.SystemGenerator;
 using System;
 
@@ -47,6 +49,29 @@ public partial class PlanetData : Resource
         Scale = planet.Planet.Scale;
         Heights = [.. planet.PlanetTerrain.Heights];
         Seed = planet.PlanetTerrain.Seed;
-        ResourceSaver.Save(this, $"{SaveFolder}/{Guid}.tres", ResourceSaver.SaverFlags.BundleResources);
+        PlanetDataProto proto = new()
+        {
+            Guid = Guid.ToString(),
+            Name = Name,
+            Scale = Scale,
+            Heights = { Heights },
+            Seed = (int)Seed
+        };
+        using FileAccess file = FileAccess.Open($"{SaveFolder}/{Guid}.dat", FileAccess.ModeFlags.Write);
+        file.StoreBuffer(proto.ToByteArray());
+    }
+
+    public void LoadPlanet(string guid)
+    {
+        using FileAccess file = FileAccess.Open($"{SaveFolder}/{guid}.dat", FileAccess.ModeFlags.Read);
+        byte[] bytes = file.GetBuffer((int)file.GetLength());
+        PlanetDataProto proto = PlanetDataProto.Parser.ParseFrom(bytes);
+        GD.Print($"Loaded planet data from {SaveFolder}/{guid}.dat");
+        GD.Print($"{proto.ToString()}");
+        Guid = Guid.Parse(proto.Guid);
+        Name = proto.Name;
+        Scale = proto.Scale;
+        Heights = new Array<float>(proto.Heights);
+        Seed = (ulong)proto.Seed;
     }
 }

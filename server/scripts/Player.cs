@@ -124,7 +124,7 @@ public partial class Player : CharacterBody3D
             Node collider = (Node)collision.GetCollider();
             PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
             _ChangeMotionMode(cParent, _up);
-            GD.Print("Collided with: " + collider.Name);
+            //GD.Print("Collided with: " + collider.Name);
         }
 
         PlayerMovementProto protomovement = new()
