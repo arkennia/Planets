@@ -1,0 +1,12 @@
+syntax="proto3";
+package Planets;
+
+option csharp_namespace = "Planets";
+
+message PlanetDataProto {
+    string guid = 1;
+    int32 seed = 2;
+    string name = 3;
+    int32 scale = 4;
+    repeated float heights = 5 [packed=true];
+}

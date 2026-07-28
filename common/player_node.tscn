@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://da4k4iimbemic"]
+
+[ext_resource type="Script" uid="uid://mwreg2c00ky2" path="res://scripts/Player.cs" id="1_72p8a"]
+
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4m5hh"]
+margin = 0.08
+radius = 0.41064453
+height = 1.9667969
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4m5hh"]
+radius = 0.35
+height = 1.9
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
+collision_mask = 2
+motion_mode = 1
+script = ExtResource("1_72p8a")
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="MainCamera" type="Camera3D" parent="Pivot"]
+transform = Transform3D(3.333333, 0, 0, 0, 3.333333, 0, 0, 0, 3.333333, 0, 1.5389407, -0.34487972)
+current = true
+fov = 34.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.90819395, 0)
+shape = SubResource("CapsuleShape3D_4m5hh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9999998, 0, 0, 0, 0.9999998, 0, 0, 0, 0.9999998, 0, 0.908, 0)
+mesh = SubResource("CapsuleMesh_4m5hh")
+
+[node name="PlayerNode" type="Node3D" parent="."]
