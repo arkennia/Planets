@@ -29,7 +29,7 @@ namespace Planets {
             "MhUuUGxhbmV0cy5Qcm90b1ZlY3RvcjMSLAoNU3Bhd25Qb3NpdGlvbhgCIAEo",
             "CzIVLlBsYW5ldHMuUHJvdG9WZWN0b3IzEiEKAlVwGAMgASgLMhUuUGxhbmV0",
             "cy5Qcm90b1ZlY3RvcjMSDQoFU3BlZWQYBCABKAUSEQoJSnVtcFNwZWVkGAUg",
-            "ASgFEhgKEE1vdXNlU2Vuc2l0aXZpdHkYBiABKAISEwoLU3Bhd25QbGFuZXQY",
+            "ASgFEhgKEE1vdXNlU2Vuc2l0aXZpdHkYBiABKAESEwoLU3Bhd25QbGFuZXQY",
             "ByABKAkSFQoNQ3VycmVudFBsYW5ldBgIIAEoCRIMCgRVdWlkGAkgASgJQgqq",
             "AgdQbGFuZXRzYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
@@ -157,10 +157,10 @@ namespace Planets {
 
     /// <summary>Field number for the "MouseSensitivity" field.</summary>
     public const int MouseSensitivityFieldNumber = 6;
-    private float mouseSensitivity_;
+    private double mouseSensitivity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float MouseSensitivity {
+    public double MouseSensitivity {
       get { return mouseSensitivity_; }
       set {
         mouseSensitivity_ = value;
@@ -223,7 +223,7 @@ namespace Planets {
       if (!object.Equals(Up, other.Up)) return false;
       if (Speed != other.Speed) return false;
       if (JumpSpeed != other.JumpSpeed) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(MouseSensitivity, other.MouseSensitivity)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(MouseSensitivity, other.MouseSensitivity)) return false;
       if (SpawnPlanet != other.SpawnPlanet) return false;
       if (CurrentPlanet != other.CurrentPlanet) return false;
       if (Uuid != other.Uuid) return false;
@@ -239,7 +239,7 @@ namespace Planets {
       if (up_ != null) hash ^= Up.GetHashCode();
       if (Speed != 0) hash ^= Speed.GetHashCode();
       if (JumpSpeed != 0) hash ^= JumpSpeed.GetHashCode();
-      if (MouseSensitivity != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(MouseSensitivity);
+      if (MouseSensitivity != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(MouseSensitivity);
       if (SpawnPlanet.Length != 0) hash ^= SpawnPlanet.GetHashCode();
       if (CurrentPlanet.Length != 0) hash ^= CurrentPlanet.GetHashCode();
       if (Uuid.Length != 0) hash ^= Uuid.GetHashCode();
@@ -281,9 +281,9 @@ namespace Planets {
         output.WriteRawTag(40);
         output.WriteInt32(JumpSpeed);
       }
-      if (MouseSensitivity != 0F) {
-        output.WriteRawTag(53);
-        output.WriteFloat(MouseSensitivity);
+      if (MouseSensitivity != 0D) {
+        output.WriteRawTag(49);
+        output.WriteDouble(MouseSensitivity);
       }
       if (SpawnPlanet.Length != 0) {
         output.WriteRawTag(58);
@@ -327,9 +327,9 @@ namespace Planets {
         output.WriteRawTag(40);
         output.WriteInt32(JumpSpeed);
       }
-      if (MouseSensitivity != 0F) {
-        output.WriteRawTag(53);
-        output.WriteFloat(MouseSensitivity);
+      if (MouseSensitivity != 0D) {
+        output.WriteRawTag(49);
+        output.WriteDouble(MouseSensitivity);
       }
       if (SpawnPlanet.Length != 0) {
         output.WriteRawTag(58);
@@ -368,8 +368,8 @@ namespace Planets {
       if (JumpSpeed != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(JumpSpeed);
       }
-      if (MouseSensitivity != 0F) {
-        size += 1 + 4;
+      if (MouseSensitivity != 0D) {
+        size += 1 + 8;
       }
       if (SpawnPlanet.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(SpawnPlanet);
@@ -416,7 +416,7 @@ namespace Planets {
       if (other.JumpSpeed != 0) {
         JumpSpeed = other.JumpSpeed;
       }
-      if (other.MouseSensitivity != 0F) {
+      if (other.MouseSensitivity != 0D) {
         MouseSensitivity = other.MouseSensitivity;
       }
       if (other.SpawnPlanet.Length != 0) {
@@ -476,8 +476,8 @@ namespace Planets {
             JumpSpeed = input.ReadInt32();
             break;
           }
-          case 53: {
-            MouseSensitivity = input.ReadFloat();
+          case 49: {
+            MouseSensitivity = input.ReadDouble();
             break;
           }
           case 58: {
@@ -540,8 +540,8 @@ namespace Planets {
             JumpSpeed = input.ReadInt32();
             break;
           }
-          case 53: {
-            MouseSensitivity = input.ReadFloat();
+          case 49: {
+            MouseSensitivity = input.ReadDouble();
             break;
           }
           case 58: {

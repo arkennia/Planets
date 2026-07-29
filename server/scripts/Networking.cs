@@ -122,7 +122,7 @@ public partial class Networking : Node
             RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
                 p.Planet.Guid.ToByteArray(),
                 p.PlanetTerrain.Seed,
-                new Array<float>(p.PlanetTerrain.Heights));
+                new Array<double>(p.PlanetTerrain.Heights));
         }
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1, 0, new Array<float>());
 

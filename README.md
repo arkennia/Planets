@@ -39,8 +39,11 @@ You can edit the platform and `-j6` options to suit your hardware and operating 
 `scons platform=windows target=editor profile=custom.py -j6`
 After that finishes, run:
 ` .\bin\godot.windows.editor.double.x86_64.mono.console.exe --headless --generate-mono-glue modules/mono/glue`
-and
-`python ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --precision=double`
+You need to create a NugetSource directory for this step. I created it at `C:\Users\<user>\NugetSource`
+You can add it to dotnet with the command 
+`dotnet nuget add source C:\Users\<user>\NugetSource --name NugetSource       `
+Then run:
+`python ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir ./bin --push-nupkgs-local C:\Users\jmanl\NugetSource --precision=double`
 #### Complete
 The Godot binaries should now be in the bin folder and ready for use.
 

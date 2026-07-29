@@ -8,5 +8,5 @@ message PlanetDataProto {
     int32 seed = 2;
     string name = 3;
     int32 scale = 4;
-    repeated float heights = 5 [packed=true];
+    repeated double heights = 5 [packed=true];
 }

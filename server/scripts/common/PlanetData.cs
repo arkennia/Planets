@@ -24,7 +24,7 @@ public partial class PlanetData : Resource
     [Export]
     public int Scale { get; private set; } = 250;
     [Export]
-    public Array<float> Heights { get; private set; } = [];
+    public Array<double> Heights { get; private set; } = [];
     [Export]
     public ulong Seed { get; private set; } = 0;
 
@@ -67,11 +67,11 @@ public partial class PlanetData : Resource
         byte[] bytes = file.GetBuffer((int)file.GetLength());
         PlanetDataProto proto = PlanetDataProto.Parser.ParseFrom(bytes);
         GD.Print($"Loaded planet data from {SaveFolder}/{guid}.dat");
-        GD.Print($"{proto.ToString()}");
+        //GD.Print($"{proto.ToString()}");
         Guid = Guid.Parse(proto.Guid);
         Name = proto.Name;
         Scale = proto.Scale;
-        Heights = new Array<float>(proto.Heights);
+        Heights = new Array<double>(proto.Heights);
         Seed = (ulong)proto.Seed;
     }
 }

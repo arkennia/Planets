@@ -89,7 +89,7 @@ public partial class SimplexTerrain3D : Terrain3D
 
     }
 
-    public override void FromHeights(bool generateLods, int seed, Array<float> heights, ShaderMaterial shaderMaterial = null)
+    public override void FromHeights(bool generateLods, int seed, Array<double> heights, ShaderMaterial shaderMaterial = null)
     {
         if (Noise1 is null)
             _CreateNoise();
@@ -162,7 +162,7 @@ public partial class SimplexTerrain3D : Terrain3D
         return arrayMesh;
     }
 
-    private static float _SampleNoise(FastNoiseLite noise, Vector3 v)
+    private static double _SampleNoise(FastNoiseLite noise, Vector3 v)
     {
         return (noise.GetNoise3Dv(v) + 1) / 2;
     }
@@ -359,20 +359,20 @@ public partial class SimplexTerrain3D : Terrain3D
         GD.Print($"Num Vertices: {vCount}");
 #endif
         _material.SetShaderParameter("VertexCount", vCount);
-        Heights = new float[vCount];
+        Heights = new double[vCount];
         CoordinateOrigin = mdt.GetVertex(0);
         Parallel.For(0, vCount, i =>
         {
             Vector3 vert = mdt.GetVertex(i);
 
             // float height = Heights[i];
-            float n1 = _SampleNoise(Noise1, vert);
-            float n2 = _SampleNoise(Noise2, vert * 2f);
-            float n3 = _SampleNoise(Noise3, vert * 4f);
-            float m = _SampleNoise(Moisture, vert);
-            float h = n1 * 1f + n2 * 0.33f + n3 * 0.1f;
+            double n1 = _SampleNoise(Noise1, vert);
+            double n2 = _SampleNoise(Noise2, vert * 2f);
+            double n3 = _SampleNoise(Noise3, vert * 4f);
+            double m = _SampleNoise(Moisture, vert);
+            double h = n1 * 1f + n2 * 0.33f + n3 * 0.1f;
             h /= 1f + 0.33f + 0.1f;
-            h = (float)Mathf.Pow(h * 1.3f, 2.0);
+            h = (double)Mathf.Pow(h * 1.3f, 2.0);
             Vector3 vertN = mdt.GetVertexNormal(i);
             Heights[i] = h;
             if (h > MountainLevel)
@@ -434,13 +434,13 @@ public partial class SimplexTerrain3D : Terrain3D
             // float n1 = _SampleNoise(Noise1, vert);
             // float n2 = _SampleNoise(Noise2, vert * 2f);
             // float n3 = _SampleNoise(Noise3, vert * 4f);
-            float m = _SampleNoise(Moisture, vert);
+            double m = _SampleNoise(Moisture, vert);
             // float h = n1 * 1f + n2 * 0.33f + n3 * 0.1f;
             // h /= 1f + 0.33f + 0.1f;
             // h = (float)Mathf.Pow(h * 1.3f, 2.0);
             Vector3 vertN = mdt.GetVertexNormal(i);
             // Heights[i] = h;
-            float h = Heights[i];
+            double h = Heights[i];
             if (h > MountainLevel)
                 vert += vertN * h * 13f;
             else vert += vertN * h * 10f;
@@ -663,7 +663,7 @@ public partial class SimplexTerrain3D : Terrain3D
         // _rd.FreeRid(uniformSet);
     } */
 
-    private Color _GetColor(float height, float m)
+    private Color _GetColor(double height, double m)
     {
         if (height < 0.18)
             return Colors.DeepWater;

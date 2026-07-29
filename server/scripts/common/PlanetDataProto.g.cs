@@ -26,7 +26,7 @@ namespace Planets {
           string.Concat(
             "ChVQbGFuZXREYXRhUHJvdG8ucHJvdG8SB1BsYW5ldHMiXwoPUGxhbmV0RGF0",
             "YVByb3RvEgwKBGd1aWQYASABKAkSDAoEc2VlZBgCIAEoBRIMCgRuYW1lGAMg",
-            "ASgJEg0KBXNjYWxlGAQgASgFEhMKB2hlaWdodHMYBSADKAJCAhABQgqqAgdQ",
+            "ASgJEg0KBXNjYWxlGAQgASgFEhMKB2hlaWdodHMYBSADKAFCAhABQgqqAgdQ",
             "bGFuZXRzYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
@@ -137,12 +137,12 @@ namespace Planets {
 
     /// <summary>Field number for the "heights" field.</summary>
     public const int HeightsFieldNumber = 5;
-    private static readonly pb::FieldCodec<float> _repeated_heights_codec
-        = pb::FieldCodec.ForFloat(42);
-    private readonly pbc::RepeatedField<float> heights_ = new pbc::RepeatedField<float>();
+    private static readonly pb::FieldCodec<double> _repeated_heights_codec
+        = pb::FieldCodec.ForDouble(42);
+    private readonly pbc::RepeatedField<double> heights_ = new pbc::RepeatedField<double>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<float> Heights {
+    public pbc::RepeatedField<double> Heights {
       get { return heights_; }
     }
 
@@ -324,7 +324,7 @@ namespace Planets {
             break;
           }
           case 42:
-          case 45: {
+          case 41: {
             heights_.AddEntriesFrom(input, _repeated_heights_codec);
             break;
           }
@@ -364,7 +364,7 @@ namespace Planets {
             break;
           }
           case 42:
-          case 45: {
+          case 41: {
             heights_.AddEntriesFrom(ref input, _repeated_heights_codec);
             break;
           }

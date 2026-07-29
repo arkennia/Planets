@@ -38,7 +38,7 @@ public abstract partial class Terrain3D : MeshInstance3D
     /// <summary>
     /// The heights by vertex index.
     /// </summary>
-    public float[] Heights { get; protected set; }
+    public double[] Heights { get; protected set; }
 
     /// <summary>
     /// The origin to use to calculate surface coordinates.
@@ -63,7 +63,7 @@ public abstract partial class Terrain3D : MeshInstance3D
     /// <param name="shaderMaterial">The shader material to use.</param>
     public abstract void Generate(bool generateLods, ShaderMaterial shaderMaterial = null);
 
-    public abstract void FromHeights(bool generateLods, int seed, Array<float> heights, ShaderMaterial shaderMaterial = null);
+    public abstract void FromHeights(bool generateLods, int seed, Array<double> heights, ShaderMaterial shaderMaterial = null);
 
     protected void _GenerateSpawnPoints(MeshDataTool mdt, int vCount)
     {

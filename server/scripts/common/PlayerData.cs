@@ -18,7 +18,7 @@ public partial class PlayerData : Resource
 
     public int JumpSpeed { get; set; } = 8;
 
-    public float MouseSensitivty { get; set; } = 0.005f;
+    public double MouseSensitivty { get; set; } = 0.005f;
 
     public string SpawnPlanet { get; set; } = string.Empty;
 

@@ -13,7 +13,7 @@ public partial class Player : CharacterBody3D
 {
     public readonly long MultiplayerId = 0;
     [Export]
-    public float Gravity { get; set; }
+    public double Gravity { get; set; }
 
     [Export]
     public PlanetNode Planet { get; set; }

@@ -11,7 +11,7 @@ message PlayerDataProto {
     ProtoVector3 Up = 3;
     int32 Speed = 4;
     int32 JumpSpeed = 5;
-    float MouseSensitivity = 6;
+    double MouseSensitivity = 6;
     string SpawnPlanet = 7;
     string CurrentPlanet = 8;
     string Uuid = 9;

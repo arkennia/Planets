@@ -25,7 +25,7 @@ namespace Planets {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChJQcm90b1ZlY3RvcjMucHJvdG8SB1BsYW5ldHMiLwoMUHJvdG9WZWN0b3Iz",
-            "EgkKAXgYASABKAISCQoBeRgCIAEoAhIJCgF6GAMgASgCQgqqAgdQbGFuZXRz",
+            "EgkKAXgYASABKAESCQoBeRgCIAEoARIJCgF6GAMgASgBQgqqAgdQbGFuZXRz",
             "YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
@@ -86,10 +86,10 @@ namespace Planets {
 
     /// <summary>Field number for the "x" field.</summary>
     public const int XFieldNumber = 1;
-    private float x_;
+    private double x_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float X {
+    public double X {
       get { return x_; }
       set {
         x_ = value;
@@ -98,10 +98,10 @@ namespace Planets {
 
     /// <summary>Field number for the "y" field.</summary>
     public const int YFieldNumber = 2;
-    private float y_;
+    private double y_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float Y {
+    public double Y {
       get { return y_; }
       set {
         y_ = value;
@@ -110,10 +110,10 @@ namespace Planets {
 
     /// <summary>Field number for the "z" field.</summary>
     public const int ZFieldNumber = 3;
-    private float z_;
+    private double z_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float Z {
+    public double Z {
       get { return z_; }
       set {
         z_ = value;
@@ -135,9 +135,9 @@ namespace Planets {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -145,9 +145,9 @@ namespace Planets {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
-      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
-      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
+      if (X != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(X);
+      if (Y != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Y);
+      if (Z != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -166,17 +166,17 @@ namespace Planets {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (X != 0F) {
-        output.WriteRawTag(13);
-        output.WriteFloat(X);
+      if (X != 0D) {
+        output.WriteRawTag(9);
+        output.WriteDouble(X);
       }
-      if (Y != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(Y);
+      if (Y != 0D) {
+        output.WriteRawTag(17);
+        output.WriteDouble(Y);
       }
-      if (Z != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(Z);
+      if (Z != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -188,17 +188,17 @@ namespace Planets {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (X != 0F) {
-        output.WriteRawTag(13);
-        output.WriteFloat(X);
+      if (X != 0D) {
+        output.WriteRawTag(9);
+        output.WriteDouble(X);
       }
-      if (Y != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(Y);
+      if (Y != 0D) {
+        output.WriteRawTag(17);
+        output.WriteDouble(Y);
       }
-      if (Z != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(Z);
+      if (Z != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -210,14 +210,14 @@ namespace Planets {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (X != 0F) {
-        size += 1 + 4;
+      if (X != 0D) {
+        size += 1 + 8;
       }
-      if (Y != 0F) {
-        size += 1 + 4;
+      if (Y != 0D) {
+        size += 1 + 8;
       }
-      if (Z != 0F) {
-        size += 1 + 4;
+      if (Z != 0D) {
+        size += 1 + 8;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -231,13 +231,13 @@ namespace Planets {
       if (other == null) {
         return;
       }
-      if (other.X != 0F) {
+      if (other.X != 0D) {
         X = other.X;
       }
-      if (other.Y != 0F) {
+      if (other.Y != 0D) {
         Y = other.Y;
       }
-      if (other.Z != 0F) {
+      if (other.Z != 0D) {
         Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -259,16 +259,16 @@ namespace Planets {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 13: {
-            X = input.ReadFloat();
+          case 9: {
+            X = input.ReadDouble();
             break;
           }
-          case 21: {
-            Y = input.ReadFloat();
+          case 17: {
+            Y = input.ReadDouble();
             break;
           }
-          case 29: {
-            Z = input.ReadFloat();
+          case 25: {
+            Z = input.ReadDouble();
             break;
           }
         }
@@ -290,16 +290,16 @@ namespace Planets {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 13: {
-            X = input.ReadFloat();
+          case 9: {
+            X = input.ReadDouble();
             break;
           }
-          case 21: {
-            Y = input.ReadFloat();
+          case 17: {
+            Y = input.ReadDouble();
             break;
           }
-          case 29: {
-            Z = input.ReadFloat();
+          case 25: {
+            Z = input.ReadDouble();
             break;
           }
         }

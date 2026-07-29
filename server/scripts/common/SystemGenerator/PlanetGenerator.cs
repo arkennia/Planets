@@ -23,7 +23,7 @@ public partial class PlanetGenerator : EditorScript
         p.Save();
     }
 
-    public static PlanetNode GeneratePlanet(string name = "Earth", int scale = 1000, int seed = 0, Array<float> heights = null, Guid? guid = null)
+    public static PlanetNode GeneratePlanet(string name = "Earth", int scale = 1000, int seed = 0, Array<double> heights = null, Guid? guid = null)
     {
         Planet planet = new(name, scale, guid);
         PlanetNode mI = new()

@@ -62,14 +62,14 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public Vector2 CalculatePosition(Vector3 coord)
     {
-        float x = coord.X - PlanetTerrain.CoordinateOrigin.X;
-        float y = coord.Y - PlanetTerrain.CoordinateOrigin.Y;
+        double x = coord.X - PlanetTerrain.CoordinateOrigin.X;
+        double y = coord.Y - PlanetTerrain.CoordinateOrigin.Y;
         return new Vector2(x, y);
     }
 
 
 
-    public void Generate(bool withHeights = false, int seed = 0, Array<float> heights = null)
+    public void Generate(bool withHeights = false, int seed = 0, Array<double> heights = null)
     {
         Terrain3D terrain = null;
         if (!withHeights)
