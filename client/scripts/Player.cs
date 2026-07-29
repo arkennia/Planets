@@ -30,10 +30,10 @@ public partial class Player : CharacterBody3D
     public int JumpSpeed { get; set; } = 8;
 
     [Export]
-    public float MouseSensitivty { get; set; } = 0.005f;
+    public double MouseSensitivty { get; set; } = 0.005f;
 
     public Guid Uuid { get; set; }
-    public float Gravity { get; set; }
+    public double Gravity { get; set; }
     public PlanetNode Planet { get; set; }
 
     public PlayerData PlayerData { get; set; }
@@ -123,7 +123,7 @@ public partial class Player : CharacterBody3D
                 Vector2 mouseMovement = motionEvent.ScreenRelative;
                 _rotation.X = -mouseMovement.X * MouseSensitivty;
                 _rotation.Y = -mouseMovement.Y * MouseSensitivty;
-                float currentRotation = _camera.Rotation.X;
+                double currentRotation = _camera.Rotation.X;
                 _pivot.Rotate(Vector3.Up, _rotation.X);
                 // Prevents the camera for doing a 360 spin and going upside down.
                 if (Mathf.Abs(currentRotation + _rotation.Y) > MathF.PI / 2f)

@@ -128,7 +128,7 @@ public partial class Networking : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void GetPlanets(byte[] id, int seed, Array<float> heights)
+    private void GetPlanets(byte[] id, int seed, Array<double> heights)
     {
         GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
         if (Multiplayer.GetRemoteSenderId() != 1) return;
