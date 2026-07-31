@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 using Godot;
 using Godot.Collections;
@@ -30,6 +31,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     public string SaveLocation { get; set; }
 
+    public Guid Guid => Planet.Guid;
 
     public const string SAVE_PATH = "res://scenes/planets";
 

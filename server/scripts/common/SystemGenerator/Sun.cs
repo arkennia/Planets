@@ -1,20 +1,41 @@
 using Godot;
-using Planets.SystemGenerator;
 using System;
 
+namespace Planets.SystemGenerator;
+
+/// <summary>
+/// The <c>Sun</c> class inherits Resource, and implements ICelestialBody. It contains all of the data describing a Sun. <br/>
+/// </summary>
 public partial class Sun : Resource, ICelestialBody
 {
-    public Guid Guid => throw new NotImplementedException();
+    public Guid Guid { get; private set; } = Guid.Empty;
 
-    public string Name => throw new NotImplementedException();
+    [Export]
+    public string Name { get; set; } = "Sol";
 
-    public Vector2 Sector => throw new NotImplementedException();
+    [Export]
+    public int Radius { get; set; } = 100;
 
-    public Vector3 SectorLocation => throw new NotImplementedException();
+    [Export]
+    public Vector3 Sector { get; private set; } = Vector3.Zero;
 
-    public void Save(string path)
+    [Export]
+    public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
+
+    public Sun()
     {
-        throw new NotImplementedException();
+
     }
 
+    public Sun(string name = "Sol", int radius = 100, Guid? guid = null)
+    {
+        Name = name;
+        Radius = radius;
+        Guid = (Guid)(guid is null ? Guid.NewGuid() : guid);
+    }
+
+    public void Save(string path = "res://resources")
+    {
+        ResourceSaver.Save(this, $"{path}/{Guid}.res", ResourceSaver.SaverFlags.Compress);
+    }
 }

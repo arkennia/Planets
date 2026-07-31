@@ -1,16 +1,36 @@
 using Godot;
-using Planets.SystemGenerator;
 using System;
 
+namespace Planets.SystemGenerator;
+
+/// <summary>
+/// The <c>SunNode</c> class inherits Node3D, and implements ICelestialBodyNode. <br/>
+/// Used in conjunction with the <c>Sun</c> class to display a Sun in the scene tree.
+/// </summary>
 public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
 {
-    public ICelestialBody CelestialBody => throw new NotImplementedException();
+    [Export]
+    public Sun Sun { get; set; } = null;
 
-    public string SaveLocation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    [Export]
+    public Area3D SunArea { get; private set; }
+
+    public ICelestialBody CelestialBody => Sun;
+
+    public string SaveLocation { get; set; }
+
+    private Mesh _mesh;
 
     public void Generate()
     {
-        throw new NotImplementedException();
+        Sun ??= new Sun();
+        _mesh = new SphereMesh
+        {
+            Radius = Sun.Radius,
+            Height = Sun.Radius,
+            RadialSegments = 32,
+            Rings = 16,
+        };
     }
 
     public void Save()

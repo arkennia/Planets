@@ -1,3 +1,5 @@
+using System;
+
 namespace Planets.SystemGenerator;
 /// <summary>
 /// ICelestialBodyNode should only be inherited by classes derived from <c>Node</c> or its descendants. <br/>
@@ -7,6 +9,8 @@ namespace Planets.SystemGenerator;
 public interface ICelestialBodyNode<T> where T : ICelestialBody
 {
     ICelestialBody CelestialBody { get; }
+
+    public Guid Guid => CelestialBody.Guid;
     string SaveLocation { get; set; }
 
     /// <summary>

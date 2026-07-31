@@ -35,7 +35,7 @@ public partial class Planet : Resource, ICelestialBody
 
 
     [Export]
-    public Vector2 Sector { get; private set; } = Vector2.Zero;
+    public Vector3 Sector { get; private set; } = Vector3.Zero;
 
     [Export]
     public Vector3 SectorLocation { get; private set; } = Vector3.Zero;
