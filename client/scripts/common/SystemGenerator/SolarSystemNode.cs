@@ -42,9 +42,11 @@ public partial class SolarSystemNode : Node3D
 		AddChild(Sun);
 		Sun.Generate();
 
-		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 250);
-		p.Position = new Vector3(1000, 0, 0);
+		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 50);
+		// p = PlanetGenerator.GeneratePlanet(scale: 50, seed: (int)p.PlanetTerrain.Seed, heights: new Array<double>(p.PlanetTerrain.Heights), guid: p.Guid);
+		p.Position = new Vector3(10000, 0, 0);
 		Planets[p.Guid.ToString()] = p;
 		AddChild(p);
+		p.Save();
 	}
 }

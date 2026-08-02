@@ -193,7 +193,7 @@ public partial class Player : CharacterBody3D
         {
             Vector3 dest = -_up * 100f;
             PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
-            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
+            PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(GlobalPosition, dest);
             query.Exclude = [GetRid()];
             query.CollisionMask = CollisionMask;
             // query.HitFromInside = true;
@@ -224,7 +224,6 @@ public partial class Player : CharacterBody3D
             _ChangeMotionMode(cParent, _up);
             GD.Print("Collided with: " + collider.Name);
         }
-
     }
 
     public void DisableMovement()

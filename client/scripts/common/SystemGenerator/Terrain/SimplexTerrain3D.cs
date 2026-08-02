@@ -66,14 +66,13 @@ public partial class SimplexTerrain3D : Terrain3D
     /// </summary>
     public override void _Ready()
     {
-        if (Multiplayer.IsServer())
-        {
-            if (_generateCalled && !Generated)
-            {
-                _Generate();
-                Generated = true;
-            }
-        }
+
+        // if (_generateCalled && !Generated)
+        // {
+        //     _Generate();
+        //     Generated = true;
+        // }
+
     }
     public override void Generate(bool generateLods, ShaderMaterial shaderMaterial = null)
     {
@@ -84,8 +83,8 @@ public partial class SimplexTerrain3D : Terrain3D
         _material = shaderMaterial;
         _generateCalled = true;
         Images = new NoiseImages();
-        // if (!Generated)
-        //     _Generate();
+        if (!Generated)
+            _Generate();
 
     }
 
