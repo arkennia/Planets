@@ -146,7 +146,7 @@ public partial class Player : CharacterBody3D
         GlobalPosition = PlayerData.SpawnPosition;
         //-(planet.GlobalPosition - GlobalPosition).Normalized();
         _up = UpDirection = PlayerData.Up;
-        PlanetNode p = ServerManager.Planets[PlayerData.SpawnPlanet];
+        PlanetNode p = ServerManager.Systems[PlayerData.SpawnPlanet];
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         // ProcessMode = ProcessModeEnum.Pausable;

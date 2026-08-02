@@ -131,8 +131,8 @@ public partial class PlayerPeer : Player
         GlobalPosition = PlayerData.SpawnPosition;
         //-(planet.GlobalPosition - GlobalPosition).Normalized();
         _up = UpDirection = PlayerData.Up;
-        PlanetNode p = GameManager.Planets[PlayerData.SpawnPlanet];
-        _ChangeMotionMode(p, PlayerData.Up);
+        //PlanetNode p = GameManager.Systems[PlayerData.SpawnPlanet];
+        //_ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         // ProcessMode = ProcessModeEnum.Pausable;
         // SetPhysicsProcess(true);

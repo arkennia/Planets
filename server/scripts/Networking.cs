@@ -79,9 +79,9 @@ public partial class Networking : Node
         // int newPlayerId = Multiplayer.GetRemoteSenderId();
         // _players[newPlayerId] = newPlayerInfo;
         Player p = new(id);
-        
+
         ServerManager.AddPlayer(id, p);
-        
+
         GetTree().CurrentScene.GetNode<Node>("Game").AddChild(p);
         GD.Print("Currently connected players: " + ServerManager.ConnectedPlayers.ToString());
         foreach (Player player in ServerManager.ConnectedPlayers.Values)
@@ -103,38 +103,66 @@ public partial class Networking : Node
         RpcId(Multiplayer.GetRemoteSenderId(), MethodName.SendPeerData, id, ServerManager.ConnectedPlayers[id].PlayerData.ToProto().ToByteArray());
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void GetPlanets(byte[] guid, int seed, Array<float> heights)
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetSolarSystems(byte[] guid, int seed)
     {
-        GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
-        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Planets.Count);
+        GD.Print("GetSolarSystems called by: " + Multiplayer.GetRemoteSenderId());
+        foreach (SolarSystemNode system in ServerManager.Systems.Values)
+        {
+            RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetSolarSystems, system.Guid.ToByteArray(), seed);
+            RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, system.Planets.Count);
+            foreach (PlanetNode p in system.Planets.Values)
+            {
+                GD.Print("Sent Planet GUID: " + p.Guid.ToString());
+                RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanet,
+                    p.Guid.ToByteArray(),
+                    p.PlanetTerrain.Seed,
+                    new Array<double>(p.PlanetTerrain.Heights),
+                    system.Guid.ToByteArray());
+            }
+        }
+        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetSolarSystems, 1, 0);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetSun(byte[] guid, byte[] systemGuid, int radius)
+    {
+        
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void GetPlanet(byte[] guid, int seed, Array<double> heights, byte[] systemGuid)
+    {
+        // GD.Print("Method called by: " + Multiplayer.GetRemoteSenderId());
+        //RpcId(Multiplayer.GetRemoteSenderId(), MethodName.NumPlanets, ServerManager.Systems.Count);
         // for (int i = 0; i < ServerManager.Planets.Count; i++)
         // {
         //     GD.Print("Sent GUID: " + ServerManager.Planets[i].Planet.Guid.ToString());
         //     RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
         //         ServerManager.Planets[i].Planet.Guid.ToByteArray(),
         //         ServerManager.Planets[i].PlanetTerrain.Seed,
-        //         new Array<float>(ServerManager.Planets[i].PlanetTerrain.Heights));
+        //         new Array<double>(ServerManager.Planets[i].PlanetTerrain.Heights));
         // }
-        foreach (PlanetNode p in ServerManager.Planets.Values)
-        {
-            GD.Print("Sent Planet GUID: " + p.Planet.Guid.ToString());
-            RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets,
-                p.Planet.Guid.ToByteArray(),
-                p.PlanetTerrain.Seed,
-                new Array<double>(p.PlanetTerrain.Heights));
-        }
-        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1, 0, new Array<float>());
+        // foreach (PlanetNode p in ServerManager.Systems.Values)
+        // {
+        GD.Print("Sent Planet GUID: " + new Guid(guid).ToString());
+        RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanet, guid, seed, heights, systemGuid);
+        // }
+        // RpcId(Multiplayer.GetRemoteSenderId(), MethodName.GetPlanets, 1, 0, new Array<double>());
 
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void NumPlanets(int numPlanets)
+    private void NumPlanets(int numPlanets, byte[] systemGuid)
     {
         GD.Print("NumPlanets Method called by: " + Multiplayer.GetRemoteSenderId());
-
-        GD.Print($"NumPlanets called. Value sent: {ServerManager.Planets.Count}");
+        GD.Print($"NumPlanets called. Value sent: {numPlanets} for system {new Guid(systemGuid).ToString()}");
     }
+    // {
+    //     GD.Print("NumPlanets Method called by: " + Multiplayer.GetRemoteSenderId());
+
+    //     GD.Print($"NumPlanets called. Value sent: {ServerManager.Systems.Count}");
+    // }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void SendPlayerData()
@@ -211,7 +239,7 @@ public partial class Networking : Node
         GD.Print("Disconnect: " + id);
         // _players.Remove(id);
         ServerManager.ConnectedPlayers[id].Save();
-        ServerManager.RemovePlayer(id);        
+        ServerManager.RemovePlayer(id);
         EmitSignal(SignalName.PlayerDisconnected, id);
     }
 

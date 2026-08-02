@@ -1,0 +1,16 @@
+syntax="proto3";
+package Planets;
+
+option csharp_namespace = "Planets";
+
+import "ProtoVector3.proto";
+
+message PlayerMovementProto {
+    ProtoVector3 CurrentGlobalPosition = 1;
+    ProtoVector3 Velocity = 2;
+    ProtoVector3 Rotation = 3;
+    ProtoVector3 Up = 4;
+    ProtoVector3 MovementDirection = 5;
+    bool IsJumping = 6;
+    bool IsInAir = 7;
+}

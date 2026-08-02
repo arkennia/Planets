@@ -9,8 +9,8 @@ namespace Planets.Server;
 
 public partial class ServerManager : Node
 {
-    public static Dictionary<string, PlanetNode> Planets { get => _planets; }
-    private readonly static Dictionary<string, PlanetNode> _planets = [];
+    public static Dictionary<string, SolarSystemNode> Systems { get => _systems; }
+    private readonly static Dictionary<string, SolarSystemNode> _systems = [];
 
     public static Dictionary<long, Player> ConnectedPlayers { get => _playerObjects; }
     private static Dictionary<long, Player> _playerObjects = [];
@@ -32,9 +32,9 @@ public partial class ServerManager : Node
 
     }
 
-    public static void AddPlanet(PlanetNode planet)
+    public static void AddSolarSystem(SolarSystemNode system)
     {
-        _planets.Add(planet.Planet.Guid.ToString(), planet);
+        _systems.Add(system.Guid.ToString(), system);
         //PlanetSpawner.AddSpawnableScene(planet.SaveLocation);
         // GD.Print(PlanetSpawner.GetSpawnableScene(0));
     }
@@ -62,7 +62,7 @@ public partial class ServerManager : Node
 
             if (p.PlayerData.SpawnPlanet == string.Empty)
             {
-                SetPlayerSpawn(p, _planets.Values.ToArray()[0]);
+                SetPlayerSpawn(p, _systems.Values.ToArray()[0].Planets.Values.ToArray()[0]);
             }
         }
     }

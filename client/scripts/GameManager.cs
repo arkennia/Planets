@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Godot.Collections;
 using Planets.SystemGenerator;
@@ -32,8 +33,10 @@ public partial class GameManager : Node
         Exit,
     }
     public static GameManager Instance { get; private set; }
-    public static Dictionary<string, PlanetNode> Planets => _planets;
-    private readonly static Dictionary<string, PlanetNode> _planets = [];
+    public static Dictionary<string, SolarSystemNode> Systems => _systems;
+    private readonly static Dictionary<string, SolarSystemNode> _systems = [];
+
+    public static PlanetNode Planet { get; set; }
 
     public State CurrentState => _machine.State;
 
@@ -84,20 +87,48 @@ public partial class GameManager : Node
         GD.Print("Current state in constructor: " + _machine.State);
     }
 
-    public static void AddPlanet(PlanetNode p)
+    public static void AddSolarSystem(SolarSystemNode system)
     {
-        string guid = p.Planet.Guid.ToString();
-        if (!_planets.TryGetValue(guid, out PlanetNode value))
+        string guid = system.Guid.ToString();
+        if (!_systems.TryGetValue(guid, out SolarSystemNode value))
         {
-            _planets[guid] = p;
+            _systems[guid] = system;
         }
     }
 
-    public static void RemovePlanet(PlanetNode p)
+    public static void RemoveSystem(SolarSystemNode system)
     {
-        string guid = p.Planet.Guid.ToString();
-        _planets[guid].QueueFree();
-        _planets.Remove(guid);
+        // string guid = p.Planet.Guid.ToString();
+        // _systems[guid].QueueFree();
+        // _systems.Remove(guid);
+    }
+
+    public static void AddPlanet(PlanetNode p, Guid systemGuid)
+    {
+        string guid = systemGuid.ToString();
+        if (_systems.TryGetValue(guid, out SolarSystemNode system))
+        {
+            system.Planets[p.Planet.Guid.ToString()] = p;
+        }
+    }
+
+    public static void RemovePlanet(PlanetNode p, Guid systemGuid)
+    {
+        string guid = systemGuid.ToString();
+        if (_systems.TryGetValue(guid, out SolarSystemNode system))
+        {
+            system.Planets[p.Planet.Guid.ToString()].QueueFree();
+            system.Planets.Remove(p.Planet.Guid.ToString());
+        }
+    }
+
+    private void LoadWorld()
+    {
+        SolarSystemNode solarSystemNode = new();
+        solarSystemNode.Generate();
+        AddSolarSystem(solarSystemNode);
+        GetTree().Root.GetNode("/root/Main/Game/World").AddChild(solarSystemNode);
+        Instance.WorldLoaded();
     }
 
     public void ConnectToServer() => _machine.Fire(Triggers.Connect);
@@ -125,17 +156,18 @@ public partial class GameManager : Node
     private void _OnConnectingEntry()
     {
         GD.Print("Connecting State entered.");
-        Error e = Networking.Instance.CallDeferred(Networking.MethodName.ConnectToServer).As<Error>();
-        if (e == Error.Ok)
-        {
-            ConnectedToServer();
-            GD.Print("Connected to server!");
-        }
-        else
-        {
-            GD.Print("Failed to connect to server!: " + e.ToString());
-            ConnectionFailed();
-        }
+        // Error e = Networking.Instance.CallDeferred(Networking.MethodName.ConnectToServer).As<Error>();
+        // if (e == Error.Ok)
+        // {
+        //     ConnectedToServer();
+        //     GD.Print("Connected to server!");
+        // }
+        // else
+        // {
+        //     GD.Print("Failed to connect to server!: " + e.ToString());
+        //     ConnectionFailed();
+        // }
+        ConnectedToServer();
     }
 
     private void _OnConnectingExit()
@@ -148,6 +180,7 @@ public partial class GameManager : Node
         if (GetTree().CurrentScene is Client c)
         {
             c.ShowLoadingScreen();
+            Instance.LoadWorld();
         }
         // Networking.Instance.CallDeferred(Networking.MethodName.BeginPlanetSync);
     }
@@ -167,7 +200,7 @@ public partial class GameManager : Node
         if (GetTree().CurrentScene.GetNode<Game>("%Game") is Game g)
         {
             g.SetupPlayer();
-            Networking.Instance.BeginPlayerDataSync();
+            // Networking.Instance.BeginPlayerDataSync();
         }
         else
         {
@@ -181,7 +214,7 @@ public partial class GameManager : Node
         // {
         //     c.RemoveLoadingScreen();
         // }
-        Networking.Instance.RequestPlayerSpawn();
+        //Networking.Instance.RequestPlayerSpawn();
     }
 
     private void _OnExitingEntry()

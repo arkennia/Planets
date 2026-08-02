@@ -1,0 +1,18 @@
+syntax="proto3";
+package Planets;
+
+option csharp_namespace = "Planets";
+
+import "ProtoVector3.proto";
+
+message PlayerDataProto {
+    ProtoVector3 Position = 1;
+    ProtoVector3 SpawnPosition = 2;
+    ProtoVector3 Up = 3;
+    int32 Speed = 4;
+    int32 JumpSpeed = 5;
+    double MouseSensitivity = 6;
+    string SpawnPlanet = 7;
+    string CurrentPlanet = 8;
+    string Uuid = 9;
+}

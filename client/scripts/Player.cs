@@ -69,7 +69,7 @@ public partial class Player : CharacterBody3D
 
     public override void _Ready()
     {
-        
+
         Input.MouseMode = Input.MouseModeEnum.Captured;
         _camera = GetNode<Camera3D>("./Pivot/MainCamera");
         _pivot = GetNode<Node3D>("Pivot");
@@ -78,6 +78,9 @@ public partial class Player : CharacterBody3D
         FloorSnapLength = 0.5f;
         ProcessMode = ProcessModeEnum.Disabled;
         SetPhysicsProcess(false);
+        SetCollisionLayerValue(1, true);
+        SetCollisionMaskValue(1, false);
+        SetCollisionMaskValue(2, true);
     }
 
     /// <summary>
@@ -90,7 +93,7 @@ public partial class Player : CharacterBody3D
         DisableMovement();
         GlobalPosition = PlayerData.SpawnPosition;
         _up = UpDirection = PlayerData.Up;
-        PlanetNode p = GameManager.Planets[PlayerData.SpawnPlanet];
+        PlanetNode p = GameManager.Systems.Values.First().Planets[PlayerData.SpawnPlanet];
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
@@ -184,26 +187,6 @@ public partial class Player : CharacterBody3D
 
             }
         }
-        PlayerMovementProto movement = new()
-        {
-            CurrentGlobalPosition = ProtoUtils.GodotToProtoVector3(GlobalPosition),
-            Rotation = ProtoUtils.GodotToProtoVector3(Rotation),
-            Velocity = ProtoUtils.GodotToProtoVector3(Velocity),
-            Up = ProtoUtils.GodotToProtoVector3(_up),
-            MovementDirection = ProtoUtils.GodotToProtoVector3(direction),
-            IsJumping = jumpedLocal,
-            IsInAir = _isInAir
-        };
-        Networking.Instance.RpcId(1, Networking.MethodName.RequestMovement, movement.ToByteArray());
-        MoveAndSlide();
-
-        for (int i = 0; i < GetSlideCollisionCount(); i++)
-        {
-            KinematicCollision3D collision = GetSlideCollision(i);
-            Node collider = (Node)collision.GetCollider();
-            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
-            _ChangeMotionMode(cParent, _up);
-        }
         // Raycast for detecting where the ground is, and for calculating the ground normal. It then snaps the player to the floor.
 
         if (!_isInAir && MotionMode == MotionModeEnum.Grounded)
@@ -213,24 +196,35 @@ public partial class Player : CharacterBody3D
             PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
             query.Exclude = [GetRid()];
             query.CollisionMask = CollisionMask;
-            query.HitFromInside = true;
+            // query.HitFromInside = true;
             Dictionary result = spaceState.IntersectRay(query);
-            Control debugUI = GetNodeOrNull<Control>("%DebugUI");
+            Control debugUI = GetTree().Root.GetNodeOrNull<Control>("/root/Main/Game/DebugUI");
             if (debugUI != null)
             {
-                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
+                GetNode<Label>("/root/Main/Game/DebugUI/VBoxContainer/HBoxContainer/PlayerPosition").Text =
                     Position.ToString("F");
-                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
-                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
-                GetNode<Label>("%DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
+                GetNode<Label>("/root/Main/Game/DebugUI/VBoxContainer/HBoxContainer2/RayDest").Text = dest.ToString("F");
+                GetNode<Label>("/root/Main/Game/DebugUI/VBoxContainer/HBoxContainer3/Result").Text = result.ToString();
+                GetNode<Label>("/root/Main/Game/DebugUI/VBoxContainer/HBoxContainer4/Up").Text = _up.ToString("F");
             }
 
             if (result.Count > 0)
             {
                 _up = UpDirection = (Vector3)result["normal"];
-                //ApplyFloorSnap();
+                ApplyFloorSnap();
             }
         }
+        MoveAndSlide();
+
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            KinematicCollision3D collision = GetSlideCollision(i);
+            Node collider = (Node)collision.GetCollider();
+            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
+            _ChangeMotionMode(cParent, _up);
+            GD.Print("Collided with: " + collider.Name);
+        }
+
     }
 
     public void DisableMovement()

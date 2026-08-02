@@ -43,8 +43,6 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_im5ka")
 metadata/Radius = 60
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_da3od"]
-
 [node name="Main" type="Node" unique_id=289716009]
 script = ExtResource("1_4tr0r")
 LoadingScreenScene = ExtResource("2_r26j7")
@@ -78,6 +76,3 @@ anchors_preset = -1
 unique_name_in_owner = true
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 script = null
-
-[node name="PlayerSync" type="MultiplayerSynchronizer" parent="Game" unique_id=1192230750]
-replication_config = SubResource("SceneReplicationConfig_da3od")

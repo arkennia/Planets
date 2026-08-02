@@ -23,7 +23,6 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Networking="*res://scripts/Networking.cs"
 UiManager="*res://scripts/ui/UiManager.cs"
 GameManager="*res://scripts/GameManager.cs"
 

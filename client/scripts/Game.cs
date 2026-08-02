@@ -49,12 +49,15 @@ public partial class Game : Node
     public void SetupPlayer()
     {
         GD.Print("Setting up player");
-        _planetNode = GameManager.Planets.Values.First();
+        _planetNode = GameManager.Systems.Values.First().Planets.Values.First();
         Player = GetNode<InstancePlaceholder>("%Player").CreateInstance(true) as Player;
-        //_SetSpawnPoint();
-        Networking.Player = Player;
+        if (Player.PlayerData == null)
+        {
+            Player.PlayerData = new PlayerData();
+        }
+        _SetSpawnPoint();
+        //Networking.Player = Player;
         GameManager.Instance.PlayerSetupComplete();
-
     }
 
     private void _Load()
@@ -102,6 +105,9 @@ public partial class Game : Node
         GD.Print($"Spawn Global Position:{spawn.Node.GlobalPosition}");
         // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
         // Player.GlobalPosition = spawn;
+        Player.PlayerData.SpawnPlanet = _planetNode.Planet.Guid.ToString();
+        Player.PlayerData.SpawnPosition = spawn.Node.GlobalPosition;
+        Player.PlayerData.Up = spawn.Normal;
         Player.Spawn();
     }
 
