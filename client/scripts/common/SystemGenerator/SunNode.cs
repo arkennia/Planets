@@ -24,6 +24,23 @@ public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
 
     private Mesh _mesh;
 
+    public void Generate(int radius)
+    {
+        Sun ??= new Sun(radius: radius);
+        _mesh = new SphereMesh
+        {
+            Radius = Sun.Radius,
+            Height = Sun.Radius * 2,
+            RadialSegments = 32,
+            Rings = 16,
+        };
+        SunMesh = new MeshInstance3D
+        {
+            Mesh = _mesh,
+        };
+        AddChild(SunMesh);
+    }
+
     public void Generate()
     {
         Sun ??= new Sun();

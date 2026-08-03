@@ -40,13 +40,35 @@ public partial class SolarSystemNode : Node3D
 		Name = "SolarSystem";
 		Sun = new SunNode();
 		AddChild(Sun);
-		Sun.Generate();
+		Sun.Generate(1000);
 
-		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 50);
-		// p = PlanetGenerator.GeneratePlanet(scale: 50, seed: (int)p.PlanetTerrain.Seed, heights: new Array<double>(p.PlanetTerrain.Heights), guid: p.Guid);
-		p.Position = new Vector3(10000, 0, 0);
+		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 250);
+		p.Position = new Vector3(50000, 0, 0);
 		Planets[p.Guid.ToString()] = p;
 		AddChild(p);
-		p.Save();
+
+		ReparentChildren(this);
+
+		// PackedScene ps = new();
+		// ps.Pack(this);
+		// string fullPath = $"res://scenes/solarsystems/{Guid}.tscn";
+		// ResourceSaver.Save(ps, fullPath, ResourceSaver.SaverFlags.Compress);
+	}
+
+	private void ReparentChildren(Node node = null)
+	{
+		if (node == null)
+		{
+			return;
+		}
+		else
+		{
+			foreach (var child in node.GetChildren(true))
+			{
+				child.Owner = this;
+				GD.Print("Reparented child: " + child.GetType().Name + " " + child.Name + " to owner: " + Name);
+				ReparentChildren(child);
+			}
+		}
 	}
 }
