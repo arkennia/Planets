@@ -37,10 +37,19 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
 
     private Mesh _mesh = ResourceLoader.Load<Mesh>("res://scripts/common/meshes/planets/Icosphere.res");
 
+    private SunNode _sunNode;
+
     public override void _Ready()
     {
         // PlanetArea = GetNode<Area3D>($"./{Planet.Area3DName}");
+        _sunNode = GameManager.GetPlanetSolarSystemNode(this)?.Sun;
     }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        Rotate(Vector3.Up, Planet.RotationalVelocity * (float)delta);
+    }
+
     public Terrain3D.SpawnPoint GetSpawnPoint()
     {
         RandomNumberGenerator rng = new()

@@ -108,7 +108,7 @@ public partial class Player : CharacterBody3D
             PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(Position, dest);
             query.Exclude = [GetRid()];
             query.CollisionMask = CollisionMask;
-            // query.HitFromInside = true;
+            query.HitFromInside = true;
             Godot.Collections.Dictionary result = spaceState.IntersectRay(query);
             if (result.Count > 0)
             {

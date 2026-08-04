@@ -30,6 +30,9 @@ public partial class SolarSystemNode : Node3D
 	[Export]
 	public Vector3 Sector { get; private set; } = Vector3.Zero;
 
+	[Export]
+	public string SaveLocation { get; set; } = "res://scenes/solarsystems";
+
 	public Guid Guid { get; private set; } = Guid.Empty;
 
 
@@ -42,17 +45,20 @@ public partial class SolarSystemNode : Node3D
 		AddChild(Sun);
 		Sun.Generate(1000);
 
-		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 250);
-		p.Position = new Vector3(50000, 0, 0);
+		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 50);
+		p.Position = new Vector3(10000, 0, 0);
 		Planets[p.Guid.ToString()] = p;
 		AddChild(p);
+	}
 
+	public void Save()
+	{
 		ReparentChildren(this);
 
-		// PackedScene ps = new();
-		// ps.Pack(this);
-		// string fullPath = $"res://scenes/solarsystems/{Guid}.tscn";
-		// ResourceSaver.Save(ps, fullPath, ResourceSaver.SaverFlags.Compress);
+		PackedScene ps = new();
+		ps.Pack(this);
+		string fullPath = $"res://scenes/solarsystems/{Guid}.tscn";
+		ResourceSaver.Save(ps, fullPath, ResourceSaver.SaverFlags.Compress);
 	}
 
 	private void ReparentChildren(Node node = null)

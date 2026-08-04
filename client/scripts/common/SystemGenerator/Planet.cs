@@ -33,6 +33,9 @@ public partial class Planet : Resource, ICelestialBody
     [Export]
     public int Scale { get; set; }
 
+    [Export]
+    public double RotationalVelocity { get; set; } = 0.1f;
+
 
     [Export]
     public Vector3 Sector { get; private set; } = Vector3.Zero;

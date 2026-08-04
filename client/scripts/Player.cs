@@ -94,6 +94,7 @@ public partial class Player : CharacterBody3D
         GlobalPosition = PlayerData.SpawnPosition;
         _up = UpDirection = PlayerData.Up;
         PlanetNode p = GameManager.Systems.Values.First().Planets[PlayerData.SpawnPlanet];
+
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
@@ -196,7 +197,7 @@ public partial class Player : CharacterBody3D
             PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(GlobalPosition, dest);
             query.Exclude = [GetRid()];
             query.CollisionMask = CollisionMask;
-            // query.HitFromInside = true;
+            query.HitFromInside = true;
             Dictionary result = spaceState.IntersectRay(query);
             Control debugUI = GetTree().Root.GetNodeOrNull<Control>("/root/Main/Game/DebugUI");
             if (debugUI != null)
@@ -256,12 +257,13 @@ public partial class Player : CharacterBody3D
             GD.Print($"Current Planet GUID: {Planet.Name}");
             Gravity = node.PlanetArea.Gravity;
             GD.Print($"Current gravity: {node.PlanetArea.Gravity} {node.PlanetArea.GravityDirection}");
+            Reparent(Planet);
             // ApplyFloorSnap();
         }
         else if (MotionMode == MotionModeEnum.Grounded && node is not null && _isInAir)
         {
             _isInAir = false;
-            // GD.Print($"Is in air: {_isInAir}");
+            GD.Print($"Is in air: {_isInAir}");
         }
     }
 

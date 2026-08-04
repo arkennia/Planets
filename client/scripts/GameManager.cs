@@ -122,6 +122,18 @@ public partial class GameManager : Node
         }
     }
 
+    public static SolarSystemNode GetPlanetSolarSystemNode(PlanetNode p)
+    {
+        foreach (var system in _systems.Values)
+        {
+            if (system.Planets.ContainsKey(p.Planet.Guid.ToString()))
+            {
+                return system;
+            }
+        }
+        return null;
+    }
+
     private void LoadWorld()
     {
         SolarSystemNode solarSystemNode = new();
@@ -129,6 +141,7 @@ public partial class GameManager : Node
         AddSolarSystem(solarSystemNode);
         GetTree().Root.GetNode("/root/Main/Game/World").AddChild(solarSystemNode);
         Instance.WorldLoaded();
+        // solarSystemNode.Save();
     }
 
     public void ConnectToServer() => _machine.Fire(Triggers.Connect);
