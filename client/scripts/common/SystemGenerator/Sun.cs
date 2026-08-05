@@ -17,7 +17,23 @@ public partial class Sun : Resource, ICelestialBody
     public string Name { get; set; } = "Sol";
 
     [Export]
-    public int Radius { get; set; } = 100;
+    public int Radius { get; set; } = 50;
+
+    [Export]
+    public int AreaSize { get; set; } = 100;
+
+    [Export]
+    public double Attenuation { get; set; } = 0.4;
+
+    [Export]
+    public int Range { get; set; } = 100000;
+
+    [Export]
+    public double Energy { get; set; } = 150;
+
+    [Export]
+    public StandardMaterial3D StandardMaterial { get; set; } = ResourceLoader.Load<StandardMaterial3D>("res://scripts/common/materials/sun_material.tres")
+        .Duplicate() as StandardMaterial3D;
 
     [Export]
     public Vector3 Sector { get; private set; } = Vector3.Zero;

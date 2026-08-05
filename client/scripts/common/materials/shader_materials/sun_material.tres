@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://7sd0g427o4sp"]
+
+[ext_resource type="Shader" uid="uid://b5d3oawxqsyfl" path="res://scripts/common/materials/shader_materials/sun_shader.tres" id="1_26fc8"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_26fc8")

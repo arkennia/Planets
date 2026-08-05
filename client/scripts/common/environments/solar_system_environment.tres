@@ -1,0 +1,14 @@
+[gd_resource type="Environment" format=3 uid="uid://cb76q4ou78jek"]
+
+[sub_resource type="Sky" id="Sky_da3od"]
+
+[resource]
+background_mode = 1
+background_color = Color(0, 0, 0.047058824, 1)
+background_energy_multiplier = 2.08
+sky = SubResource("Sky_da3od")
+ambient_light_source = 2
+ambient_light_color = Color(0.7921569, 0.8235294, 0.57254905, 1)
+ambient_light_energy = 0.3
+sdfgi_enabled = true
+glow_enabled = true

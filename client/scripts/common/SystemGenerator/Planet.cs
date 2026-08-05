@@ -34,7 +34,7 @@ public partial class Planet : Resource, ICelestialBody
     public int Scale { get; set; }
 
     [Export]
-    public double RotationalVelocity { get; set; } = 0.1f;
+    public double RotationalVelocity { get; set; } = 0.01f;
 
 
     [Export]

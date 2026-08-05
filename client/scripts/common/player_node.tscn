@@ -23,6 +23,7 @@ script = ExtResource("1_72p8a")
 transform = Transform3D(3.333333, 0, 0, 0, 3.333333, 0, 0, 0, 3.333333, 0, 1.5389407, -0.34487972)
 current = true
 fov = 34.5
+far = 100000.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=589251781]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.90819395, 0)

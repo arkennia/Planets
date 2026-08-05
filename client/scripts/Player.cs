@@ -21,7 +21,7 @@ public partial class Player : CharacterBody3D
     /// Speed of the player.
     /// </summary>
     [Export]
-    public int Speed { get; set; } = 20;
+    public int Speed { get; set; } = 10;
 
     /// <summary>
     /// Upward momentary speed when jumping.

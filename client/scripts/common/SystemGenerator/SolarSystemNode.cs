@@ -8,7 +8,7 @@ namespace Planets.SystemGenerator;
 /// The <c>SolarSystemNode</c> class inherits Node3D, and is a container for all solar system objects. <br/>
 /// It is used to generate a solar system in the scene tree.
 /// </summary>
-public partial class SolarSystemNode : Node3D
+public partial class SolarSystemNode : WorldEnvironment
 {
 	/// <summary>
 	/// The <c>SunNode</c> object that is the center of the solar system. <br/>
@@ -35,6 +35,10 @@ public partial class SolarSystemNode : Node3D
 
 	public Guid Guid { get; private set; } = Guid.Empty;
 
+	public override void _Ready()
+	{
+		Environment = ResourceLoader.Load("res://scripts/common/environments/solar_system_environment.tres").Duplicate() as Godot.Environment;
+	}
 
 	public void Generate(Guid? guid = null)
 	{
@@ -43,10 +47,10 @@ public partial class SolarSystemNode : Node3D
 		Name = "SolarSystem";
 		Sun = new SunNode();
 		AddChild(Sun);
-		Sun.Generate(1000);
+		Sun.Generate(10000);
 
 		PlanetNode p = PlanetGenerator.GeneratePlanet(scale: 50);
-		p.Position = new Vector3(10000, 0, 0);
+		p.Position = new Vector3(50000, 0, 0);
 		Planets[p.Guid.ToString()] = p;
 		AddChild(p);
 	}

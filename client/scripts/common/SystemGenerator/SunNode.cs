@@ -42,6 +42,7 @@ public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
             Height = Sun.Radius * 2,
             RadialSegments = 32,
             Rings = 16,
+            Material = Sun.StandardMaterial,
         };
         SunMesh = new MeshInstance3D
         {
@@ -54,7 +55,7 @@ public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
         {
             Shape = new SphereShape3D
             {
-                Radius = Sun.Radius * 5,
+                Radius = Sun.AreaSize,
             },
         };
         SunArea.AddChild(collisionShape);
@@ -62,10 +63,11 @@ public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
 
         SunLight = new OmniLight3D
         {
-            OmniAttenuation = 0.1f,
-            OmniRange = 100000,
+            OmniAttenuation = Sun.Attenuation,
+            OmniRange = Sun.Range,
             OmniShadowMode = OmniLight3D.ShadowMode.Cube,
-            LightEnergy = 300,
+            LightEnergy = Sun.Energy,
+            ShadowEnabled = true,
         };
         AddChild(SunLight);
     }
@@ -74,5 +76,4 @@ public partial class SunNode : Node3D, ICelestialBodyNode<Sun>
     {
         throw new NotImplementedException();
     }
-
 }

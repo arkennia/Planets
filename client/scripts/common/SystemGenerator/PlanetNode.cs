@@ -118,6 +118,7 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             terrain.FromHeights(false, seed, heights, Planet.ShaderMaterial);
         }
 
+        terrain.GIMode = GeometryInstance3D.GIModeEnum.Dynamic;
         StaticBody3D sB = new()
         {
             CollisionLayer = 0b10

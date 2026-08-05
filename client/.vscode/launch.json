@@ -10,13 +10,21 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "D:\\CustomGodotBinary\\godot.windows.editor.double.x86_64.mono.exe",
-            "args": ["--debug", "--remote-debug" ,"tcp://127.0.0.1:6007"],
+            "args": [
+                "--debug",
+                "--remote-debug",
+                "tcp://127.0.0.1:6007"
+            ],
             "symbolOptions": {
-                "searchPaths": ["D:\\GodotProjects\\planets\\.godot\\mono\\temp\\bin\\Debug"],
+                "searchPaths": [
+                    "D:\\GodotProjects\\planets\\.godot\\mono\\temp\\bin\\Debug"
+                ],
                 "searchMicrosoftSymbolServer": true,
                 "searchNuGetOrgSymbolServer": false
             },
-            "logging": {"diagnosticsLog": {}},
+            "logging": {
+                "diagnosticsLog": {}
+            },
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "stopAtEntry": false,
