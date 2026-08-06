@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://knfgbfy5ehec"]
+
+[ext_resource type="ArrayMesh" uid="uid://c71byj5v0c2a7" path="res://meshes/Blender/spaceship.res" id="1_esq3j"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2oxxn"]
+size = Vector3(5, 210.94676211322712, 301.41427865382684)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3uvgd"]
+size = Vector3(5, 211.6574092310684, 53.13742381708994)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vm0mt"]
+size = Vector3(601.0319456723846, 5, 305.726335463909)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_esq3j"]
+size = Vector3(603.2243752273225, 5, 212.50742893571987)
+
+[node name="Node3D" type="CharacterBody3D" unique_id=1039270705]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=607281317]
+mesh = ExtResource("1_esq3j")
+
+[node name="WindowCollider" type="CollisionShape3D" parent="." unique_id=1827847532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2124459376322464, 104.89396297696335, -147.7448410220608)
+shape = SubResource("BoxShape3D_2oxxn")
+
+[node name="LeftDoorCollider" type="CollisionShape3D" parent="." unique_id=1056851999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 595.4110672586163, 104.69999999999709, -23.502695039247673)
+shape = SubResource("BoxShape3D_3uvgd")
+
+[node name="RightDoorCollider" type="CollisionShape3D" parent="." unique_id=1422346764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 595.8841712427369, 104.75132572986077, -274.1510657458713)
+shape = SubResource("BoxShape3D_3uvgd")
+
+[node name="FloorCollider" type="CollisionShape3D" parent="." unique_id=984784240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 298.00429015170204, 1.353000000002794, -145.93336230865143)
+shape = SubResource("BoxShape3D_vm0mt")
+
+[node name="RoofCollider" type="CollisionShape3D" parent="." unique_id=1019521803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 297.6235661433321, 207.79042678757074, -148.10216378671726)
+shape = SubResource("BoxShape3D_vm0mt")
+
+[node name="RightWallCollider" type="CollisionShape3D" parent="." unique_id=1948928421]
+transform = Transform3D(1, 0, 0, 0, 6.123233995736766e-17, -1, 0, 1, 6.123233995736766e-17, 297.567761117823, 105.08512496805535, -295.59763787915705)
+shape = SubResource("BoxShape3D_esq3j")
+
+[node name="LeftWallCollider" type="CollisionShape3D" parent="." unique_id=2089277726]
+transform = Transform3D(1, 0, 0, 0, 6.123233995736766e-17, -1, 0, 1, 6.123233995736766e-17, 297.567761117823, 105.08512496805535, 0.7507464034868158)
+shape = SubResource("BoxShape3D_esq3j")

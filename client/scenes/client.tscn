@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://gqyfs0rbresq" path="res://scenes/game_ui.tscn" id="3_t0ykn"]
 [ext_resource type="Script" uid="uid://b8ovwpsgexm14" path="res://scripts/Game.cs" id="4_da3od"]
 [ext_resource type="PackedScene" uid="uid://wpa6nw1cmvpr" path="res://scenes/debug_ui.tscn" id="5_dipmf"]
+[ext_resource type="PackedScene" uid="uid://bxb2jgexlh3eo" path="res://meshes/Blender/spaceship.blend" id="7_dipmf"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rsb3r"]
 
@@ -77,3 +78,6 @@ anchors_preset = -1
 unique_name_in_owner = true
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 script = null
+
+[node name="spaceship" parent="Game" unique_id=2019930426 instance=ExtResource("7_dipmf")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0.7542432412813798)
