@@ -81,6 +81,7 @@ public partial class Player : CharacterBody3D
         SetCollisionLayerValue(1, true);
         SetCollisionMaskValue(1, false);
         SetCollisionMaskValue(2, true);
+        SetCollisionLayerValue(3, true);
     }
 
     /// <summary>

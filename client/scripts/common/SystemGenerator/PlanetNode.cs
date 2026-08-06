@@ -186,6 +186,11 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
                 p.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
                 p.Planet = this;
             }
+            else if (body is Ship s)
+            {
+                s.Planet = this;
+                s.PlanetGravity = Planet.Gravity;
+            }
         };
 
         PlanetArea.BodyExited += body =>
@@ -193,6 +198,13 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
             if (body is Player p)
             {
                 p.MotionMode = CharacterBody3D.MotionModeEnum.Floating;
+                p.Gravity = 0.0;
+                p.Planet = null;
+            }
+            else if (body is Ship s)
+            {
+                s.Planet = null;
+                s.PlanetGravity = 0.0;
             }
         };
     }

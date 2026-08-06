@@ -11,6 +11,10 @@ height = 1.9667969
 radius = 0.35
 height = 1.9
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dipmf"]
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.5
+
 [node name="Player" type="CharacterBody3D" unique_id=1200882408]
 transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
 collision_mask = 2
@@ -23,6 +27,7 @@ script = ExtResource("1_72p8a")
 transform = Transform3D(3.333333, 0, 0, 0, 3.333333, 0, 0, 0, 3.333333, 0, 1.5389407, -0.34487972)
 current = true
 fov = 34.5
+near = 0.009000000000000001
 far = 100000.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=589251781]
@@ -31,6 +36,15 @@ shape = SubResource("CapsuleShape3D_4m5hh")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1664254886]
 transform = Transform3D(0.9999998, 0, 0, 0, 0.9999998, 0, 0, 0, 0.9999998, 0, 0.908, 0)
+gi_mode = 2
 mesh = SubResource("CapsuleMesh_4m5hh")
+surface_material_override/0 = SubResource("StandardMaterial3D_dipmf")
 
 [node name="PlayerNode" type="Node3D" parent="." unique_id=2099452602]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1906282982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2691134393313805, 0)
+light_energy = 0.3
+light_size = 1.0
+omni_range = 50.0
+omni_attenuation = 0.44400000000000084

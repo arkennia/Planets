@@ -232,6 +232,6 @@ public partial class GameManager : Node
 
     private void _OnExitingEntry()
     {
-
+        
     }
 }

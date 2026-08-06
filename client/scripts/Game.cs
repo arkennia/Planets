@@ -109,6 +109,12 @@ public partial class Game : Node
         Player.PlayerData.SpawnPosition = spawn.Node.GlobalPosition;
         Player.PlayerData.Up = spawn.Normal;
         Player.Spawn();
+        var ship = ResourceLoader.Load<PackedScene>("res://scenes/ships/spaceship_prototype.tscn").Instantiate() as Ship;
+        ship.UpDirection = spawn.Normal;
+        GetNode("/root/Main/Game/World").AddChild(ship);
+        ship.GlobalPosition = spawn.Node.GlobalPosition;
+        ship.Planet = _planetNode;
+        ship.Reparent(_planetNode);
     }
 
     public void OnPlanetLoaded(PlanetNode planet)

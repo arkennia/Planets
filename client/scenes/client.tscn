@@ -80,4 +80,4 @@ transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 script = null
 
 [node name="spaceship" parent="Game" unique_id=2019930426 instance=ExtResource("7_dipmf")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0.7542432412813798)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -0.9548599217517475, 0.25685178649722634, 3.15991293002849)
