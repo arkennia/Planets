@@ -27,7 +27,7 @@ public partial class Player : CharacterBody3D
     /// Upward momentary speed when jumping.
     /// </summary>
     [Export]
-    public int JumpSpeed { get; set; } = 8;
+    public int JumpSpeed { get; set; } = 200;
 
     [Export]
     public double MouseSensitivty { get; set; } = 0.005f;
@@ -85,10 +85,8 @@ public partial class Player : CharacterBody3D
     }
 
     /// <summary>
-    /// Spawn the character at <paramref name="coords"/>.
+    /// Spawn the character.
     /// </summary>
-    /// <remarks><paramref name="coords"/> is in Global coordinates.
-    /// <param name="coords">The spawn location.</param>
     public void Spawn(/* Terrain3D.SpawnPoint sp, PlanetNode planet */)
     {
         DisableMovement();
@@ -145,7 +143,7 @@ public partial class Player : CharacterBody3D
     public override void _PhysicsProcess(double delta)
     {
         Vector3 direction = GetDirection();
-        bool jumpedLocal = _jumped;
+        // bool jumpedLocal = _jumped;
         _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
         _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
         if (MotionMode == MotionModeEnum.Grounded)
@@ -156,14 +154,16 @@ public partial class Player : CharacterBody3D
                 Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
                 Vector3 newX = newZ.Cross(_up).Normalized();
                 direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
-                _targetVelocity = _targetVelocity.Lerp(direction * Speed, 0.8f * (float)delta);
+                Velocity = direction * Speed;
+                // _targetVelocity = _targetVelocity.Lerp(direction * Speed, 0.8f * (float)delta);
                 if (_jumped)
                 {
-                    _targetVelocity += _up * JumpSpeed;
+                    // _targetVelocity += _up * JumpSpeed;
+                    Velocity += _up * JumpSpeed;
                     _jumped = false;
                 }
 
-                Velocity = _targetVelocity;
+                // Velocity = _targetVelocity;
             }
             else
             {
@@ -171,7 +171,8 @@ public partial class Player : CharacterBody3D
             }
             RotatePlayer((float)delta);
             if (Planet is not null && !IsOnFloor())
-                Velocity += -_up * Gravity * 50f * (float)delta;
+                Velocity += -_up * Gravity;
+            // Velocity += -_up * Gravity * 50f * (float)delta;
             // Apply gravity when not on the ground.
         }
         else
