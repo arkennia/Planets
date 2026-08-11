@@ -182,11 +182,12 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         {
             if (body is Player p)
             {
-                p.Gravity = Planet.Gravity;
-                p.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
+                // p.Gravity = Planet.Gravity;
+                // p.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
                 p.Planet = this;
+                // p.MovementLocation = Player.MovementLocationEnum.Planet;
             }
-            else if (body is Ship s)
+            if (body is Ship s)
             {
                 s.Planet = this;
                 s.PlanetGravity = Planet.Gravity;
@@ -197,11 +198,12 @@ public partial class PlanetNode : Node3D, ICelestialBodyNode<Planet>
         {
             if (body is Player p)
             {
-                p.MotionMode = CharacterBody3D.MotionModeEnum.Floating;
-                p.Gravity = 0.0;
+                // p.MotionMode = CharacterBody3D.MotionModeEnum.Floating;
+                // p.Gravity = 0.0;
                 p.Planet = null;
+                // p.MovementLocation = Player.MovementLocationEnum.Space;
             }
-            else if (body is Ship s)
+            if (body is Ship s)
             {
                 s.Planet = null;
                 s.PlanetGravity = 0.0;

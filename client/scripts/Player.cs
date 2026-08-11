@@ -36,7 +36,18 @@ public partial class Player : CharacterBody3D
     public double Gravity { get; set; }
     public PlanetNode Planet { get; set; }
 
+    public Ship Ship { get; set; }
+
     public PlayerData PlayerData { get; set; }
+
+    public MovementLocationEnum MovementLocation { get; set; } = MovementLocationEnum.Space;
+
+    public enum MovementLocationEnum
+    {
+        Planet,
+        Ship,
+        Space
+    }
 
     private Vector3 _targetVelocity = Vector3.Zero;
 
@@ -47,6 +58,8 @@ public partial class Player : CharacterBody3D
     private Camera3D _camera;
 
     private Node3D _pivot;
+
+    private Area3D _areaDetector;
 
     private Vector3 _up = Vector3.Up;
 
@@ -73,6 +86,7 @@ public partial class Player : CharacterBody3D
         Input.MouseMode = Input.MouseModeEnum.Captured;
         _camera = GetNode<Camera3D>("./Pivot/MainCamera");
         _pivot = GetNode<Node3D>("Pivot");
+        _areaDetector = GetNode<Area3D>("AreaDetector");
         MotionMode = MotionModeEnum.Floating;
         _ = InitUiSignals();
         FloorSnapLength = 0.5f;
@@ -81,7 +95,8 @@ public partial class Player : CharacterBody3D
         SetCollisionLayerValue(1, true);
         SetCollisionMaskValue(1, false);
         SetCollisionMaskValue(2, true);
-        SetCollisionLayerValue(3, true);
+        // SetCollisionLayerValue(3, true);
+        SetCollisionMaskValue(3, true);
     }
 
     /// <summary>
@@ -93,7 +108,7 @@ public partial class Player : CharacterBody3D
         GlobalPosition = PlayerData.SpawnPosition;
         _up = UpDirection = PlayerData.Up;
         PlanetNode p = GameManager.Systems.Values.First().Planets[PlayerData.SpawnPlanet];
-
+        MovementLocation = MovementLocationEnum.Planet;
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
         ProcessMode = ProcessModeEnum.Pausable;
@@ -143,37 +158,60 @@ public partial class Player : CharacterBody3D
     public override void _PhysicsProcess(double delta)
     {
         Vector3 direction = GetDirection();
+        MovementLocation = _DetectMovementAreas();
+        Gravity = _GetGravity(MovementLocation);
         // bool jumpedLocal = _jumped;
-        _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
-        _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
+        switch (MovementLocation)
+        {
+            case MovementLocationEnum.Planet:
+
+                break;
+            case MovementLocationEnum.Ship:
+
+                break;
+            default:
+                break;
+        }
+
         if (MotionMode == MotionModeEnum.Grounded)
         {
-            if (direction != Vector3.Zero)
-            {
-                // Translate the input direction(s) to actual world direction while on a planet.
-                Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
-                Vector3 newX = newZ.Cross(_up).Normalized();
-                direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
-                Velocity = direction * Speed;
-                // _targetVelocity = _targetVelocity.Lerp(direction * Speed, 0.8f * (float)delta);
-                if (_jumped)
-                {
-                    // _targetVelocity += _up * JumpSpeed;
-                    Velocity += _up * JumpSpeed;
-                    _jumped = false;
-                }
+            // if (direction != Vector3.Zero)
+            // {
+            //     // Translate the input direction(s) to actual world direction while on a planet.
+            //     Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+            //     Vector3 newX = newZ.Cross(_up).Normalized();
+            //     direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
+            //     Velocity = direction * Speed;
+            //     // _targetVelocity = _targetVelocity.Lerp(direction * Speed, 0.8f * (float)delta);
+            //     if (_jumped)
+            //     {
+            //         // _targetVelocity += _up * JumpSpeed;
+            //         Velocity += _up * JumpSpeed;
+            //         _jumped = false;
+            //     }
 
-                // Velocity = _targetVelocity;
-            }
-            else
+            //     // Velocity = _targetVelocity;
+            // }
+            // else
+            // {
+            //     Velocity = Vector3.Zero;
+            // }
+            // RotatePlayer((float)delta);
+            // if (Planet is not null && !IsOnFloor())
+            //     Velocity += -_up * Gravity;
+            if (MovementLocation == MovementLocationEnum.Planet)
             {
-                Velocity = Vector3.Zero;
+                _up = -(Planet.GlobalPosition - GlobalPosition).Normalized();
+                _UpdateCoordsUI(Planet.CalculatePosition(GlobalPosition));
+                _HandlePlanetMovement(direction, delta);
             }
-            RotatePlayer((float)delta);
-            if (Planet is not null && !IsOnFloor())
-                Velocity += -_up * Gravity;
-            // Velocity += -_up * Gravity * 50f * (float)delta;
-            // Apply gravity when not on the ground.
+            else if (MovementLocation == MovementLocationEnum.Ship)
+            {
+                _up = Ship.Up;
+                _UpdateCoordsUI(new Vector2(Ship.GlobalPosition.X, Ship.GlobalPosition.Y));
+                _HandleShipMovement(direction, delta);
+            }
+
         }
         else
         {
@@ -262,7 +300,7 @@ public partial class Player : CharacterBody3D
             Reparent(Planet);
             // ApplyFloorSnap();
         }
-        else if (MotionMode == MotionModeEnum.Grounded && node is not null && _isInAir)
+        else if (MotionMode == MotionModeEnum.Grounded /*&& node is not null*/ && _isInAir)
         {
             _isInAir = false;
             GD.Print($"Is in air: {_isInAir}");
@@ -311,5 +349,90 @@ public partial class Player : CharacterBody3D
         if (Input.IsActionPressed("MoveDown") &&
             MotionMode != MotionModeEnum.Grounded) direction.Y -= 1.0f;
         return direction.Normalized();
+    }
+
+    private MovementLocationEnum _DetectMovementAreas()
+    {
+        Array<Area3D> areas = _areaDetector.GetOverlappingAreas();
+        if (Ship is not null)
+        {
+            if (areas.Contains(Ship.ShipArea))
+            {
+                return MovementLocationEnum.Ship;
+            }
+        }
+        else if (Planet is not null)
+        {
+            if (areas.Contains(Planet.PlanetArea))
+            {
+                return MovementLocationEnum.Planet;
+            }
+        }
+        return MovementLocationEnum.Space;
+
+    }
+
+    private double _GetGravity(MovementLocationEnum movementLocation)
+    {
+        switch (movementLocation)
+        {
+            case MovementLocationEnum.Planet:
+                return Planet.Planet.Gravity;
+            case MovementLocationEnum.Ship:
+                return Ship.ShipGravity;
+            default:
+                return 0.0;
+        }
+    }
+
+    private void _HandlePlanetMovement(Vector3 direction, double delta)
+    {
+        if (direction != Vector3.Zero)
+        {
+            // Translate the input direction(s) to actual world direction while on a planet.
+            Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+            Vector3 newX = newZ.Cross(_up).Normalized();
+            direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
+            Velocity = direction * Speed;
+            // _targetVelocity = _targetVelocity.Lerp(direction * Speed, 0.8f * (float)delta);
+            if (_jumped)
+            {
+                // _targetVelocity += _up * JumpSpeed;
+                Velocity += _up * JumpSpeed;
+                _jumped = false;
+            }
+
+            // Velocity = _targetVelocity;
+        }
+        else
+        {
+            Velocity = Vector3.Zero;
+        }
+        RotatePlayer((float)delta);
+        if (Planet is not null && !IsOnFloor())
+            Velocity += -_up * Gravity;
+    }
+
+    private void _HandleShipMovement(Vector3 direction, double delta)
+    {
+        if (direction != Vector3.Zero)
+        {
+            Velocity = direction * Speed;
+            if (_jumped)
+            {
+                // _targetVelocity += _up * JumpSpeed;
+                Velocity += _up * JumpSpeed;
+                _jumped = false;
+            }
+        }
+        else
+        {
+            Velocity = Vector3.Zero;
+        }
+        RotatePlayer((float)delta);
+        if (Ship is not null && !IsOnFloor())
+        {
+            Velocity += -_up * Gravity;
+        }
     }
 }

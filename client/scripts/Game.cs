@@ -1,9 +1,10 @@
+using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
-using Planets;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
+
+namespace Planets;
 
 public partial class Game : Node
 {
@@ -113,10 +114,10 @@ public partial class Game : Node
                                   .Instantiate() as Ship;
         ship.UpDirection = spawn.Normal;
         GetNode("/root/Main/Game/World").AddChild(ship);
-        ship.GlobalPosition = spawn.Node.GlobalPosition;
-        ship.Planet = _planetNode;
-        ship.Reparent(_planetNode);
-        ship.Scale = Vector3.One * 0.5f;
+        ship.GlobalPosition = new Vector3(25000, 0, 0);
+        ship.Planet = null;
+        // ship.Reparent(_planetNode);
+        //ship.Scale = Vector3.One * 0.1f;
     }
 
     public void OnPlanetLoaded(PlanetNode planet)

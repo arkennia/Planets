@@ -17,7 +17,7 @@ emission_energy_multiplier = 0.5
 
 [node name="Player" type="CharacterBody3D" unique_id=1200882408]
 transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
-collision_mask = 2
+collision_mask = 6
 motion_mode = 1
 script = ExtResource("1_72p8a")
 
@@ -48,3 +48,10 @@ light_energy = 0.3
 light_size = 1.0
 omni_range = 50.0
 omni_attenuation = 0.44400000000000084
+
+[node name="AreaDetector" type="Area3D" parent="." unique_id=830077061]
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AreaDetector" unique_id=834857816]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8163879, 0)
+shape = SubResource("CapsuleShape3D_4m5hh")

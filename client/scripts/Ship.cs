@@ -2,6 +2,8 @@ using Godot;
 using Planets.SystemGenerator;
 using System;
 
+namespace Planets;
+
 [GlobalClass]
 public partial class Ship : CharacterBody3D
 {
@@ -17,6 +19,10 @@ public partial class Ship : CharacterBody3D
 	public double ShipGravity { get; set; } = 9.8;
 	[Export]
 	public Node3D SpawnPoint { get; set; } = null;
+	[Export]
+	public Area3D ShipArea { get; set; } = null;
+
+	public Vector3 Up => _up;
 
 	private bool _hasPilot = false;
 
@@ -24,9 +30,13 @@ public partial class Ship : CharacterBody3D
 
 	private CollisionShape3D _floor;
 
+
+
 	public override void _Ready()
 	{
 		_floor = GetNode<CollisionShape3D>("%FloorCollider");
+		ShipArea = GetNode<Area3D>("%ShipArea");
+		_SetupShipArea();
 	}
 
 
@@ -99,5 +109,33 @@ public partial class Ship : CharacterBody3D
 
 		if (Input.IsActionPressed("MoveDown")) direction.Y -= 1.0f;
 		return direction.Normalized();
+	}
+
+	private void _SetupShipArea()
+	{
+		ShipArea.BodyEntered += body =>
+		{
+			if (body is Player p)
+			{
+				p.Ship = this;
+				// p.Gravity = ShipGravity;
+				// p.MotionMode = MotionModeEnum.Grounded;
+				// p.MovementLocation = Player.MovementLocationEnum.Ship;
+				GD.Print("Player entered ship area.");
+			}
+		};
+
+		ShipArea.BodyExited += body =>
+		{
+			if (body is Player p)
+			{
+				p.Ship = null;
+				// p.Planet = null;
+				// p.Gravity = 0.0;
+				// p.MotionMode = MotionModeEnum.Floating;
+				// p.MovementLocation = Player.MovementLocationEnum.Space;
+				GD.Print("Player exited ship area.");
+			}
+		};
 	}
 }
