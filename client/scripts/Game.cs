@@ -101,21 +101,22 @@ public partial class Game : Node
 
     private void _SetSpawnPoint()
     {
-        Terrain3D.SpawnPoint spawn = _planetNode.GetSpawnPoint();
-        GD.Print($"Spawn Local Position: {spawn.Node.Position}");
-        GD.Print($"Spawn Global Position:{spawn.Node.GlobalPosition}");
-        // spawn.mI.GlobalPosition = spawn.Node.GlobalPosition;
-        // Player.GlobalPosition = spawn;
-        Player.PlayerData.SpawnPlanet = _planetNode.Planet.Guid.ToString();
-        Player.PlayerData.SpawnPosition = spawn.Node.GlobalPosition;
-        Player.PlayerData.Up = spawn.Normal;
-        Player.Spawn();
+        // Terrain3D.SpawnPoint spawn = _planetNode.GetSpawnPoint();
+        // GD.Print($"Spawn Local Position: {spawn.Node.Position}");
+        // GD.Print($"Spawn Global Position:{spawn.Node.GlobalPosition}");
+        // Player.PlayerData.SpawnPlanet = _planetNode.Planet.Guid.ToString();
+        // Player.PlayerData.SpawnPosition = spawn.Node.GlobalPosition;
+        // Player.PlayerData.Up = spawn.Normal;
+        // Player.Spawn();
         Ship ship = ResourceLoader.Load<PackedScene>("res://scenes/ships/spaceship_prototype.tscn")
                                   .Instantiate() as Ship;
-        ship.UpDirection = spawn.Normal;
+        ship.UpDirection = Vector3.Up;
         GetNode("/root/Main/Game/World").AddChild(ship);
         ship.GlobalPosition = new Vector3(25000, 0, 0);
         ship.Planet = null;
+        Player.PlayerData.SpawnPosition = ship.SpawnPoint.GlobalPosition;
+        Player.PlayerData.Up = Vector3.Up;
+        Player.Spawn(ship);
         // ship.Reparent(_planetNode);
         //ship.Scale = Vector3.One * 0.1f;
     }

@@ -36,6 +36,7 @@ public partial class Ship : CharacterBody3D
 	{
 		_floor = GetNode<CollisionShape3D>("%FloorCollider");
 		ShipArea = GetNode<Area3D>("%ShipArea");
+		SpawnPoint = GetNode<Node3D>("%SpawnPoint");
 		_SetupShipArea();
 	}
 

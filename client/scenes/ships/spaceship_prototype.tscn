@@ -75,6 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 6.123233995736766e-17, -1, 0, 1, 6.123233995
 shape = SubResource("BoxShape3D_esq3j")
 
 [node name="SpawnPoint" type="Node3D" parent="." unique_id=472951737]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 297.7940817904952, 12.752500614207705, -136.08278834596106)
 
 [node name="ShipArea" type="Area3D" parent="." unique_id=1435010522]

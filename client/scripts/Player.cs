@@ -102,7 +102,7 @@ public partial class Player : CharacterBody3D
     /// <summary>
     /// Spawn the character.
     /// </summary>
-    public void Spawn(/* Terrain3D.SpawnPoint sp, PlanetNode planet */)
+    public void Spawn()
     {
         DisableMovement();
         GlobalPosition = PlayerData.SpawnPosition;
@@ -111,6 +111,18 @@ public partial class Player : CharacterBody3D
         MovementLocation = MovementLocationEnum.Planet;
         _ChangeMotionMode(p, PlayerData.Up);
         // float angle = GlobalPosition.AngleTo(_up);
+        ProcessMode = ProcessModeEnum.Pausable;
+        SetPhysicsProcess(true);
+    }
+
+    public void Spawn(Ship ship)
+    {
+        DisableMovement();
+        GlobalPosition = PlayerData.SpawnPosition;
+        _up = UpDirection = PlayerData.Up;
+        Ship = ship;
+        MovementLocation = MovementLocationEnum.Ship;
+        _ChangeMotionMode(ship, PlayerData.Up);
         ProcessMode = ProcessModeEnum.Pausable;
         SetPhysicsProcess(true);
     }
@@ -261,8 +273,16 @@ public partial class Player : CharacterBody3D
         {
             KinematicCollision3D collision = GetSlideCollision(i);
             Node collider = (Node)collision.GetCollider();
-            PlanetNode cParent = collider.GetOwnerOrNull<PlanetNode>();
-            _ChangeMotionMode(cParent, _up);
+            Node3D cParent = collider.GetOwnerOrNull<Node3D>();
+            if (cParent is PlanetNode)
+            {
+                _ChangeMotionMode(cParent as PlanetNode, _up);
+            }
+            else if (cParent is Ship)
+            {
+                _ChangeMotionMode(cParent as Ship, _up);
+            }
+
             // GD.Print("Collided with: " + collider.Name);
         }
     }
@@ -299,6 +319,28 @@ public partial class Player : CharacterBody3D
             GD.Print($"Current gravity: {node.PlanetArea.Gravity} {node.PlanetArea.GravityDirection}");
             Reparent(Planet);
             // ApplyFloorSnap();
+        }
+        else if (MotionMode == MotionModeEnum.Grounded /*&& node is not null*/ && _isInAir)
+        {
+            _isInAir = false;
+            GD.Print($"Is in air: {_isInAir}");
+        }
+    }
+
+    private void _ChangeMotionMode(Ship ship, Vector3 up)
+    {
+        if (ship is not null && MotionMode == MotionModeEnum.Floating)
+        {
+            MotionMode = MotionModeEnum.Grounded;
+            Velocity = Vector3.Zero;
+            _up = up;
+            Ship = ship;
+            _camera.Basis = Basis.Identity;
+            GD.Print("Motion mode changed to grounded (ship).");
+            GD.Print($"Currently on ship {Ship.Name}.");
+            Gravity = Ship.ShipGravity;
+            GD.Print($"Ship Gravity Value: {Ship.ShipGravity}");
+            Reparent(Ship);
         }
         else if (MotionMode == MotionModeEnum.Grounded /*&& node is not null*/ && _isInAir)
         {
@@ -417,10 +459,12 @@ public partial class Player : CharacterBody3D
     {
         if (direction != Vector3.Zero)
         {
+            Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+            Vector3 newX = newZ.Cross(_up).Normalized();
+            direction = (newX * direction.X + _up * direction.Y + -newZ * direction.Z).Normalized();
             Velocity = direction * Speed;
             if (_jumped)
             {
-                // _targetVelocity += _up * JumpSpeed;
                 Velocity += _up * JumpSpeed;
                 _jumped = false;
             }
