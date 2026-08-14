@@ -2,7 +2,7 @@ using Godot;
 using Planets.SystemGenerator;
 using System;
 
-namespace Planets;
+namespace Planets.Ship;
 
 [GlobalClass]
 public partial class Ship : CharacterBody3D

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://knfgbfy5ehec"]
 
-[ext_resource type="Script" uid="uid://duamdc2mlq1pn" path="res://scripts/Ship.cs" id="1_cq2cj"]
+[ext_resource type="Script" uid="uid://duamdc2mlq1pn" path="res://scripts/ship/Ship.cs" id="1_cq2cj"]
 [ext_resource type="ArrayMesh" uid="uid://c71byj5v0c2a7" path="res://meshes/Blender/spaceship.res" id="1_esq3j"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cq2cj"]
@@ -46,11 +46,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.281273194807376, 7.5397144
 mesh = SubResource("BoxMesh_2oxxn")
 
 [node name="WindowCollider" type="CollisionShape3D" parent="." unique_id=1827847532]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2124459376322464, 104.89396297696335, -147.7448410220608)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2124459376322464, 104.89396297696337, -147.7448410220608)
 shape = SubResource("BoxShape3D_2oxxn")
 
 [node name="LeftDoorCollider" type="CollisionShape3D" parent="." unique_id=1056851999]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 595.4110672586163, 104.69999999999709, -23.502695039247673)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 595.4110672586163, 104.69999999999708, -23.502695039247673)
 shape = SubResource("BoxShape3D_3uvgd")
 
 [node name="RightDoorCollider" type="CollisionShape3D" parent="." unique_id=1422346764]
@@ -59,11 +59,11 @@ shape = SubResource("BoxShape3D_3uvgd")
 
 [node name="FloorCollider" type="CollisionShape3D" parent="." unique_id=984784240]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 298.00429015170204, 1.353000000002794, -145.93336230865143)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 298.00429015170204, 1.353000000002794, -145.93336230865145)
 shape = SubResource("BoxShape3D_vm0mt")
 
 [node name="RoofCollider" type="CollisionShape3D" parent="." unique_id=1019521803]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 297.6235661433321, 207.79042678757074, -148.10216378671726)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 297.6235661433321, 207.7904267875707, -148.10216378671726)
 shape = SubResource("BoxShape3D_vm0mt")
 
 [node name="RightWallCollider" type="CollisionShape3D" parent="." unique_id=1948928421]
