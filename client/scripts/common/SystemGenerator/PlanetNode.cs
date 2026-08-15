@@ -2,6 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Godot;
 using Godot.Collections;
+using Planets.Ships;
 using Planets.SystemGenerator.Terrain;
 
 namespace Planets.SystemGenerator;

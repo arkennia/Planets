@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using Google.Protobuf;
+using Planets.Ships;
 using Planets.SystemGenerator;
 using Planets.SystemGenerator.Terrain;
 using Planets.UI;
@@ -148,6 +149,7 @@ public partial class Player : CharacterBody3D
         }
 
         if (!_movementDisabled)
+        {
             if (@event is InputEventMouseMotion motionEvent)
             {
                 Vector2 mouseMovement = motionEvent.ScreenRelative;
@@ -165,10 +167,14 @@ public partial class Player : CharacterBody3D
                     _camera.Rotate(Vector3.Right, _rotation.Y);
                 }
             }
+        }
     }
 
     public override void _PhysicsProcess(double delta)
     {
+        if (isInteracting())
+            Interaction();
+
         Vector3 direction = GetDirection();
         MovementLocation = _DetectMovementAreas();
         Gravity = _GetGravity(MovementLocation);
@@ -478,5 +484,24 @@ public partial class Player : CharacterBody3D
         {
             Velocity += -_up * Gravity;
         }
+    }
+
+    private void Interaction()
+    {
+        Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
+        Vector3 newX = newZ.Cross(_up).Normalized();
+        Vector3 dest = newX;
+        PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(GlobalPosition, dest);
+        query.Exclude = [GetRid()];
+        query.CollisionMask = 0b1000;
+        query.HitFromInside = true;
+        Dictionary result = spaceState.IntersectRay(query);
+        GD.Print($"Interactable objects detected: {result}");
+    }
+
+    private bool isInteracting()
+    {
+        return Input.IsActionJustPressed("Interact");
     }
 }

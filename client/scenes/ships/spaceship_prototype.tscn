@@ -1,18 +1,13 @@
 [gd_scene format=3 uid="uid://knfgbfy5ehec"]
 
-[ext_resource type="Script" uid="uid://duamdc2mlq1pn" path="res://scripts/ship/Ship.cs" id="1_cq2cj"]
+[ext_resource type="Script" uid="uid://duamdc2mlq1pn" path="res://scripts/ships/Ship.cs" id="1_cq2cj"]
 [ext_resource type="ArrayMesh" uid="uid://c71byj5v0c2a7" path="res://meshes/Blender/spaceship.res" id="1_esq3j"]
+[ext_resource type="Script" uid="uid://cwo6ycy3bo4ii" path="res://scripts/ships/CaptainsChair.cs" id="3_c64rd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cq2cj"]
 emission_enabled = true
 emission = Color(1, 1, 1, 1)
 emission_energy_multiplier = 0.1
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3uvgd"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_2oxxn"]
-material = SubResource("StandardMaterial3D_3uvgd")
-size = Vector3(20, 10, 20)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2oxxn"]
 size = Vector3(5, 210.94676211322712, 301.41427865382684)
@@ -29,21 +24,25 @@ size = Vector3(603.2243752273225, 5, 212.50742893571987)
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_cq2cj"]
 points = PackedVector3Array(-2.5, 0, -297.5, -2.5, 0, 2.5, -2.5, 210, -297.5, 597.5, 0, -297.5, -2.5, 210, 2.5, 597.5, 0, 2.5, 597.5, 210, -297.5, 597.5, 210, 2.5)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3uvgd"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_2oxxn"]
+material = SubResource("StandardMaterial3D_3uvgd")
+size = Vector3(20, 10, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c64rd"]
+size = Vector3(20, 10, 20)
+
 [node name="SpaceshipPrototype" type="CharacterBody3D" unique_id=1332691782 node_paths=PackedStringArray("SpawnPoint")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 collision_layer = 4
 script = ExtResource("1_cq2cj")
 SpawnPoint = NodePath("SpawnPoint")
-metadata/_custom_type_script = "uid://duamdc2mlq1pn"
 
 [node name="ShipMesh" type="MeshInstance3D" parent="." unique_id=607281317]
 gi_mode = 2
 mesh = ExtResource("1_esq3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_cq2cj")
-
-[node name="PilotsChair" type="MeshInstance3D" parent="." unique_id=2019775132]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.281273194807376, 7.539714431303279, -151.20780228004665)
-mesh = SubResource("BoxMesh_2oxxn")
 
 [node name="WindowCollider" type="CollisionShape3D" parent="." unique_id=1827847532]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2124459376322464, 104.89396297696337, -147.7448410220608)
@@ -80,6 +79,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 297.7940817904952, 12.7525006
 
 [node name="ShipArea" type="Area3D" parent="." unique_id=1435010522]
 unique_name_in_owner = true
+collision_layer = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ShipArea" unique_id=842755585]
 shape = SubResource("ConvexPolygonShape3D_cq2cj")
+
+[node name="PilotsChair" type="StaticBody3D" parent="." unique_id=2048461506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.281273194807376, 7.43356421105767, -151.20780228004665)
+collision_layer = 8
+collision_mask = 0
+
+[node name="PilotsChair" type="MeshInstance3D" parent="PilotsChair" unique_id=2019775132]
+mesh = SubResource("BoxMesh_2oxxn")
+skeleton = NodePath("../..")
+script = ExtResource("3_c64rd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PilotsChair" unique_id=1769077944]
+shape = SubResource("BoxShape3D_c64rd")
