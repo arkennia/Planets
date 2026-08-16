@@ -4,7 +4,7 @@ using Planets;
 /// <summary>
 /// The captain's chair in the ship. Used to pilot the ship.
 /// </summary>
-public partial class CaptainsChair : MeshInstance3D, IInteractable
+public partial class CaptainsChair : Node, IInteractable
 {
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()

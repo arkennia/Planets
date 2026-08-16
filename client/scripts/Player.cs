@@ -33,6 +33,9 @@ public partial class Player : CharacterBody3D
     [Export]
     public double MouseSensitivty { get; set; } = 0.005f;
 
+    [Export]
+    public double InteractDistance { get; set; } = 5.0;
+
     public Guid Uuid { get; set; }
     public double Gravity { get; set; }
     public PlanetNode Planet { get; set; }
@@ -489,15 +492,19 @@ public partial class Player : CharacterBody3D
     private void Interaction()
     {
         Vector3 newZ = -_camera.GlobalBasis.Z.Slide(_up).Normalized();
-        Vector3 newX = newZ.Cross(_up).Normalized();
-        Vector3 dest = newX;
+        Vector3 dest = newZ * InteractDistance;
         PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
-        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(GlobalPosition, dest);
+        PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(GlobalPosition, GlobalPosition + dest);
         query.Exclude = [GetRid()];
         query.CollisionMask = 0b1000;
         query.HitFromInside = true;
         Dictionary result = spaceState.IntersectRay(query);
         GD.Print($"Interactable objects detected: {result}");
+        Node collider = (Node)result["collider"];
+        if (collider.GetParent() is IInteractable interactable)
+        {
+            interactable.Interact();
+        }
     }
 
     private bool isInteracting()
